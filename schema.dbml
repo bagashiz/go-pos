@@ -1,0 +1,112 @@
+Project "Go POS" {
+  database_type: 'PostgreSQL'
+  Note: '''
+    # Point of Sale System
+  '''
+}
+
+Enum "users_role_enum" {
+  "admin"
+  "cashier"
+}
+
+Table "payments" {
+  "id" bigserial [pk, increment]
+  "name" varchar [not null]
+  "type" varchar [not null]
+  "logo" varchar
+  "created_at" timestamptz [not null, default: `now()`]
+  "updated_at" timestamptz [not null, default: `now()`]
+
+Indexes {
+  name [unique, name: "payment_name"]
+}
+}
+
+Table "users" {
+  "id" bigserial [pk, increment]
+  "name" varchar [not null]
+  "email" varchar [not null]
+  "password" varchar [not null]
+  "role" users_role_enum [default: "cashier"]
+  "created_at" timestamptz [not null, default: `now()`]
+  "updated_at" timestamptz [not null, default: `now()`]
+
+Indexes {
+  email [unique, name: "email"]
+}
+}
+
+Table "orders" {
+  "id" bigserial [pk, increment]
+  "user_id" bigint [not null]
+  "payment_id" bigint [not null]
+  "customer_name" varchar [not null]
+  "total_price" decimal(18,2) [not null]
+  "total_paid" decimal(18,2) [not null]
+  "total_return" decimal(18,2) [not null]
+  "receipt_code"  uuid      [not null, default: `gen_random_uuid()`]
+  "created_at" timestamptz [not null, default: `now()`]
+  "updated_at" timestamptz [not null, default: `now()`]
+
+Indexes {
+  customer_name [name: "orders_customer_name"]
+  payment_id [name: "orders_payment_id"]
+  user_id [name: "orders_user_id"]
+  receipt_code [unique, name: "receipt_code"]
+}
+}
+
+Table "categories" {
+  "id" bigserial [pk, increment]
+  "updated_at" timestamptz [not null, default: `now()`]
+  "created_at" timestamptz [not null, default: `now()`]
+  "name" varchar [not null]
+
+Indexes {
+  name [unique, name: "category_name"]
+}
+}
+
+Table "products" {
+  "id" bigserial [pk, increment]
+  "category_id" bigint [not null]
+  "sku" varchar [not null]
+  "name" varchar [not null]
+  "stock" bigint [not null]
+  "price" decimal(18,2) [not null]
+  "image" varchar
+  "created_at" timestamptz [not null, default: `now()`]
+  "updated_at" timestamptz [not null, default: `now()`]
+  
+Indexes {
+  category_id [name: "products_category_id"]
+  name [name: "products_name"]
+  sku [unique, name: "sku"]
+}
+}
+
+Table "order_products" {
+  "id" bigserial [pk, increment]
+  "order_id" bigint [not null]
+  "product_id" bigint [not null]
+  "quantity" bigint [not null]
+  "total_price" decimal(18,2) [not null]
+  "created_at" timestamptz [not null, default: `now()`]
+  "updated_at" timestamptz [not null, default: `now()`]
+
+Indexes {
+  order_id [name: "order_product_order_id"]
+  product_id [name: "order_product_product_id"]
+}
+}
+
+Ref "fk_payments_orders":"payments"."id" < "orders"."payment_id" [update: no action, delete: no action]
+
+Ref "fk_users_orders":"users"."id" < "orders"."user_id" [update: no action, delete: no action]
+
+Ref "fk_categories_products":"categories"."id" < "products"."category_id" [update: no action, delete: no action]
+
+Ref "fk_orders_order_products":"orders"."id" < "order_products"."order_id" [update: no action, delete: no action]
+
+Ref "fk_products_order_products":"products"."id" < "order_products"."product_id" [update: no action, delete: no action]

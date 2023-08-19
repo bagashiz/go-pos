@@ -1,0 +1,60 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  DBML_FILE: "./schema.dbml"
+
+dotenv:
+  - ".env"
+
+tasks:
+  default:
+    desc: "Gettings started"
+    cmds:
+      - task: install
+      - task: db:start
+      - task: dev
+
+  db:docs:
+    desc: "Generate database documentation from DBML file"
+    cmd: dbdocs build {{.DBML_FILE}}
+    requires:
+      vars:
+        - DBML_FILE
+
+  db:start:
+    desc: "Start database container"
+    cmd: podman-compose up -d
+
+  db:stop:
+    desc: "Stop database container"
+    cmd: podman-compose down
+
+  dev:
+    desc: "Start development server"
+    cmd: air
+
+  build:
+    desc: "Build binary"
+    cmd: go build -o ./bin/{{.APP_NAME}} ./cmd/http/main.go
+
+  start:
+    desc: "Start binary"
+    cmd: ./bin/{{.APP_NAME}}
+
+  # docs:
+  #   desc: "Generate swagger documentation"
+  #   cmds:
+  #     - swag fmt
+  #     - swag init --dir ./cmd/http
+
+  # test:
+  #   desc: "Run tests"
+  #   cmd: ginkgo -v -r --cover --race --keep-going --timeout=30s
+
+  install:
+    desc: "Install dependencies"
+    cmds:
+      - go install github.com/go-task/task/v3/cmd/task@latest
+      - go install github.com/cosmtrek/air@latest

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres_gopos:
+    image: postgres:15.4-alpine3.18
+    container_name: postgres_gopos
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    volumes:
+      - data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+
+volumes:
+  data:
