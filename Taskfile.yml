@@ -4,6 +4,7 @@ version: "3"
 
 vars:
   DBML_FILE: "./schema.dbml"
+  DSN: "{{.DB_CONNECTION}}://{{.DB_USERNAME}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_DATABASE}}?sslmode=disable"
 
 dotenv:
   - ".env"
@@ -13,7 +14,9 @@ tasks:
     desc: "Gettings started"
     cmds:
       - task: install
-      - task: db:start
+      - task: db:up
+      - task: db:create
+      - task: migrate:up
       - task: dev
 
   db:docs:
@@ -23,13 +26,47 @@ tasks:
       vars:
         - DBML_FILE
 
-  db:start:
+  db:up:
     desc: "Start database container"
     cmd: podman-compose up -d
 
-  db:stop:
+  db:create:
+    desc: "Create database schema"
+    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'CREATE DATABASE {{.DB_DATABASE}};'"
+    requires:
+      vars:
+        - DB_USERNAME
+        - DB_DATABASE
+
+  migrate:up:
+    desc: "Run database migrations"
+    cmd: migrate -path ./db/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
+    requires:
+      vars:
+        - DSN
+
+  migrate:down:
+    desc: "Rollback database migrations"
+    cmd: migrate -path ./db/migrations -database {{.DSN}} -verbose down {{.CLI_ARGS}}
+    requires:
+      vars:
+        - DSN
+
+  db:drop:
+    desc: "Drop database schema"
+    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'DROP DATABASE {{.DB_DATABASE}};'"
+    requires:
+      vars:
+        - DB_USERNAME
+        - DB_DATABASE
+
+  db:down:
     desc: "Stop database container"
     cmd: podman-compose down
+
+  sqlc:
+    desc: "Generate SQL code"
+    cmd: sqlc generate
 
   dev:
     desc: "Start development server"
@@ -38,10 +75,16 @@ tasks:
   build:
     desc: "Build binary"
     cmd: go build -o ./bin/{{.APP_NAME}} ./cmd/http/main.go
+    requires:
+      vars:
+        - APP_NAME
 
   start:
     desc: "Start binary"
     cmd: ./bin/{{.APP_NAME}}
+    requires:
+      vars:
+        - APP_NAME
 
   # docs:
   #   desc: "Generate swagger documentation"
@@ -58,3 +101,5 @@ tasks:
     cmds:
       - go install github.com/go-task/task/v3/cmd/task@latest
       - go install github.com/cosmtrek/air@latest
+      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+      - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
