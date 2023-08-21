@@ -1,7 +1,7 @@
 CREATE TABLE "products" (
     "id" BIGSERIAL PRIMARY KEY,
     "category_id" bigint NOT NULL,
-    "sku" varchar NOT NULL,
+    "sku" uuid NOT NULL DEFAULT (gen_random_uuid()),
     "name" varchar NOT NULL,
     "stock" bigint NOT NULL,
     "price" decimal(18, 2) NOT NULL,

@@ -71,7 +71,7 @@ Indexes {
 Table "products" {
   "id" bigserial [pk, increment]
   "category_id" bigint [not null]
-  "sku" varchar [not null]
+  "sku" uuid [not null, default: `gen_random_uuid()`]
   "name" varchar [not null]
   "stock" bigint [not null]
   "price" decimal(18,2) [not null]
