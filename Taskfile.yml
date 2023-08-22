@@ -40,14 +40,14 @@ tasks:
 
   migrate:up:
     desc: "Run database migrations"
-    cmd: migrate -path ./internal/adapter/db/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
+    cmd: migrate -path ./internal/adapter/postgres/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
     requires:
       vars:
         - DSN
 
   migrate:down:
     desc: "Rollback database migrations"
-    cmd: migrate -path ./internal/adapter/db/migrations -database {{.DSN}} -verbose down {{.CLI_ARGS}}
+    cmd: migrate -path ./internal/adapter/postgres/migrations -database {{.DSN}} -verbose down {{.CLI_ARGS}}
     requires:
       vars:
         - DSN
@@ -63,10 +63,6 @@ tasks:
   db:down:
     desc: "Stop database container"
     cmd: podman-compose down
-
-  sqlc:
-    desc: "Generate SQL code"
-    cmd: sqlc generate
 
   dev:
     desc: "Start development server"
@@ -101,5 +97,4 @@ tasks:
     cmds:
       - go install github.com/go-task/task/v3/cmd/task@latest
       - go install github.com/cosmtrek/air@latest
-      - go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
       - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest

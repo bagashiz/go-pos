@@ -5,7 +5,5 @@ run:
   skip-dirs-use-default: true
   skip-dirs:
     - "opt"
-  skip-files:
-    - "db.go"
   allow-parallel-runners: false
   go: "1.21"
