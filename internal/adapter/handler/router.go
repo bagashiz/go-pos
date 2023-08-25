@@ -58,11 +58,6 @@ func (r *Router) InitRoutes(userHandler UserHandler) {
 	}
 }
 
-// Start starts the HTTP server
-func (r *Router) Start(listenAddr string) {
-	r.Run(listenAddr)
-}
-
 // customLogger is a custom Gin logger
 func customLogger(param gin.LogFormatterParams) string {
 	return fmt.Sprintf("[%s] - %s \"%s %s %s %d %s [%s]\"\n",

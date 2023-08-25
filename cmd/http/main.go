@@ -42,9 +42,10 @@ func main() {
 	port := os.Getenv("APP_PORT")
 	listenAddr := url + ":" + port
 
-	slog.Info("Starting the application", "app", appName, "env", env)
+	slog.Info("Starting the application...", "app", appName, "env", env)
 
 	// Init database
+	slog.Info("Connecting to the database...")
 	db, err := postgres.NewDB()
 	if err != nil {
 		slog.Error("Error connecting to database", "error", err)
@@ -66,5 +67,9 @@ func main() {
 
 	// Start server
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
-	router.Start(listenAddr)
+	err = router.Run(listenAddr)
+	if err != nil {
+		slog.Error("Error starting the HTTP server", "error", err)
+		os.Exit(1)
+	}
 }
