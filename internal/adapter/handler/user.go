@@ -144,9 +144,9 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 
 // updateUserRequest represents the request body for updating a user
 type updateUserRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
+	Name     string `json:"name" binding:"omitempty,required"`
+	Email    string `json:"email" binding:"omitempty,required,email"`
+	Password string `json:"password" binding:"omitempty,required,min=8"`
 }
 
 // UpdateUser updates a user's name, email, and password
@@ -175,6 +175,11 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 	if err != nil {
 		if err.Error() == "user not found" {
 			errorResponse(ctx, http.StatusNotFound, err)
+			return
+		}
+
+		if err.Error() == "no data to update" {
+			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
 

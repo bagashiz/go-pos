@@ -73,6 +73,11 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 		return nil, err
 	}
 
+	emptyData := user.Name == "" && user.Email == "" && user.Password == ""
+	if emptyData {
+		return nil, errors.New("no data to update")
+	}
+
 	var hashedPassword string
 
 	if user.Password != "" {
