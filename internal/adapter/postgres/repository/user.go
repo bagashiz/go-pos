@@ -172,10 +172,14 @@ func (ur *UserRepository) ListUsers(ctx context.Context, pageId, pageSize uint64
 
 // UpdateUser updates a user by ID in the database
 func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+	name := nullString(user.Name)
+	email := nullString(user.Email)
+	password := nullString(user.Password)
+
 	query := psql.Update("users").
-		Set("name", user.Name).
-		Set("email", user.Email).
-		Set("password", user.Password).
+		Set("name", sq.Expr("COALESCE(?, name)", name)).
+		Set("email", sq.Expr("COALESCE(?, email)", email)).
+		Set("password", sq.Expr("COALESCE(?, password)", password)).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": user.ID}).
 		Suffix("RETURNING *").

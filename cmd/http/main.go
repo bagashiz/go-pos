@@ -48,12 +48,18 @@ func main() {
 	slog.Info("Connecting to the database...")
 	db, err := postgres.NewDB()
 	if err != nil {
-		slog.Error("Error connecting to database", "error", err)
+		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	slog.Info("Successfully connected to the database")
+	err = db.Ping()
+	if err != nil {
+		slog.Error("Error connecting database", "error", err)
+		os.Exit(1)
+	} else {
+		slog.Info("Successfully connected to the database")
+	}
 
 	// Dependency injection
 	// User
