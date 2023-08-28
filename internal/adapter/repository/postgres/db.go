@@ -1,10 +1,11 @@
-package postgres
+package repository
 
 import (
 	"database/sql"
 	"fmt"
 	"os"
 
+	sq "github.com/Masterminds/squirrel"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -31,4 +32,22 @@ func NewDB() (*DB, error) {
 	return &DB{
 		db,
 	}, nil
+}
+
+/**
+ * psql holds a reference to squirrel.StatementBuilderType
+ * which is used to build SQL queries that compatible with PostgreSQL syntax
+ */
+var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
+// nullString converts a string to sql.NullString for empty string check
+func nullString(value string) sql.NullString {
+	if value == "" {
+		return sql.NullString{}
+	}
+
+	return sql.NullString{
+		String: value,
+		Valid:  true,
+	}
 }

@@ -7,16 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/bagashiz/go-pos/internal/adapter/postgres"
 	"github.com/bagashiz/go-pos/internal/core/domain"
-)
-
-var (
-	/**
-	 * psql holds a reference to squirrel.StatementBuilderType
-	 * which is used to build SQL queries that compatible with PostgreSQL syntax
-	 */
-	psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 )
 
 /**
@@ -24,11 +15,11 @@ var (
  * and provides an access to the postgres database
  */
 type UserRepository struct {
-	db *postgres.DB
+	db *DB
 }
 
 // NewUserRepository creates a new user repository instance
-func NewUserRepository(db *postgres.DB) *UserRepository {
+func NewUserRepository(db *DB) *UserRepository {
 	return &UserRepository{
 		db: db,
 	}
@@ -132,12 +123,12 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*do
 }
 
 // ListUsers lists all users from the database
-func (ur *UserRepository) ListUsers(ctx context.Context, pageId, pageSize uint64) ([]*domain.User, error) {
+func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
 	query := psql.Select("*").
 		From("users").
 		OrderBy("id").
-		Limit(pageSize).
-		Offset((pageId - 1) * pageSize).
+		Limit(limit).
+		Offset((skip - 1) * limit).
 		RunWith(ur.db)
 
 	var users []*domain.User

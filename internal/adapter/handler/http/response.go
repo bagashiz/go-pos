@@ -4,6 +4,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// meta represents metadata for a paginated response
+type meta struct {
+	Total uint64 `json:"total"`
+	Limit uint64 `json:"limit"`
+	Skip  uint64 `json:"skip"`
+}
+
+// newMeta is a helper function to create metadata for a paginated response
+func newMeta(total, limit, skip uint64) meta {
+	return meta{
+		Total: total,
+		Limit: limit,
+		Skip:  skip,
+	}
+}
+
 // errorResponse returns a JSON response with the error message and status code
 func errorResponse(ctx *gin.Context, statusCode int, err error) {
 	ctx.JSON(statusCode, gin.H{
@@ -25,21 +41,5 @@ func successResponse(ctx *gin.Context, statusCode int, data any) {
 			"message": "Success",
 			"data":    data,
 		})
-	}
-}
-
-// meta represents metadata for a paginated response
-type meta struct {
-	Total uint64 `json:"total"`
-	Limit uint64 `json:"limit"`
-	Skip  uint64 `json:"skip"`
-}
-
-// newMeta is a helper function to create metadata for a paginated response
-func newMeta(total, limit, skip uint64) meta {
-	return meta{
-		Total: total,
-		Limit: limit,
-		Skip:  skip,
 	}
 }

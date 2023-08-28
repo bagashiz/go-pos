@@ -62,8 +62,8 @@ func (us *UserService) GetUser(ctx context.Context, id uint64) (*domain.User, er
 }
 
 // ListUsers lists all users
-func (us *UserService) ListUsers(ctx context.Context, pageId, pageSize uint64) ([]*domain.User, error) {
-	return us.repo.ListUsers(ctx, pageId, pageSize)
+func (us *UserService) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
+	return us.repo.ListUsers(ctx, skip, limit)
 }
 
 // UpdateUser updates a user's name, email, and password
