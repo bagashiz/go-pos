@@ -44,7 +44,10 @@ func NewRouter() *Router {
 }
 
 // InitRoutes configures the handler for each route
-func (r *Router) InitRoutes(userHandler UserHandler) {
+func (r *Router) InitRoutes(
+	userHandler UserHandler,
+	paymentHandler PaymentHandler,
+) {
 	v1 := r.Group("/v1")
 	{
 		user := v1.Group("/users")
@@ -54,6 +57,14 @@ func (r *Router) InitRoutes(userHandler UserHandler) {
 			user.GET("/:id", userHandler.GetUser)
 			user.PUT("/:id", userHandler.UpdateUser)
 			user.DELETE("/:id", userHandler.DeleteUser)
+		}
+		payment := v1.Group("/payments")
+		{
+			payment.POST("/", paymentHandler.CreatePayment)
+			payment.GET("/", paymentHandler.ListPayments)
+			payment.GET("/:id", paymentHandler.GetPayment)
+			payment.PUT("/:id", paymentHandler.UpdatePayment)
+			payment.DELETE("/:id", paymentHandler.DeletePayment)
 		}
 	}
 }
