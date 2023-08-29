@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
@@ -104,11 +103,9 @@ func (uh *UserHandler) ListUsers(ctx *gin.Context) {
 		usersList = append(usersList, newUserResponse(user))
 	}
 
-	meta := newMeta(uint64(len(usersList)), req.Limit, req.Skip)
-
-	rsp := make(map[string]any)
-	rsp["meta"] = meta
-	rsp["users"] = usersList
+	total := uint64(len(usersList))
+	meta := newMeta(total, req.Limit, req.Skip)
+	rsp := toMap(meta, usersList, "users")
 
 	successResponse(ctx, http.StatusOK, rsp)
 }
@@ -158,7 +155,7 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	id, err := convertStringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return

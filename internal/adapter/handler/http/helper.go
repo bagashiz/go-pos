@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +19,21 @@ func newMeta(total, limit, skip uint64) meta {
 		Total: total,
 		Limit: limit,
 		Skip:  skip,
+	}
+}
+
+// convertStringToUint64 is a helper function to convert a string to uint64
+func convertStringToUint64(str string) (uint64, error) {
+	num, err := strconv.ParseUint(str, 10, 64)
+
+	return num, err
+}
+
+// toMap is a helper function to add meta and data to a map
+func toMap(m meta, data any, key string) map[string]any {
+	return map[string]any{
+		"meta": m,
+		key:    data,
 	}
 }
 

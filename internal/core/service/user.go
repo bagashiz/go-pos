@@ -53,12 +53,7 @@ func (us *UserService) Login(ctx context.Context, email, password string) (*doma
 
 // GetUser gets a user by ID
 func (us *UserService) GetUser(ctx context.Context, id uint64) (*domain.User, error) {
-	user, err := us.repo.GetUserByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	return us.repo.GetUserByID(ctx, id)
 }
 
 // ListUsers lists all users
