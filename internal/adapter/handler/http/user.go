@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
@@ -10,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserHandler represents the HTTP handler for user-related operations
+// UserHandler represents the HTTP handler for user-related requests
 type UserHandler struct {
 	svc port.UserService
 }
@@ -81,8 +80,8 @@ func (uh *UserHandler) Register(ctx *gin.Context) {
 
 // listUsersRequest represents the request body for listing users
 type listUsersRequest struct {
-	PageID   uint64 `form:"page_id" binding:"required,min=1"`
-	PageSize uint64 `form:"page_size" binding:"required,min=5"`
+	Skip  uint64 `form:"skip" binding:"required,min=0"`
+	Limit uint64 `form:"limit" binding:"required,min=5"`
 }
 
 // ListUsers lists all users with pagination
@@ -93,22 +92,20 @@ func (uh *UserHandler) ListUsers(ctx *gin.Context) {
 		return
 	}
 
-	users, err := uh.svc.ListUsers(ctx, req.PageID, req.PageSize)
+	users, err := uh.svc.ListUsers(ctx, req.Skip, req.Limit)
 	if err != nil {
 		errorResponse(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
-	data := make([]userResponse, 0)
+	usersList := make([]userResponse, 0)
 	for _, user := range users {
-		data = append(data, newUserResponse(user))
+		usersList = append(usersList, newUserResponse(user))
 	}
 
-	meta := newMeta(uint64(len(data)), req.PageSize, req.PageID)
-
-	rsp := make(map[string]any)
-	rsp["meta"] = meta
-	rsp["users"] = data
+	total := uint64(len(usersList))
+	meta := newMeta(total, req.Limit, req.Skip)
+	rsp := toMap(meta, usersList, "users")
 
 	successResponse(ctx, http.StatusOK, rsp)
 }
@@ -158,7 +155,7 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	id, err := convertStringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return

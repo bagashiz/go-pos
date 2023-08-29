@@ -4,9 +4,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/bagashiz/go-pos/internal/adapter/handler"
-	"github.com/bagashiz/go-pos/internal/adapter/postgres"
-	"github.com/bagashiz/go-pos/internal/adapter/postgres/repository"
+	handler "github.com/bagashiz/go-pos/internal/adapter/handler/http"
+	repo "github.com/bagashiz/go-pos/internal/adapter/repository/postgres"
 	"github.com/bagashiz/go-pos/internal/core/service"
 	"github.com/joho/godotenv"
 )
@@ -46,7 +45,7 @@ func main() {
 
 	// Init database
 	slog.Info("Connecting to the database...")
-	db, err := postgres.NewDB()
+	db, err := repo.NewDB()
 	if err != nil {
 		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
@@ -63,13 +62,18 @@ func main() {
 
 	// Dependency injection
 	// User
-	userRepo := repository.NewUserRepository(db)
+	userRepo := repo.NewUserRepository(db)
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 
+	// Payment
+	paymentRepo := repo.NewPaymentRepository(db)
+	paymentService := service.NewPaymentService(paymentRepo)
+	paymentHandler := handler.NewPaymentHandler(paymentService)
+
 	// Init router
 	router := handler.NewRouter()
-	router.InitRoutes(*userHandler)
+	router.InitRoutes(*userHandler, *paymentHandler)
 
 	// Start server
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
