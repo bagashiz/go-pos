@@ -71,9 +71,14 @@ func main() {
 	paymentService := service.NewPaymentService(paymentRepo)
 	paymentHandler := handler.NewPaymentHandler(paymentService)
 
+	// Category
+	categoryRepo := repo.NewCategoryRepository(db)
+	categoryService := service.NewCategoryService(categoryRepo)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+
 	// Init router
 	router := handler.NewRouter()
-	router.InitRoutes(*userHandler, *paymentHandler)
+	router.InitRoutes(*userHandler, *paymentHandler, *categoryHandler)
 
 	// Start server
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)

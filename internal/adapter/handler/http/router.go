@@ -23,8 +23,8 @@ func NewRouter() *Router {
 	if env == "production" {
 		gin.SetMode(gin.ReleaseMode)
 
-		f, _ := os.Create("gin.log")
-		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+		logFile, _ := os.Create("gin.log")
+		gin.DefaultWriter = io.Writer(logFile)
 	}
 
 	router := gin.New()
@@ -47,6 +47,7 @@ func NewRouter() *Router {
 func (r *Router) InitRoutes(
 	userHandler UserHandler,
 	paymentHandler PaymentHandler,
+	categoryHandler CategoryHandler,
 ) {
 	v1 := r.Group("/v1")
 	{
@@ -65,6 +66,14 @@ func (r *Router) InitRoutes(
 			payment.GET("/:id", paymentHandler.GetPayment)
 			payment.PUT("/:id", paymentHandler.UpdatePayment)
 			payment.DELETE("/:id", paymentHandler.DeletePayment)
+		}
+		category := v1.Group("/categories")
+		{
+			category.POST("/", categoryHandler.CreateCategory)
+			category.GET("/", categoryHandler.ListCategories)
+			category.GET("/:id", categoryHandler.GetCategory)
+			category.PUT("/:id", categoryHandler.UpdateCategory)
+			category.DELETE("/:id", categoryHandler.DeleteCategory)
 		}
 	}
 }
