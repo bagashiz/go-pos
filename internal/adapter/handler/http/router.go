@@ -23,8 +23,8 @@ func NewRouter() *Router {
 	if env == "production" {
 		gin.SetMode(gin.ReleaseMode)
 
-		f, _ := os.Create("gin.log")
-		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+		logFile, _ := os.Create("gin.log")
+		gin.DefaultWriter = io.Writer(logFile)
 	}
 
 	router := gin.New()

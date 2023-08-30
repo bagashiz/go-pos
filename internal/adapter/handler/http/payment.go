@@ -40,9 +40,9 @@ func newPaymentResponse(payment *domain.Payment) paymentResponse {
 
 // createPaymentRequest represents a request body for creating a new payment
 type createPaymentRequest struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Logo string `json:"logo"`
+	Name string `json:"name" binding:"required"`
+	Type string `json:"type" binding:"required"`
+	Logo string `json:"logo" binding:"omitempty,required"`
 }
 
 // CreatePayment creates a new payment
