@@ -21,7 +21,7 @@ type UserRepository struct {
 // NewUserRepository creates a new user repository instance
 func NewUserRepository(db *DB) *UserRepository {
 	return &UserRepository{
-		db: db,
+		db,
 	}
 }
 
@@ -30,8 +30,7 @@ func (ur *UserRepository) CheckUserExists(ctx context.Context, email string) (bo
 	query := psql.Select("COUNT(*)").
 		From("users").
 		Where(sq.Eq{"email": email}).
-		Limit(1).
-		RunWith(ur.db)
+		Limit(1)
 
 	var count int
 
@@ -48,8 +47,7 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 	query := psql.Insert("users").
 		Columns("name", "email", "password").
 		Values(user.Name, user.Email, user.Password).
-		Suffix("RETURNING *").
-		RunWith(ur.db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&user.ID,
@@ -72,8 +70,7 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.U
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"id": id}).
-		Limit(1).
-		RunWith(ur.db)
+		Limit(1)
 
 	var user domain.User
 
@@ -101,8 +98,7 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*do
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"email": email}).
-		Limit(1).
-		RunWith(ur.db)
+		Limit(1)
 
 	var user domain.User
 
@@ -128,8 +124,7 @@ func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]
 		From("users").
 		OrderBy("id").
 		Limit(limit).
-		Offset((skip - 1) * limit).
-		RunWith(ur.db)
+		Offset((skip - 1) * limit)
 
 	var users []*domain.User
 
@@ -173,8 +168,7 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 		Set("password", sq.Expr("COALESCE(?, password)", password)).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": user.ID}).
-		Suffix("RETURNING *").
-		RunWith(ur.db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&user.ID,
@@ -195,8 +189,7 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 // DeleteUser deletes a user by ID from the database
 func (ur *UserRepository) DeleteUser(ctx context.Context, id uint64) error {
 	query := psql.Delete("users").
-		Where(sq.Eq{"id": id}).
-		RunWith(ur.db)
+		Where(sq.Eq{"id": id})
 
 	_, err := query.ExecContext(ctx)
 	if err != nil {

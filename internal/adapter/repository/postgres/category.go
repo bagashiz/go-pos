@@ -12,7 +12,7 @@ import (
 
 /**
  * CategoryRepository implements port.CategoryRepository interface
- * and crovides an access to the postgres database
+ * and provides an access to the postgres database
  */
 type CategoryRepository struct {
 	db *DB
@@ -21,7 +21,7 @@ type CategoryRepository struct {
 // NewCategoryRepository creates a new category repository instance
 func NewCategoryRepository(db *DB) *CategoryRepository {
 	return &CategoryRepository{
-		db: db,
+		db,
 	}
 }
 
@@ -30,8 +30,7 @@ func (cr *CategoryRepository) CreateCategory(ctx context.Context, category *doma
 	query := psql.Insert("categories").
 		Columns("name").
 		Values(category.Name).
-		Suffix("RETURNING *").
-		RunWith(cr.db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&category.ID,
@@ -51,8 +50,7 @@ func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*
 	query := psql.Select("*").
 		From("categories").
 		Where(sq.Eq{"id": id}).
-		Limit(1).
-		RunWith(cr.db)
+		Limit(1)
 
 	var category domain.Category
 
@@ -78,8 +76,7 @@ func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit ui
 		From("categories").
 		OrderBy("id").
 		Limit(limit).
-		Offset((skip - 1) * limit).
-		RunWith(cr.db)
+		Offset((skip - 1) * limit)
 
 	rows, err := query.QueryContext(ctx)
 	if err != nil {
@@ -113,8 +110,7 @@ func (cr *CategoryRepository) UpdateCategory(ctx context.Context, category *doma
 		Set("name", category.Name).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": category.ID}).
-		Suffix("RETURNING *").
-		RunWith(cr.db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&category.ID,
@@ -132,8 +128,7 @@ func (cr *CategoryRepository) UpdateCategory(ctx context.Context, category *doma
 // DeleteCategory deletes a category record from the database by id
 func (cr *CategoryRepository) DeleteCategory(ctx context.Context, id uint64) error {
 	query := psql.Delete("categories").
-		Where(sq.Eq{"id": id}).
-		RunWith(cr.db)
+		Where(sq.Eq{"id": id})
 
 	_, err := query.ExecContext(ctx)
 	if err != nil {

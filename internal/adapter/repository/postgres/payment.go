@@ -21,7 +21,7 @@ type PaymentRepository struct {
 // NewPaymentRepository creates a new payment repository instance
 func NewPaymentRepository(db *DB) *PaymentRepository {
 	return &PaymentRepository{
-		db: db,
+		db,
 	}
 }
 
@@ -30,8 +30,7 @@ func (pr *PaymentRepository) CreatePayment(ctx context.Context, payment *domain.
 	query := psql.Insert("payments").
 		Columns("name", "type", "logo").
 		Values(payment.Name, payment.Type, payment.Logo).
-		Suffix("RETURNING *").
-		RunWith(pr.db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&payment.ID,
@@ -53,8 +52,7 @@ func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*do
 	query := psql.Select("*").
 		From("payments").
 		Where(sq.Eq{"id": id}).
-		Limit(1).
-		RunWith(pr.db)
+		Limit(1)
 
 	var payment domain.Payment
 
@@ -82,8 +80,7 @@ func (pr *PaymentRepository) ListPayments(ctx context.Context, skip, limit uint6
 		From("payments").
 		OrderBy("id").
 		Limit(limit).
-		Offset((skip - 1) * limit).
-		RunWith(pr.db)
+		Offset((skip - 1) * limit)
 
 	rows, err := query.QueryContext(ctx)
 	if err != nil {
@@ -125,8 +122,7 @@ func (pr *PaymentRepository) UpdatePayment(ctx context.Context, payment *domain.
 		Set("logo", sq.Expr("COALESCE(?, logo)", logo)).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": payment.ID}).
-		Suffix("RETURNING *").
-		RunWith(pr.db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&payment.ID,
@@ -146,8 +142,7 @@ func (pr *PaymentRepository) UpdatePayment(ctx context.Context, payment *domain.
 // DeletePayment deletes a payment record from the database by id
 func (pr *PaymentRepository) DeletePayment(ctx context.Context, id uint64) error {
 	query := psql.Delete("payments").
-		Where(sq.Eq{"id": id}).
-		RunWith(pr.db)
+		Where(sq.Eq{"id": id})
 
 	_, err := query.ExecContext(ctx)
 	if err != nil {
