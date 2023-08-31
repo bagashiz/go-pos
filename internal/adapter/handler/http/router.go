@@ -48,6 +48,7 @@ func (r *Router) InitRoutes(
 	userHandler UserHandler,
 	paymentHandler PaymentHandler,
 	categoryHandler CategoryHandler,
+	productHandler ProductHandler,
 ) {
 	v1 := r.Group("/v1")
 	{
@@ -74,6 +75,14 @@ func (r *Router) InitRoutes(
 			category.GET("/:id", categoryHandler.GetCategory)
 			category.PUT("/:id", categoryHandler.UpdateCategory)
 			category.DELETE("/:id", categoryHandler.DeleteCategory)
+		}
+		product := v1.Group("/products")
+		{
+			product.POST("/", productHandler.CreateProduct)
+			product.GET("/", productHandler.ListProducts)
+			product.GET("/:id", productHandler.GetProduct)
+			product.PUT("/:id", productHandler.UpdateProduct)
+			product.DELETE("/:id", productHandler.DeleteProduct)
 		}
 	}
 }

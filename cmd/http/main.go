@@ -73,9 +73,18 @@ func main() {
 	categoryService := service.NewCategoryService(store)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
+	// Product
+	productService := service.NewProductService(store, store)
+	productHandler := handler.NewProductHandler(productService)
+
 	// Init router
 	router := handler.NewRouter()
-	router.InitRoutes(*userHandler, *paymentHandler, *categoryHandler)
+	router.InitRoutes(
+		*userHandler,
+		*paymentHandler,
+		*categoryHandler,
+		*productHandler,
+	)
 
 	// Start server
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
