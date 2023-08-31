@@ -10,28 +10,13 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
-/**
- * UserRepository implements port.UserRepository interface
- * and provides an access to the postgres database
- */
-type UserRepository struct {
-	db *DB
-}
-
-// NewUserRepository creates a new user repository instance
-func NewUserRepository(db *DB) *UserRepository {
-	return &UserRepository{
-		db: db,
-	}
-}
-
 // CheckUserExists checks if a user exists in the database using the email
-func (ur *UserRepository) CheckUserExists(ctx context.Context, email string) (bool, error) {
+func (db *DB) CheckUserExists(ctx context.Context, email string) (bool, error) {
 	query := psql.Select("COUNT(*)").
 		From("users").
 		Where(sq.Eq{"email": email}).
 		Limit(1).
-		RunWith(ur.db)
+		RunWith(db)
 
 	var count int
 
@@ -44,12 +29,12 @@ func (ur *UserRepository) CheckUserExists(ctx context.Context, email string) (bo
 }
 
 // CreateUser creates a new user in the database
-func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (db *DB) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	query := psql.Insert("users").
 		Columns("name", "email", "password").
 		Values(user.Name, user.Email, user.Password).
 		Suffix("RETURNING *").
-		RunWith(ur.db)
+		RunWith(db)
 
 	err := query.QueryRowContext(ctx).Scan(
 		&user.ID,
@@ -68,12 +53,12 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 }
 
 // GetUserByID gets a user by ID from the database
-func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.User, error) {
+func (db *DB) GetUserByID(ctx context.Context, id uint64) (*domain.User, error) {
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"id": id}).
 		Limit(1).
-		RunWith(ur.db)
+		RunWith(db)
 
 	var user domain.User
 
@@ -97,12 +82,12 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.U
 }
 
 // GetUserByEmailAndPassword gets a user by email from the database
-func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (db *DB) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"email": email}).
 		Limit(1).
-		RunWith(ur.db)
+		RunWith(db)
 
 	var user domain.User
 
@@ -123,13 +108,13 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*do
 }
 
 // ListUsers lists all users from the database
-func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
+func (db *DB) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
 	query := psql.Select("*").
 		From("users").
 		OrderBy("id").
 		Limit(limit).
 		Offset((skip - 1) * limit).
-		RunWith(ur.db)
+		RunWith(db)
 
 	var users []*domain.User
 
@@ -162,7 +147,7 @@ func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]
 }
 
 // UpdateUser updates a user by ID in the database
-func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (db *DB) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	name := nullString(user.Name)
 	email := nullString(user.Email)
 	password := nullString(user.Password)
@@ -174,7 +159,7 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": user.ID}).
 		Suffix("RETURNING *").
-		RunWith(ur.db)
+		RunWith(db)
 
 	err := query.QueryRowContext(ctx).Scan(
 		&user.ID,
@@ -193,10 +178,10 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 }
 
 // DeleteUser deletes a user by ID from the database
-func (ur *UserRepository) DeleteUser(ctx context.Context, id uint64) error {
+func (db *DB) DeleteUser(ctx context.Context, id uint64) error {
 	query := psql.Delete("users").
 		Where(sq.Eq{"id": id}).
-		RunWith(ur.db)
+		RunWith(db)
 
 	_, err := query.ExecContext(ctx)
 	if err != nil {
