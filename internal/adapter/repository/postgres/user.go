@@ -10,13 +10,27 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+/**
+ * UserRepository implements port.UserRepository interface
+ * and provides an access to the postgres database
+ */
+type UserRepository struct {
+	db *DB
+}
+
+// NewUserRepository creates a new user repository instance
+func NewUserRepository(db *DB) *UserRepository {
+	return &UserRepository{
+		db,
+	}
+}
+
 // CheckUserExists checks if a user exists in the database using the email
-func (db *DB) CheckUserExists(ctx context.Context, email string) (bool, error) {
+func (ur *UserRepository) CheckUserExists(ctx context.Context, email string) (bool, error) {
 	query := psql.Select("COUNT(*)").
 		From("users").
 		Where(sq.Eq{"email": email}).
-		Limit(1).
-		RunWith(db)
+		Limit(1)
 
 	var count int
 
@@ -29,12 +43,11 @@ func (db *DB) CheckUserExists(ctx context.Context, email string) (bool, error) {
 }
 
 // CreateUser creates a new user in the database
-func (db *DB) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	query := psql.Insert("users").
 		Columns("name", "email", "password").
 		Values(user.Name, user.Email, user.Password).
-		Suffix("RETURNING *").
-		RunWith(db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&user.ID,
@@ -53,12 +66,11 @@ func (db *DB) CreateUser(ctx context.Context, user *domain.User) (*domain.User, 
 }
 
 // GetUserByID gets a user by ID from the database
-func (db *DB) GetUserByID(ctx context.Context, id uint64) (*domain.User, error) {
+func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.User, error) {
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"id": id}).
-		Limit(1).
-		RunWith(db)
+		Limit(1)
 
 	var user domain.User
 
@@ -82,12 +94,11 @@ func (db *DB) GetUserByID(ctx context.Context, id uint64) (*domain.User, error) 
 }
 
 // GetUserByEmailAndPassword gets a user by email from the database
-func (db *DB) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"email": email}).
-		Limit(1).
-		RunWith(db)
+		Limit(1)
 
 	var user domain.User
 
@@ -108,13 +119,12 @@ func (db *DB) GetUserByEmail(ctx context.Context, email string) (*domain.User, e
 }
 
 // ListUsers lists all users from the database
-func (db *DB) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
+func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
 	query := psql.Select("*").
 		From("users").
 		OrderBy("id").
 		Limit(limit).
-		Offset((skip - 1) * limit).
-		RunWith(db)
+		Offset((skip - 1) * limit)
 
 	var users []*domain.User
 
@@ -147,7 +157,7 @@ func (db *DB) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User
 }
 
 // UpdateUser updates a user by ID in the database
-func (db *DB) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	name := nullString(user.Name)
 	email := nullString(user.Email)
 	password := nullString(user.Password)
@@ -158,8 +168,7 @@ func (db *DB) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, 
 		Set("password", sq.Expr("COALESCE(?, password)", password)).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": user.ID}).
-		Suffix("RETURNING *").
-		RunWith(db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&user.ID,
@@ -178,10 +187,9 @@ func (db *DB) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, 
 }
 
 // DeleteUser deletes a user by ID from the database
-func (db *DB) DeleteUser(ctx context.Context, id uint64) error {
+func (ur *UserRepository) DeleteUser(ctx context.Context, id uint64) error {
 	query := psql.Delete("users").
-		Where(sq.Eq{"id": id}).
-		RunWith(db)
+		Where(sq.Eq{"id": id})
 
 	_, err := query.ExecContext(ctx)
 	if err != nil {

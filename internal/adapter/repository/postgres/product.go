@@ -10,13 +10,27 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+/**
+ * ProductRepository implements port.ProductRepository interface
+ * and provides an access to the postgres database
+ */
+type ProductRepository struct {
+	db *DB
+}
+
+// NewProductRepository creates a new product repository instance
+func NewProductRepository(db *DB) *ProductRepository {
+	return &ProductRepository{
+		db,
+	}
+}
+
 // CreateProduct creates a new product record in the database
-func (db *DB) CreateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error) {
+func (pr *ProductRepository) CreateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error) {
 	query := psql.Insert("products").
 		Columns("category_id", "name", "image", "price", "stock").
 		Values(product.CategoryID, product.Name, product.Image, product.Price, product.Stock).
-		Suffix("RETURNING *").
-		RunWith(db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&product.ID,
@@ -37,12 +51,11 @@ func (db *DB) CreateProduct(ctx context.Context, product *domain.Product) (*doma
 }
 
 // GetProductByID retrieves a product record from the database by id
-func (db *DB) GetProductByID(ctx context.Context, id uint64) (*domain.Product, error) {
+func (pr *ProductRepository) GetProductByID(ctx context.Context, id uint64) (*domain.Product, error) {
 	query := psql.Select("*").
 		From("products").
 		Where(sq.Eq{"id": id}).
-		Limit(1).
-		RunWith(db)
+		Limit(1)
 
 	var product domain.Product
 
@@ -68,13 +81,12 @@ func (db *DB) GetProductByID(ctx context.Context, id uint64) (*domain.Product, e
 }
 
 // ListProducts retrieves a list of products from the database
-func (db *DB) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]*domain.Product, error) {
+func (pr *ProductRepository) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]*domain.Product, error) {
 	query := psql.Select("*").
 		From("products").
 		OrderBy("id").
 		Limit(limit).
-		Offset((skip - 1) * limit).
-		RunWith(db)
+		Offset((skip - 1) * limit)
 
 	if categoryId != 0 {
 		query = query.Where(sq.Eq{"category_id": categoryId})
@@ -116,7 +128,7 @@ func (db *DB) ListProducts(ctx context.Context, search string, categoryId, skip,
 }
 
 // UpdateProduct updates a product record in the database
-func (db *DB) UpdateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error) {
+func (pr *ProductRepository) UpdateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error) {
 	categoryId := nullUint64(product.CategoryID)
 	name := nullString(product.Name)
 	image := nullString(product.Image)
@@ -131,8 +143,7 @@ func (db *DB) UpdateProduct(ctx context.Context, product *domain.Product) (*doma
 		Set("stock", sq.Expr("COALESCE(?, stock)", stock)).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": product.ID}).
-		Suffix("RETURNING *").
-		RunWith(db)
+		Suffix("RETURNING *")
 
 	err := query.QueryRowContext(ctx).Scan(
 		&product.ID,
@@ -153,10 +164,9 @@ func (db *DB) UpdateProduct(ctx context.Context, product *domain.Product) (*doma
 }
 
 // DeleteProduct deletes a product record from the database by id
-func (db *DB) DeleteProduct(ctx context.Context, id uint64) error {
+func (pr *ProductRepository) DeleteProduct(ctx context.Context, id uint64) error {
 	query := psql.Delete("products").
-		Where(sq.Eq{"id": id}).
-		RunWith(db)
+		Where(sq.Eq{"id": id})
 
 	_, err := query.ExecContext(ctx)
 	if err != nil {

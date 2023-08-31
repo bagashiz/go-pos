@@ -45,14 +45,14 @@ func main() {
 
 	// Init database
 	slog.Info("Connecting to the database...")
-	store, err := repo.NewDB()
+	db, err := repo.NewDB()
 	if err != nil {
 		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
 	}
-	defer store.Close()
+	defer db.Close()
 
-	err = store.Ping()
+	err = db.Ping()
 	if err != nil {
 		slog.Error("Error connecting database", "error", err)
 		os.Exit(1)
@@ -62,19 +62,23 @@ func main() {
 
 	// Dependency injection
 	// User
-	userService := service.NewUserService(store)
+	userRepo := repo.NewUserRepository(db)
+	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 
 	// Payment
-	paymentService := service.NewPaymentService(store)
+	paymentRepo := repo.NewPaymentRepository(db)
+	paymentService := service.NewPaymentService(paymentRepo)
 	paymentHandler := handler.NewPaymentHandler(paymentService)
 
 	// Category
-	categoryService := service.NewCategoryService(store)
+	categoryRepo := repo.NewCategoryRepository(db)
+	categoryService := service.NewCategoryService(categoryRepo)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	// Product
-	productService := service.NewProductService(store, store)
+	productRepo := repo.NewProductRepository(db)
+	productService := service.NewProductService(productRepo, categoryRepo)
 	productHandler := handler.NewProductHandler(productService)
 
 	// Init router

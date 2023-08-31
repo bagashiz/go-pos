@@ -9,6 +9,12 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
+/**
+ * psql holds a reference to squirrel.StatementBuilderType
+ * which is used to build SQL queries that compatible with PostgreSQL syntax
+ */
+var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
 // DB is a wrapper for PostgreSQL database connection
 type DB struct {
 	*sql.DB
@@ -29,16 +35,12 @@ func NewDB() (*DB, error) {
 		return nil, err
 	}
 
+	psql = psql.RunWith(db)
+
 	return &DB{
 		db,
 	}, nil
 }
-
-/**
- * psql holds a reference to squirrel.StatementBuilderType
- * which is used to build SQL queries that compatible with PostgreSQL syntax
- */
-var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 // nullString converts a string to sql.NullString for empty string check
 func nullString(value string) sql.NullString {
