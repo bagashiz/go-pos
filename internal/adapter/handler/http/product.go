@@ -43,7 +43,7 @@ func newProductResponse(product *domain.Product) productResponse {
 		Stock:     product.Stock,
 		Price:     product.Price,
 		Image:     product.Image,
-		Category:  newCategoryResponse(&product.Category),
+		Category:  newCategoryResponse(product.Category),
 		CreatedAt: product.CreatedAt,
 		UpdatedAt: product.UpdatedAt,
 	}

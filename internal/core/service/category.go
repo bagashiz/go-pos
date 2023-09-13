@@ -19,7 +19,7 @@ type CategoryService struct {
 // NewCategoryService creates a new category service instance
 func NewCategoryService(repo port.CategoryRepository) *CategoryService {
 	return &CategoryService{
-		repo: repo,
+		repo,
 	}
 }
 

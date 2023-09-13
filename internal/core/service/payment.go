@@ -19,7 +19,7 @@ type PaymentService struct {
 // NewPaymentService creates a new payment service instance
 func NewPaymentService(repo port.PaymentRepository) *PaymentService {
 	return &PaymentService{
-		repo: repo,
+		repo,
 	}
 }
 

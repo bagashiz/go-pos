@@ -20,7 +20,7 @@ type UserService struct {
 // NewUserService creates a new user service instance
 func NewUserService(repo port.UserRepository) *UserService {
 	return &UserService{
-		repo: repo,
+		repo,
 	}
 }
 

@@ -31,7 +31,7 @@ func (ps *ProductService) CreateProduct(ctx context.Context, product *domain.Pro
 		return nil, err
 	}
 
-	product.Category = *category
+	product.Category = category
 
 	return ps.productRepo.CreateProduct(ctx, product)
 }
@@ -48,7 +48,7 @@ func (ps *ProductService) GetProduct(ctx context.Context, id uint64) (*domain.Pr
 		return nil, err
 	}
 
-	product.Category = *category
+	product.Category = category
 
 	return product, nil
 }
@@ -66,7 +66,7 @@ func (ps *ProductService) ListProducts(ctx context.Context, search string, categ
 			return nil, err
 		}
 
-		product.Category = *category
+		product.Category = category
 	}
 
 	return products, nil
@@ -84,7 +84,7 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 		return nil, err
 	}
 
-	product.Category = *category
+	product.Category = category
 
 	return ps.productRepo.UpdateProduct(ctx, product)
 }
