@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
@@ -45,16 +46,18 @@ func main() {
 
 	// Init database
 	slog.Info("Connecting to the database...")
-	db, err := repo.NewDB()
+
+	ctx := context.Background()
+	db, err := repo.NewDB(ctx)
 	if err != nil {
 		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	err = db.Ping()
+	err = db.Ping(ctx)
 	if err != nil {
-		slog.Error("Error connecting database", "error", err)
+		slog.Error("Error connecting to database", "error", err)
 		os.Exit(1)
 	} else {
 		slog.Info("Successfully connected to the database")

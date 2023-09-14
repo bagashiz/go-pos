@@ -1,12 +1,13 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
 
 	sq "github.com/Masterminds/squirrel"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 /**
@@ -17,11 +18,11 @@ var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 // DB is a wrapper for PostgreSQL database connection
 type DB struct {
-	*sql.DB
+	*pgxpool.Pool
 }
 
 // NewDB creates a new PostgreSQL database instance
-func NewDB() (*DB, error) {
+func NewDB(ctx context.Context) (*DB, error) {
 	dsn := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_USERNAME"),
 		os.Getenv("DB_PASSWORD"),
@@ -30,12 +31,10 @@ func NewDB() (*DB, error) {
 		os.Getenv("DB_DATABASE"),
 	)
 
-	db, err := sql.Open("pgx", dsn)
+	db, err := pgxpool.New(ctx, dsn)
 	if err != nil {
 		return nil, err
 	}
-
-	psql = psql.RunWith(db)
 
 	return &DB{
 		db,

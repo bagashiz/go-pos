@@ -2,12 +2,12 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/core/domain"
+	"github.com/jackc/pgx/v5"
 )
 
 /**
@@ -27,14 +27,19 @@ func NewUserRepository(db *DB) *UserRepository {
 
 // CheckUserExists checks if a user exists in the database using the email
 func (ur *UserRepository) CheckUserExists(ctx context.Context, email string) (bool, error) {
+	var count int
+
 	query := psql.Select("COUNT(*)").
 		From("users").
 		Where(sq.Eq{"email": email}).
 		Limit(1)
 
-	var count int
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return false, err
+	}
 
-	err := query.QueryRowContext(ctx).Scan(&count)
+	err = ur.db.QueryRow(ctx, sql, args...).Scan(&count)
 	if err != nil {
 		return false, err
 	}
@@ -49,7 +54,12 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 		Values(user.Name, user.Email, user.Password).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = ur.db.QueryRow(ctx, sql, args...).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
@@ -67,14 +77,19 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 
 // GetUserByID gets a user by ID from the database
 func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.User, error) {
+	var user domain.User
+
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
 
-	var user domain.User
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
 
-	err := query.QueryRowContext(ctx).Scan(
+	err = ur.db.QueryRow(ctx, sql, args...).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
@@ -84,7 +99,7 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.U
 		&user.UpdatedAt,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, errors.New("user not found")
 		}
 		return nil, err
@@ -95,14 +110,19 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.U
 
 // GetUserByEmailAndPassword gets a user by email from the database
 func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+	var user domain.User
+
 	query := psql.Select("*").
 		From("users").
 		Where(sq.Eq{"email": email}).
 		Limit(1)
 
-	var user domain.User
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
 
-	err := query.QueryRowContext(ctx).Scan(
+	err = ur.db.QueryRow(ctx, sql, args...).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
@@ -120,23 +140,27 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*do
 
 // ListUsers lists all users from the database
 func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
+	var user domain.User
+	var users []*domain.User
+
 	query := psql.Select("*").
 		From("users").
 		OrderBy("id").
 		Limit(limit).
 		Offset((skip - 1) * limit)
 
-	var users []*domain.User
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
 
-	rows, err := query.QueryContext(ctx)
+	rows, err := ur.db.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var user domain.User
-
 		err := rows.Scan(
 			&user.ID,
 			&user.Name,
@@ -170,7 +194,12 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 		Where(sq.Eq{"id": user.ID}).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = ur.db.QueryRow(ctx, sql, args...).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
@@ -191,7 +220,12 @@ func (ur *UserRepository) DeleteUser(ctx context.Context, id uint64) error {
 	query := psql.Delete("users").
 		Where(sq.Eq{"id": id})
 
-	_, err := query.ExecContext(ctx)
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = ur.db.Exec(ctx, sql, args...)
 	if err != nil {
 		return err
 	}

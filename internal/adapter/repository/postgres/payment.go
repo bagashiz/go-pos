@@ -2,12 +2,12 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/core/domain"
+	"github.com/jackc/pgx/v5"
 )
 
 /**
@@ -32,7 +32,12 @@ func (pr *PaymentRepository) CreatePayment(ctx context.Context, payment *domain.
 		Values(payment.Name, payment.Type, payment.Logo).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = pr.db.QueryRow(ctx, sql, args...).Scan(
 		&payment.ID,
 		&payment.Name,
 		&payment.Type,
@@ -49,14 +54,19 @@ func (pr *PaymentRepository) CreatePayment(ctx context.Context, payment *domain.
 
 // GetPaymentByID retrieves a payment record from the database by id
 func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*domain.Payment, error) {
+	var payment domain.Payment
+
 	query := psql.Select("*").
 		From("payments").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
 
-	var payment domain.Payment
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
 
-	err := query.QueryRowContext(ctx).Scan(
+	err = pr.db.QueryRow(ctx, sql, args...).Scan(
 		&payment.ID,
 		&payment.Name,
 		&payment.Type,
@@ -65,7 +75,7 @@ func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*do
 		&payment.UpdatedAt,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, errors.New("payment not found")
 		}
 		return nil, err
@@ -76,22 +86,26 @@ func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*do
 
 // ListPayments retrieves a list of payments from the database
 func (pr *PaymentRepository) ListPayments(ctx context.Context, skip, limit uint64) ([]*domain.Payment, error) {
+	var payment domain.Payment
+	var payments []*domain.Payment
+
 	query := psql.Select("*").
 		From("payments").
 		OrderBy("id").
 		Limit(limit).
 		Offset((skip - 1) * limit)
 
-	rows, err := query.QueryContext(ctx)
+	sql, args, err := query.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	var payments []*domain.Payment
+	rows, err := pr.db.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
 
 	for rows.Next() {
-		var payment domain.Payment
-
 		err := rows.Scan(
 			&payment.ID,
 			&payment.Name,
@@ -124,7 +138,12 @@ func (pr *PaymentRepository) UpdatePayment(ctx context.Context, payment *domain.
 		Where(sq.Eq{"id": payment.ID}).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = pr.db.QueryRow(ctx, sql, args...).Scan(
 		&payment.ID,
 		&payment.Name,
 		&payment.Type,
@@ -144,7 +163,12 @@ func (pr *PaymentRepository) DeletePayment(ctx context.Context, id uint64) error
 	query := psql.Delete("payments").
 		Where(sq.Eq{"id": id})
 
-	_, err := query.ExecContext(ctx)
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = pr.db.Exec(ctx, sql, args...)
 	if err != nil {
 		return err
 	}
