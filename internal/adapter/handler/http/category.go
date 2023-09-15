@@ -100,6 +100,8 @@ type listCategoriesRequest struct {
 // ListCategories lists all categories with pagination
 func (ch *CategoryHandler) ListCategories(ctx *gin.Context) {
 	var req listCategoriesRequest
+	var categoriesList []categoryResponse
+
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -111,9 +113,8 @@ func (ch *CategoryHandler) ListCategories(ctx *gin.Context) {
 		return
 	}
 
-	categoriesList := make([]categoryResponse, 0)
 	for _, category := range categories {
-		categoriesList = append(categoriesList, newCategoryResponse(category))
+		categoriesList = append(categoriesList, newCategoryResponse(&category))
 	}
 
 	total := uint64(len(categoriesList))

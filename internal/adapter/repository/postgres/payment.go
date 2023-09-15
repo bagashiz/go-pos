@@ -85,9 +85,9 @@ func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*do
 }
 
 // ListPayments retrieves a list of payments from the database
-func (pr *PaymentRepository) ListPayments(ctx context.Context, skip, limit uint64) ([]*domain.Payment, error) {
+func (pr *PaymentRepository) ListPayments(ctx context.Context, skip, limit uint64) ([]domain.Payment, error) {
 	var payment domain.Payment
-	var payments []*domain.Payment
+	var payments []domain.Payment
 
 	query := psql.Select("*").
 		From("payments").
@@ -118,7 +118,7 @@ func (pr *PaymentRepository) ListPayments(ctx context.Context, skip, limit uint6
 			return nil, err
 		}
 
-		payments = append(payments, &payment)
+		payments = append(payments, payment)
 	}
 
 	return payments, nil

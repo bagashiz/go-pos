@@ -108,6 +108,8 @@ type listPaymentsRequest struct {
 // ListPayments lists all payments with pagination
 func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 	var req listPaymentsRequest
+	var paymentsList []paymentResponse
+
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -119,9 +121,8 @@ func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 		return
 	}
 
-	paymentsList := make([]paymentResponse, 0)
 	for _, payment := range payments {
-		paymentsList = append(paymentsList, newPaymentResponse(payment))
+		paymentsList = append(paymentsList, newPaymentResponse(&payment))
 	}
 
 	total := uint64(len(paymentsList))

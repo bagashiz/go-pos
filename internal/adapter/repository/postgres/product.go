@@ -91,9 +91,9 @@ func (pr *ProductRepository) GetProductByID(ctx context.Context, id uint64) (*do
 }
 
 // ListProducts retrieves a list of products from the database
-func (pr *ProductRepository) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]*domain.Product, error) {
+func (pr *ProductRepository) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]domain.Product, error) {
 	var product domain.Product
-	var products []*domain.Product
+	var products []domain.Product
 
 	query := psql.Select("*").
 		From("products").
@@ -135,7 +135,7 @@ func (pr *ProductRepository) ListProducts(ctx context.Context, search string, ca
 			return nil, err
 		}
 
-		products = append(products, &product)
+		products = append(products, product)
 	}
 
 	return products, nil

@@ -139,9 +139,9 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*do
 }
 
 // ListUsers lists all users from the database
-func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
+func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]domain.User, error) {
 	var user domain.User
-	var users []*domain.User
+	var users []domain.User
 
 	query := psql.Select("*").
 		From("users").
@@ -174,7 +174,7 @@ func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]
 			return nil, err
 		}
 
-		users = append(users, &user)
+		users = append(users, user)
 	}
 
 	return users, nil

@@ -125,6 +125,8 @@ type listProductsRequest struct {
 // ListProducts lists all products with pagination
 func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 	var req listProductsRequest
+	var productsList []productResponse
+
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -136,9 +138,8 @@ func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 		return
 	}
 
-	productsList := make([]productResponse, 0)
 	for _, product := range products {
-		productsList = append(productsList, newProductResponse(product))
+		productsList = append(productsList, newProductResponse(&product))
 	}
 
 	total := uint64(len(productsList))

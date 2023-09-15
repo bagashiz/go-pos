@@ -34,7 +34,7 @@ func (cs *CategoryService) GetCategory(ctx context.Context, id uint64) (*domain.
 }
 
 // ListCategories retrieves a list of categories
-func (cs *CategoryService) ListCategories(ctx context.Context, skip, limit uint64) ([]*domain.Category, error) {
+func (cs *CategoryService) ListCategories(ctx context.Context, skip, limit uint64) ([]domain.Category, error) {
 	return cs.repo.ListCategories(ctx, skip, limit)
 }
 

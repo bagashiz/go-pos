@@ -81,9 +81,9 @@ func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*
 }
 
 // ListCategories retrieves a list of categories from the database
-func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit uint64) ([]*domain.Category, error) {
+func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit uint64) ([]domain.Category, error) {
 	var category domain.Category
-	var categories []*domain.Category
+	var categories []domain.Category
 
 	query := psql.Select("*").
 		From("categories").
@@ -112,7 +112,7 @@ func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit ui
 			return nil, err
 		}
 
-		categories = append(categories, &category)
+		categories = append(categories, category)
 	}
 
 	return categories, nil

@@ -54,19 +54,19 @@ func (ps *ProductService) GetProduct(ctx context.Context, id uint64) (*domain.Pr
 }
 
 // ListProducts retrieves a list of products
-func (ps *ProductService) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]*domain.Product, error) {
+func (ps *ProductService) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]domain.Product, error) {
 	products, err := ps.productRepo.ListProducts(ctx, search, categoryId, skip, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, product := range products {
+	for i, product := range products {
 		category, err := ps.categoryRepo.GetCategoryByID(ctx, product.CategoryID)
 		if err != nil {
 			return nil, err
 		}
 
-		product.Category = category
+		products[i].Category = category
 	}
 
 	return products, nil

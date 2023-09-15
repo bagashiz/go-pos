@@ -34,7 +34,7 @@ func (ps *PaymentService) GetPayment(ctx context.Context, id uint64) (*domain.Pa
 }
 
 // ListPayments retrieves a list of payments
-func (ps *PaymentService) ListPayments(ctx context.Context, skip, limit uint64) ([]*domain.Payment, error) {
+func (ps *PaymentService) ListPayments(ctx context.Context, skip, limit uint64) ([]domain.Payment, error) {
 	return ps.repo.ListPayments(ctx, skip, limit)
 }
 
