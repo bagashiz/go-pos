@@ -43,7 +43,7 @@ func newProductResponse(product *domain.Product) productResponse {
 		Stock:     product.Stock,
 		Price:     product.Price,
 		Image:     product.Image,
-		Category:  newCategoryResponse(&product.Category),
+		Category:  newCategoryResponse(product.Category),
 		CreatedAt: product.CreatedAt,
 		UpdatedAt: product.UpdatedAt,
 	}
@@ -125,6 +125,8 @@ type listProductsRequest struct {
 // ListProducts lists all products with pagination
 func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 	var req listProductsRequest
+	var productsList []productResponse
+
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -136,9 +138,8 @@ func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 		return
 	}
 
-	productsList := make([]productResponse, 0)
 	for _, product := range products {
-		productsList = append(productsList, newProductResponse(product))
+		productsList = append(productsList, newProductResponse(&product))
 	}
 
 	total := uint64(len(productsList))
@@ -150,11 +151,11 @@ func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 
 // updateProductRequest represents a request body for updating a product
 type updateProductRequest struct {
-	CategoryID uint64  `json:"category_id" binding:"required,min=1"`
-	Name       string  `json:"name" binding:"required"`
-	Image      string  `json:"image" binding:"required"`
-	Price      float64 `json:"price" binding:"required,min=0"`
-	Stock      int64   `json:"stock" binding:"required,min=0"`
+	CategoryID uint64  `json:"category_id" binding:"omitempty,required,min=1"`
+	Name       string  `json:"name" binding:"omitempty,required"`
+	Image      string  `json:"image" binding:"omitempty,required"`
+	Price      float64 `json:"price" binding:"omitempty,required,min=0"`
+	Stock      int64   `json:"stock" binding:"omitempty,required,min=0"`
 }
 
 // UpdateProduct updates a product
@@ -185,6 +186,11 @@ func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	if err != nil {
 		if err.Error() == "product not found" {
 			errorResponse(ctx, http.StatusNotFound, err)
+			return
+		}
+
+		if err.Error() == "no data to update" {
+			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
 

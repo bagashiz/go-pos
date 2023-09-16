@@ -2,12 +2,12 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/core/domain"
+	"github.com/jackc/pgx/v5"
 )
 
 /**
@@ -32,7 +32,12 @@ func (cr *CategoryRepository) CreateCategory(ctx context.Context, category *doma
 		Values(category.Name).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = cr.db.QueryRow(ctx, sql, args...).Scan(
 		&category.ID,
 		&category.Name,
 		&category.CreatedAt,
@@ -47,21 +52,26 @@ func (cr *CategoryRepository) CreateCategory(ctx context.Context, category *doma
 
 // GetCategoryByID retrieves a category record from the database by id
 func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*domain.Category, error) {
+	var category domain.Category
+
 	query := psql.Select("*").
 		From("categories").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
 
-	var category domain.Category
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
 
-	err := query.QueryRowContext(ctx).Scan(
+	err = cr.db.QueryRow(ctx, sql, args...).Scan(
 		&category.ID,
 		&category.Name,
 		&category.CreatedAt,
 		&category.UpdatedAt,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, errors.New("category not found")
 		}
 		return nil, err
@@ -71,23 +81,27 @@ func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*
 }
 
 // ListCategories retrieves a list of categories from the database
-func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit uint64) ([]*domain.Category, error) {
+func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit uint64) ([]domain.Category, error) {
+	var category domain.Category
+	var categories []domain.Category
+
 	query := psql.Select("*").
 		From("categories").
 		OrderBy("id").
 		Limit(limit).
 		Offset((skip - 1) * limit)
 
-	rows, err := query.QueryContext(ctx)
+	sql, args, err := query.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	var categories []*domain.Category
+	rows, err := cr.db.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
 
 	for rows.Next() {
-		var category domain.Category
-
 		err := rows.Scan(
 			&category.ID,
 			&category.Name,
@@ -98,7 +112,7 @@ func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit ui
 			return nil, err
 		}
 
-		categories = append(categories, &category)
+		categories = append(categories, category)
 	}
 
 	return categories, nil
@@ -112,7 +126,12 @@ func (cr *CategoryRepository) UpdateCategory(ctx context.Context, category *doma
 		Where(sq.Eq{"id": category.ID}).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = cr.db.QueryRow(ctx, sql, args...).Scan(
 		&category.ID,
 		&category.Name,
 		&category.CreatedAt,
@@ -130,7 +149,12 @@ func (cr *CategoryRepository) DeleteCategory(ctx context.Context, id uint64) err
 	query := psql.Delete("categories").
 		Where(sq.Eq{"id": id})
 
-	_, err := query.ExecContext(ctx)
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = cr.db.Exec(ctx, sql, args...)
 	if err != nil {
 		return err
 	}

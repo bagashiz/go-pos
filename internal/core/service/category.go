@@ -19,7 +19,7 @@ type CategoryService struct {
 // NewCategoryService creates a new category service instance
 func NewCategoryService(repo port.CategoryRepository) *CategoryService {
 	return &CategoryService{
-		repo: repo,
+		repo,
 	}
 }
 
@@ -34,7 +34,7 @@ func (cs *CategoryService) GetCategory(ctx context.Context, id uint64) (*domain.
 }
 
 // ListCategories retrieves a list of categories
-func (cs *CategoryService) ListCategories(ctx context.Context, skip, limit uint64) ([]*domain.Category, error) {
+func (cs *CategoryService) ListCategories(ctx context.Context, skip, limit uint64) ([]domain.Category, error) {
 	return cs.repo.ListCategories(ctx, skip, limit)
 }
 
@@ -45,8 +45,9 @@ func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.
 		return nil, err
 	}
 
+	emptyData := category.Name == ""
 	sameData := existingCategory.Name == category.Name
-	if sameData {
+	if emptyData || sameData {
 		return nil, errors.New("no data to update")
 	}
 

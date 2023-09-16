@@ -87,6 +87,8 @@ type listUsersRequest struct {
 // ListUsers lists all users with pagination
 func (uh *UserHandler) ListUsers(ctx *gin.Context) {
 	var req listUsersRequest
+	var usersList []userResponse
+
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -98,9 +100,8 @@ func (uh *UserHandler) ListUsers(ctx *gin.Context) {
 		return
 	}
 
-	usersList := make([]userResponse, 0)
 	for _, user := range users {
-		usersList = append(usersList, newUserResponse(user))
+		usersList = append(usersList, newUserResponse(&user))
 	}
 
 	total := uint64(len(usersList))

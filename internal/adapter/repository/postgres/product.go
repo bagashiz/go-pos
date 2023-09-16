@@ -2,12 +2,12 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/core/domain"
+	"github.com/jackc/pgx/v5"
 )
 
 /**
@@ -32,7 +32,12 @@ func (pr *ProductRepository) CreateProduct(ctx context.Context, product *domain.
 		Values(product.CategoryID, product.Name, product.Image, product.Price, product.Stock).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = pr.db.QueryRow(ctx, sql, args...).Scan(
 		&product.ID,
 		&product.CategoryID,
 		&product.SKU,
@@ -52,14 +57,19 @@ func (pr *ProductRepository) CreateProduct(ctx context.Context, product *domain.
 
 // GetProductByID retrieves a product record from the database by id
 func (pr *ProductRepository) GetProductByID(ctx context.Context, id uint64) (*domain.Product, error) {
+	var product domain.Product
+
 	query := psql.Select("*").
 		From("products").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
 
-	var product domain.Product
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
 
-	err := query.QueryRowContext(ctx).Scan(
+	err = pr.db.QueryRow(ctx, sql, args...).Scan(
 		&product.ID,
 		&product.CategoryID,
 		&product.SKU,
@@ -71,7 +81,7 @@ func (pr *ProductRepository) GetProductByID(ctx context.Context, id uint64) (*do
 		&product.UpdatedAt,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, errors.New("product not found")
 		}
 		return nil, err
@@ -81,7 +91,10 @@ func (pr *ProductRepository) GetProductByID(ctx context.Context, id uint64) (*do
 }
 
 // ListProducts retrieves a list of products from the database
-func (pr *ProductRepository) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]*domain.Product, error) {
+func (pr *ProductRepository) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]domain.Product, error) {
+	var product domain.Product
+	var products []domain.Product
+
 	query := psql.Select("*").
 		From("products").
 		OrderBy("id").
@@ -96,16 +109,17 @@ func (pr *ProductRepository) ListProducts(ctx context.Context, search string, ca
 		query = query.Where(sq.ILike{"name": "%" + search + "%"})
 	}
 
-	rows, err := query.QueryContext(ctx)
+	sql, args, err := query.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	var products []*domain.Product
+	rows, err := pr.db.Query(ctx, sql, args...)
+	if err != nil {
+		return nil, err
+	}
 
 	for rows.Next() {
-		var product domain.Product
-
 		err := rows.Scan(
 			&product.ID,
 			&product.CategoryID,
@@ -121,7 +135,7 @@ func (pr *ProductRepository) ListProducts(ctx context.Context, search string, ca
 			return nil, err
 		}
 
-		products = append(products, &product)
+		products = append(products, product)
 	}
 
 	return products, nil
@@ -145,7 +159,12 @@ func (pr *ProductRepository) UpdateProduct(ctx context.Context, product *domain.
 		Where(sq.Eq{"id": product.ID}).
 		Suffix("RETURNING *")
 
-	err := query.QueryRowContext(ctx).Scan(
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	err = pr.db.QueryRow(ctx, sql, args...).Scan(
 		&product.ID,
 		&product.CategoryID,
 		&product.SKU,
@@ -168,7 +187,12 @@ func (pr *ProductRepository) DeleteProduct(ctx context.Context, id uint64) error
 	query := psql.Delete("products").
 		Where(sq.Eq{"id": id})
 
-	_, err := query.ExecContext(ctx)
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = pr.db.Exec(ctx, sql, args...)
 	if err != nil {
 		return err
 	}

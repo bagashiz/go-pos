@@ -100,6 +100,8 @@ type listCategoriesRequest struct {
 // ListCategories lists all categories with pagination
 func (ch *CategoryHandler) ListCategories(ctx *gin.Context) {
 	var req listCategoriesRequest
+	var categoriesList []categoryResponse
+
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -111,9 +113,8 @@ func (ch *CategoryHandler) ListCategories(ctx *gin.Context) {
 		return
 	}
 
-	categoriesList := make([]categoryResponse, 0)
 	for _, category := range categories {
-		categoriesList = append(categoriesList, newCategoryResponse(category))
+		categoriesList = append(categoriesList, newCategoryResponse(&category))
 	}
 
 	total := uint64(len(categoriesList))
@@ -152,6 +153,11 @@ func (ch *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 	if err != nil {
 		if err.Error() == "category not found" {
 			errorResponse(ctx, http.StatusNotFound, err)
+			return
+		}
+
+		if err.Error() == "no data to update" {
+			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
 

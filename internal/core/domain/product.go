@@ -17,5 +17,5 @@ type Product struct {
 	Image      string    `json:"image"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
-	Category   Category  `json:"category"`
+	Category   *Category `json:"category"`
 }

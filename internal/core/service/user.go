@@ -20,7 +20,7 @@ type UserService struct {
 // NewUserService creates a new user service instance
 func NewUserService(repo port.UserRepository) *UserService {
 	return &UserService{
-		repo: repo,
+		repo,
 	}
 }
 
@@ -57,19 +57,20 @@ func (us *UserService) GetUser(ctx context.Context, id uint64) (*domain.User, er
 }
 
 // ListUsers lists all users
-func (us *UserService) ListUsers(ctx context.Context, skip, limit uint64) ([]*domain.User, error) {
+func (us *UserService) ListUsers(ctx context.Context, skip, limit uint64) ([]domain.User, error) {
 	return us.repo.ListUsers(ctx, skip, limit)
 }
 
 // UpdateUser updates a user's name, email, and password
 func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
-	_, err := us.repo.GetUserByID(ctx, user.ID)
+	existingUser, err := us.repo.GetUserByID(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	emptyData := user.Name == "" && user.Email == "" && user.Password == ""
-	if emptyData {
+	sameData := existingUser.Name == user.Name && existingUser.Email == user.Email
+	if emptyData || sameData {
 		return nil, errors.New("no data to update")
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
@@ -37,27 +38,28 @@ func init() {
 func main() {
 	appName := os.Getenv("APP_NAME")
 	env := os.Getenv("APP_ENV")
+	dbConn := os.Getenv("DB_CONNECTION")
 	url := os.Getenv("APP_URL")
 	port := os.Getenv("APP_PORT")
 	listenAddr := url + ":" + port
 
-	slog.Info("Starting the application...", "app", appName, "env", env)
+	slog.Info("Starting the application", "app", appName, "env", env)
 
 	// Init database
-	slog.Info("Connecting to the database...")
-	db, err := repo.NewDB()
+	ctx := context.Background()
+	db, err := repo.NewDB(ctx)
 	if err != nil {
 		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	err = db.Ping()
+	err = db.Ping(ctx)
 	if err != nil {
-		slog.Error("Error connecting database", "error", err)
+		slog.Error("Error connecting to database", "error", err)
 		os.Exit(1)
 	} else {
-		slog.Info("Successfully connected to the database")
+		slog.Info("Successfully connected to the database", "db", dbConn)
 	}
 
 	// Dependency injection
@@ -81,6 +83,11 @@ func main() {
 	productService := service.NewProductService(productRepo, categoryRepo)
 	productHandler := handler.NewProductHandler(productService)
 
+	// Order
+	orderRepo := repo.NewOrderRepository(db)
+	orderService := service.NewOrderService(orderRepo, productRepo, categoryRepo, userRepo, paymentRepo)
+	orderHandler := handler.NewOrderHandler(orderService)
+
 	// Init router
 	router := handler.NewRouter()
 	router.InitRoutes(
@@ -88,6 +95,7 @@ func main() {
 		*paymentHandler,
 		*categoryHandler,
 		*productHandler,
+		*orderHandler,
 	)
 
 	// Start server
