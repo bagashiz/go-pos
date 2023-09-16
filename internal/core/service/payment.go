@@ -40,13 +40,14 @@ func (ps *PaymentService) ListPayments(ctx context.Context, skip, limit uint64) 
 
 // UpdatePayment updates a payment
 func (ps *PaymentService) UpdatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
-	_, err := ps.repo.GetPaymentByID(ctx, payment.ID)
+	existingPayment, err := ps.repo.GetPaymentByID(ctx, payment.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	emptyData := payment.Name == "" && payment.Type == "" && payment.Logo == ""
-	if emptyData {
+	sameData := existingPayment.Name == payment.Name && existingPayment.Type == payment.Type && existingPayment.Logo == payment.Logo
+	if emptyData || sameData {
 		return nil, errors.New("no data to update")
 	}
 

@@ -45,8 +45,9 @@ func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.
 		return nil, err
 	}
 
+	emptyData := category.Name == ""
 	sameData := existingCategory.Name == category.Name
-	if sameData {
+	if emptyData || sameData {
 		return nil, errors.New("no data to update")
 	}
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
@@ -74,9 +75,19 @@ func (ps *ProductService) ListProducts(ctx context.Context, search string, categ
 
 // UpdateProduct updates a product
 func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error) {
-	_, err := ps.productRepo.GetProductByID(ctx, product.ID)
+	existingProduct, err := ps.productRepo.GetProductByID(ctx, product.ID)
 	if err != nil {
 		return nil, err
+	}
+
+	emptyData := product.CategoryID == 0 && product.Name == "" && product.Image == "" && product.Price == 0 && product.Stock == 0
+	sameData := existingProduct.CategoryID == product.CategoryID && existingProduct.Name == product.Name && existingProduct.Image == product.Image && existingProduct.Price == product.Price && existingProduct.Stock == product.Stock
+	if emptyData || sameData {
+		return nil, errors.New("no data to update")
+	}
+
+	if product.CategoryID == 0 {
+		product.CategoryID = existingProduct.CategoryID
 	}
 
 	category, err := ps.categoryRepo.GetCategoryByID(ctx, product.CategoryID)

@@ -151,11 +151,11 @@ func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 
 // updateProductRequest represents a request body for updating a product
 type updateProductRequest struct {
-	CategoryID uint64  `json:"category_id" binding:"required,min=1"`
-	Name       string  `json:"name" binding:"required"`
-	Image      string  `json:"image" binding:"required"`
-	Price      float64 `json:"price" binding:"required,min=0"`
-	Stock      int64   `json:"stock" binding:"required,min=0"`
+	CategoryID uint64  `json:"category_id" binding:"omitempty,required,min=1"`
+	Name       string  `json:"name" binding:"omitempty,required"`
+	Image      string  `json:"image" binding:"omitempty,required"`
+	Price      float64 `json:"price" binding:"omitempty,required,min=0"`
+	Stock      int64   `json:"stock" binding:"omitempty,required,min=0"`
 }
 
 // UpdateProduct updates a product
@@ -186,6 +186,11 @@ func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	if err != nil {
 		if err.Error() == "product not found" {
 			errorResponse(ctx, http.StatusNotFound, err)
+			return
+		}
+
+		if err.Error() == "no data to update" {
+			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
 

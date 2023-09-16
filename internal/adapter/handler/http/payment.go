@@ -168,6 +168,11 @@ func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 			return
 		}
 
+		if err.Error() == "no data to update" {
+			errorResponse(ctx, http.StatusBadRequest, err)
+			return
+		}
+
 		errorResponse(ctx, http.StatusInternalServerError, err)
 		return
 	}
