@@ -101,17 +101,17 @@ func (pr *ProductRepository) ListProducts(ctx context.Context, search string, ca
 		Limit(limit).
 		Offset((skip - 1) * limit)
 
-	sql, args, err := query.ToSql()
-	if err != nil {
-		return nil, err
-	}
-
 	if categoryId != 0 {
 		query = query.Where(sq.Eq{"category_id": categoryId})
 	}
 
 	if search != "" {
 		query = query.Where(sq.ILike{"name": "%" + search + "%"})
+	}
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
 	}
 
 	rows, err := pr.db.Query(ctx, sql, args...)
