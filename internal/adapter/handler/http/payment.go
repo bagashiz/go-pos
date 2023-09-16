@@ -14,9 +14,9 @@ type PaymentHandler struct {
 }
 
 // NewPaymentHandler creates a new PaymentHandler instance
-func NewPaymentHandler(PaymentService port.PaymentService) *PaymentHandler {
+func NewPaymentHandler(svc port.PaymentService) *PaymentHandler {
 	return &PaymentHandler{
-		svc: PaymentService,
+		svc,
 	}
 }
 
@@ -148,7 +148,7 @@ func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := convertStringToUint64(idStr)
+	id, err := stringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return

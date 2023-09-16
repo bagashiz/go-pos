@@ -36,9 +36,19 @@ func NewDB(ctx context.Context) (*DB, error) {
 		return nil, err
 	}
 
+	err = db.Ping(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return &DB{
 		db,
 	}, nil
+}
+
+// Close closes the database connection
+func (db *DB) Close() {
+	db.Pool.Close()
 }
 
 // nullString converts a string to sql.NullString for empty string check

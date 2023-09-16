@@ -15,9 +15,9 @@ type OrderHandler struct {
 }
 
 // NewOrderHandler creates a new OrderHandler instance
-func NewOrderHandler(OrderService port.OrderService) *OrderHandler {
+func NewOrderHandler(svc port.OrderService) *OrderHandler {
 	return &OrderHandler{
-		svc: OrderService,
+		svc,
 	}
 }
 

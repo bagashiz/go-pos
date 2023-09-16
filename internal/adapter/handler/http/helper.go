@@ -22,8 +22,8 @@ func newMeta(total, limit, skip uint64) meta {
 	}
 }
 
-// convertStringToUint64 is a helper function to convert a string to uint64
-func convertStringToUint64(str string) (uint64, error) {
+// stringToUint64 is a helper function to convert a string to uint64
+func stringToUint64(str string) (uint64, error) {
 	num, err := strconv.ParseUint(str, 10, 64)
 
 	return num, err

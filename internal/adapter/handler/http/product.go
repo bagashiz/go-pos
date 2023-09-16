@@ -15,9 +15,9 @@ type ProductHandler struct {
 }
 
 // NewProductHandler creates a new ProductHandler instance
-func NewProductHandler(ProductService port.ProductService) *ProductHandler {
+func NewProductHandler(svc port.ProductService) *ProductHandler {
 	return &ProductHandler{
-		svc: ProductService,
+		svc,
 	}
 }
 
@@ -167,7 +167,7 @@ func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := convertStringToUint64(idStr)
+	id, err := stringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return

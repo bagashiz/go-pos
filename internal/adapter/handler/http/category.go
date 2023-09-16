@@ -14,9 +14,9 @@ type CategoryHandler struct {
 }
 
 // NewCategoryHandler creates a new CategoryHandler instance
-func NewCategoryHandler(CategoryService port.CategoryService) *CategoryHandler {
+func NewCategoryHandler(svc port.CategoryService) *CategoryHandler {
 	return &CategoryHandler{
-		svc: CategoryService,
+		svc,
 	}
 }
 
@@ -138,7 +138,7 @@ func (ch *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := convertStringToUint64(idStr)
+	id, err := stringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return

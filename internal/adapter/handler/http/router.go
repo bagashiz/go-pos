@@ -17,7 +17,13 @@ type Router struct {
 }
 
 // NewRouter creates a new HTTP router
-func NewRouter() *Router {
+func NewRouter(
+	userHandler UserHandler,
+	paymentHandler PaymentHandler,
+	categoryHandler CategoryHandler,
+	productHandler ProductHandler,
+	orderHandler OrderHandler,
+) *Router {
 	// Disable debug mode and write logs to file in production
 	env := os.Getenv("APP_ENV")
 	if env == "production" {
@@ -27,31 +33,16 @@ func NewRouter() *Router {
 		gin.DefaultWriter = io.Writer(logFile)
 	}
 
-	router := gin.New()
-	router.Use(gin.LoggerWithFormatter(customLogger))
-	router.Use(gin.Recovery())
-
 	// CORS
 	config := cors.DefaultConfig()
-	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
+	allowedOrigins := os.Getenv("HTTP_ALLOWED_ORIGINS")
 	originsList := strings.Split(allowedOrigins, ",")
 	config.AllowOrigins = originsList
-	router.Use(cors.New(config))
 
-	return &Router{
-		router,
-	}
-}
+	router := gin.New()
+	router.Use(gin.LoggerWithFormatter(customLogger), gin.Recovery(), cors.New(config))
 
-// InitRoutes configures the handler for each route
-func (r *Router) InitRoutes(
-	userHandler UserHandler,
-	paymentHandler PaymentHandler,
-	categoryHandler CategoryHandler,
-	productHandler ProductHandler,
-	orderHandler OrderHandler,
-) {
-	v1 := r.Group("/v1")
+	v1 := router.Group("/v1")
 	{
 		user := v1.Group("/users")
 		{
@@ -92,6 +83,15 @@ func (r *Router) InitRoutes(
 			order.GET("/:id", orderHandler.GetOrder)
 		}
 	}
+
+	return &Router{
+		router,
+	}
+}
+
+// Serve starts the HTTP server
+func (r *Router) Serve(listenAddr string) error {
+	return r.Run(listenAddr)
 }
 
 // customLogger is a custom Gin logger

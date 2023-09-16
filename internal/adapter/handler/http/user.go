@@ -15,9 +15,9 @@ type UserHandler struct {
 }
 
 // NewUserHandler creates a new UserHandler instance
-func NewUserHandler(UserService port.UserService) *UserHandler {
+func NewUserHandler(svc port.UserService) *UserHandler {
 	return &UserHandler{
-		svc: UserService,
+		svc,
 	}
 }
 
@@ -156,7 +156,7 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := convertStringToUint64(idStr)
+	id, err := stringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
