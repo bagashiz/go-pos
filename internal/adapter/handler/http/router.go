@@ -49,6 +49,7 @@ func (r *Router) InitRoutes(
 	paymentHandler PaymentHandler,
 	categoryHandler CategoryHandler,
 	productHandler ProductHandler,
+	orderHandler OrderHandler,
 ) {
 	v1 := r.Group("/v1")
 	{
@@ -83,6 +84,12 @@ func (r *Router) InitRoutes(
 			product.GET("/:id", productHandler.GetProduct)
 			product.PUT("/:id", productHandler.UpdateProduct)
 			product.DELETE("/:id", productHandler.DeleteProduct)
+		}
+		order := v1.Group("/orders")
+		{
+			order.POST("/", orderHandler.CreateOrder)
+			order.GET("/", orderHandler.ListOrders)
+			order.GET("/:id", orderHandler.GetOrder)
 		}
 	}
 }
