@@ -64,7 +64,7 @@ func (uh *UserHandler) Register(ctx *gin.Context) {
 
 	_, err := uh.svc.Register(ctx, &user)
 	if err != nil {
-		if err.Error() == "user already exists" {
+		if err == domain.ErrConflictingData {
 			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
@@ -126,7 +126,7 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 
 	user, err := uh.svc.GetUser(ctx, req.ID)
 	if err != nil {
-		if err.Error() == "user not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
@@ -171,13 +171,18 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 
 	_, err = uh.svc.UpdateUser(ctx, &user)
 	if err != nil {
-		if err.Error() == "user not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
 
-		if err.Error() == "no data to update" {
+		if err == domain.ErrNoUpdatedData {
 			errorResponse(ctx, http.StatusBadRequest, err)
+			return
+		}
+
+		if err == domain.ErrConflictingData {
+			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
 
@@ -205,7 +210,7 @@ func (uh *UserHandler) DeleteUser(ctx *gin.Context) {
 
 	err := uh.svc.DeleteUser(ctx, req.ID)
 	if err != nil {
-		if err.Error() == "user not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}

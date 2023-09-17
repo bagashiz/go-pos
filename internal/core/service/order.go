@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
@@ -42,7 +41,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, order *domain.Order) (*
 		}
 
 		if product.Stock < orderProduct.Quantity {
-			return nil, errors.New("product stock is not enough")
+			return nil, domain.ErrInsufficientStock
 		}
 
 		order.Products[i].TotalPrice = product.Price * float64(orderProduct.Quantity)
@@ -50,7 +49,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, order *domain.Order) (*
 	}
 
 	if order.TotalPaid < totalPrice {
-		return nil, errors.New("total paid is less than total price")
+		return nil, domain.ErrInsufficientPayment
 	}
 
 	order.TotalPrice = totalPrice

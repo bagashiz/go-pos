@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
@@ -32,7 +31,7 @@ func (us *UserService) Register(ctx context.Context, user *domain.User) (*domain
 	}
 
 	if exists {
-		return nil, errors.New("user already exists")
+		return nil, domain.ErrConflictingData
 	}
 
 	hashedPassword, err := util.HashPassword(user.Password)
@@ -71,7 +70,7 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 	emptyData := user.Name == "" && user.Email == "" && user.Password == ""
 	sameData := existingUser.Name == user.Name && existingUser.Email == user.Email
 	if emptyData || sameData {
-		return nil, errors.New("no data to update")
+		return nil, domain.ErrNoUpdatedData
 	}
 
 	var hashedPassword string
@@ -85,7 +84,14 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 
 	user.Password = hashedPassword
 
-	return us.repo.UpdateUser(ctx, user)
+	_, err = us.repo.UpdateUser(ctx, user)
+	if err != nil {
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
+		}
+	}
+
+	return user, nil
 }
 
 // DeleteUser deletes a user by ID

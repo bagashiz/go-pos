@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
@@ -25,7 +24,14 @@ func NewPaymentService(repo port.PaymentRepository) *PaymentService {
 
 // CreatePayment creates a new payment
 func (ps *PaymentService) CreatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
-	return ps.repo.CreatePayment(ctx, payment)
+	_, err := ps.repo.CreatePayment(ctx, payment)
+	if err != nil {
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
+		}
+	}
+
+	return payment, nil
 }
 
 // GetPayment retrieves a payment by id
@@ -48,10 +54,17 @@ func (ps *PaymentService) UpdatePayment(ctx context.Context, payment *domain.Pay
 	emptyData := payment.Name == "" && payment.Type == "" && payment.Logo == ""
 	sameData := existingPayment.Name == payment.Name && existingPayment.Type == payment.Type && existingPayment.Logo == payment.Logo
 	if emptyData || sameData {
-		return nil, errors.New("no data to update")
+		return nil, domain.ErrNoUpdatedData
 	}
 
-	return ps.repo.UpdatePayment(ctx, payment)
+	_, err = ps.repo.UpdatePayment(ctx, payment)
+	if err != nil {
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
+		}
+	}
+
+	return payment, nil
 }
 
 // DeletePayment deletes a payment

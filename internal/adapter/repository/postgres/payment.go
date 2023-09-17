@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -76,7 +75,7 @@ func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*do
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, errors.New("payment not found")
+			return nil, domain.ErrDataNotFound
 		}
 		return nil, err
 	}

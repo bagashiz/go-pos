@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -152,7 +151,7 @@ func (or *OrderRepository) GetOrderByID(ctx context.Context, id uint64) (*domain
 		)
 		if err != nil {
 			if err == pgx.ErrNoRows {
-				return errors.New("order not found")
+				return domain.ErrDataNotFound
 			}
 			return err
 		}
