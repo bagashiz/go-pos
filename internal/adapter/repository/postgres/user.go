@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -100,7 +99,7 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.U
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, errors.New("user not found")
+			return nil, domain.ErrDataNotFound
 		}
 		return nil, err
 	}

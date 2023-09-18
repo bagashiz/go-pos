@@ -7,6 +7,7 @@ import (
 
 	handler "github.com/bagashiz/go-pos/internal/adapter/handler/http"
 	repo "github.com/bagashiz/go-pos/internal/adapter/repository/postgres"
+	token "github.com/bagashiz/go-pos/internal/adapter/token/paseto"
 	"github.com/bagashiz/go-pos/internal/core/service"
 	"github.com/joho/godotenv"
 )
@@ -39,9 +40,10 @@ func main() {
 	appName := os.Getenv("APP_NAME")
 	env := os.Getenv("APP_ENV")
 	dbConn := os.Getenv("DB_CONNECTION")
-	url := os.Getenv("APP_URL")
-	port := os.Getenv("APP_PORT")
-	listenAddr := url + ":" + port
+	tokenSymmetricKey := os.Getenv("TOKEN_SYMMETRIC_KEY")
+	httpUrl := os.Getenv("HTTP_URL")
+	httpPort := os.Getenv("HTTP_PORT")
+	listenAddr := httpUrl + ":" + httpPort
 
 	slog.Info("Starting the application", "app", appName, "env", env)
 
@@ -54,12 +56,13 @@ func main() {
 	}
 	defer db.Close()
 
-	err = db.Ping(ctx)
+	slog.Info("Successfully connected to the database", "db", dbConn)
+
+	// Init token service
+	tokenService, err := token.NewToken(tokenSymmetricKey)
 	if err != nil {
-		slog.Error("Error connecting to database", "error", err)
+		slog.Error("Error initializing token service", "error", err)
 		os.Exit(1)
-	} else {
-		slog.Info("Successfully connected to the database", "db", dbConn)
 	}
 
 	// Dependency injection
@@ -67,6 +70,10 @@ func main() {
 	userRepo := repo.NewUserRepository(db)
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
+
+	// Auth
+	authService := service.NewAuthService(userRepo, tokenService)
+	authHandler := handler.NewAuthHandler(authService)
 
 	// Payment
 	paymentRepo := repo.NewPaymentRepository(db)
@@ -89,9 +96,10 @@ func main() {
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	// Init router
-	router := handler.NewRouter()
-	router.InitRoutes(
+	router := handler.NewRouter(
+		tokenService,
 		*userHandler,
+		*authHandler,
 		*paymentHandler,
 		*categoryHandler,
 		*productHandler,
@@ -100,7 +108,7 @@ func main() {
 
 	// Start server
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
-	err = router.Run(listenAddr)
+	err = router.Serve(listenAddr)
 	if err != nil {
 		slog.Error("Error starting the HTTP server", "error", err)
 		os.Exit(1)

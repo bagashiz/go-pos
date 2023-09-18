@@ -15,9 +15,9 @@ type OrderHandler struct {
 }
 
 // NewOrderHandler creates a new OrderHandler instance
-func NewOrderHandler(OrderService port.OrderService) *OrderHandler {
+func NewOrderHandler(svc port.OrderService) *OrderHandler {
 	return &OrderHandler{
-		svc: OrderService,
+		svc,
 	}
 }
 
@@ -115,8 +115,6 @@ func (oh *OrderHandler) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	userID := 1 // TODO: get user ID from JWT
-
 	for _, product := range req.Products {
 		products = append(products, domain.OrderProduct{
 			ProductID: product.ProductID,
@@ -124,8 +122,10 @@ func (oh *OrderHandler) CreateOrder(ctx *gin.Context) {
 		})
 	}
 
+	authPayload := getAuthPayload(ctx, authorizationPayloadKey)
+
 	order := domain.Order{
-		UserID:       uint64(userID),
+		UserID:       authPayload.UserID,
 		PaymentID:    req.PaymentID,
 		CustomerName: req.CustomerName,
 		TotalPaid:    float64(req.TotalPaid),
@@ -134,12 +134,12 @@ func (oh *OrderHandler) CreateOrder(ctx *gin.Context) {
 
 	_, err := oh.svc.CreateOrder(ctx, &order)
 	if err != nil {
-		if err.Error() == "Product stock is not enough" {
-			errorResponse(ctx, http.StatusBadRequest, err)
+		if err == domain.ErrDataNotFound {
+			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
 
-		if err.Error() == "Total paid is less than total price" {
+		if err == domain.ErrInsufficientStock || err == domain.ErrInsufficientPayment {
 			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
@@ -168,7 +168,7 @@ func (oh *OrderHandler) GetOrder(ctx *gin.Context) {
 
 	order, err := oh.svc.GetOrder(ctx, req.ID)
 	if err != nil {
-		if err.Error() == "order not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}

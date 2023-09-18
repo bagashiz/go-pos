@@ -20,7 +20,6 @@ type UserRepository interface {
 // UserService is an interface for interacting with user-related business logic
 type UserService interface {
 	Register(ctx context.Context, user *domain.User) (*domain.User, error)
-	Login(ctx context.Context, email, password string) (*domain.User, error)
 	GetUser(ctx context.Context, id uint64) (*domain.User, error)
 	ListUsers(ctx context.Context, skip, limit uint64) ([]domain.User, error)
 	UpdateUser(ctx context.Context, user *domain.User) (*domain.User, error)

@@ -14,9 +14,9 @@ type CategoryHandler struct {
 }
 
 // NewCategoryHandler creates a new CategoryHandler instance
-func NewCategoryHandler(CategoryService port.CategoryService) *CategoryHandler {
+func NewCategoryHandler(svc port.CategoryService) *CategoryHandler {
 	return &CategoryHandler{
-		svc: CategoryService,
+		svc,
 	}
 }
 
@@ -53,6 +53,11 @@ func (ch *CategoryHandler) CreateCategory(ctx *gin.Context) {
 
 	_, err := ch.svc.CreateCategory(ctx, &category)
 	if err != nil {
+		if err == domain.ErrConflictingData {
+			errorResponse(ctx, http.StatusConflict, err)
+			return
+		}
+
 		errorResponse(ctx, http.StatusInternalServerError, err)
 		return
 	}
@@ -77,7 +82,7 @@ func (ch *CategoryHandler) GetCategory(ctx *gin.Context) {
 
 	category, err := ch.svc.GetCategory(ctx, req.ID)
 	if err != nil {
-		if err.Error() == "category not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
@@ -138,7 +143,7 @@ func (ch *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := convertStringToUint64(idStr)
+	id, err := stringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -151,13 +156,18 @@ func (ch *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 
 	_, err = ch.svc.UpdateCategory(ctx, &category)
 	if err != nil {
-		if err.Error() == "category not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
 
-		if err.Error() == "no data to update" {
+		if err == domain.ErrNoUpdatedData {
 			errorResponse(ctx, http.StatusBadRequest, err)
+			return
+		}
+
+		if err == domain.ErrConflictingData {
+			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
 
@@ -185,7 +195,7 @@ func (ch *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 
 	err := ch.svc.DeleteCategory(ctx, req.ID)
 	if err != nil {
-		if err.Error() == "category not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -72,7 +71,7 @@ func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, errors.New("category not found")
+			return nil, domain.ErrDataNotFound
 		}
 		return nil, err
 	}

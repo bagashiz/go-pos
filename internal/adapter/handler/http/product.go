@@ -15,9 +15,9 @@ type ProductHandler struct {
 }
 
 // NewProductHandler creates a new ProductHandler instance
-func NewProductHandler(ProductService port.ProductService) *ProductHandler {
+func NewProductHandler(svc port.ProductService) *ProductHandler {
 	return &ProductHandler{
-		svc: ProductService,
+		svc,
 	}
 }
 
@@ -76,6 +76,11 @@ func (ph *ProductHandler) CreateProduct(ctx *gin.Context) {
 
 	_, err := ph.svc.CreateProduct(ctx, &product)
 	if err != nil {
+		if err == domain.ErrConflictingData {
+			errorResponse(ctx, http.StatusConflict, err)
+			return
+		}
+
 		errorResponse(ctx, http.StatusInternalServerError, err)
 		return
 	}
@@ -100,7 +105,7 @@ func (ph *ProductHandler) GetProduct(ctx *gin.Context) {
 
 	product, err := ph.svc.GetProduct(ctx, req.ID)
 	if err != nil {
-		if err.Error() == "product not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
@@ -167,7 +172,7 @@ func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	}
 
 	idStr := ctx.Param("id")
-	id, err := convertStringToUint64(idStr)
+	id, err := stringToUint64(idStr)
 	if err != nil {
 		errorResponse(ctx, http.StatusBadRequest, err)
 		return
@@ -184,13 +189,18 @@ func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 
 	_, err = ph.svc.UpdateProduct(ctx, &product)
 	if err != nil {
-		if err.Error() == "product not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
 
-		if err.Error() == "no data to update" {
+		if err == domain.ErrNoUpdatedData {
 			errorResponse(ctx, http.StatusBadRequest, err)
+			return
+		}
+
+		if err == domain.ErrConflictingData {
+			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
 
@@ -218,7 +228,7 @@ func (ph *ProductHandler) DeleteProduct(ctx *gin.Context) {
 
 	err := ph.svc.DeleteProduct(ctx, req.ID)
 	if err != nil {
-		if err.Error() == "product not found" {
+		if err == domain.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}

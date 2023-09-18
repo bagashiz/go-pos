@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
@@ -34,7 +33,14 @@ func (ps *ProductService) CreateProduct(ctx context.Context, product *domain.Pro
 
 	product.Category = category
 
-	return ps.productRepo.CreateProduct(ctx, product)
+	_, err = ps.productRepo.CreateProduct(ctx, product)
+	if err != nil {
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
+		}
+	}
+
+	return product, nil
 }
 
 // GetProduct retrieves a product by id
@@ -83,7 +89,7 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 	emptyData := product.CategoryID == 0 && product.Name == "" && product.Image == "" && product.Price == 0 && product.Stock == 0
 	sameData := existingProduct.CategoryID == product.CategoryID && existingProduct.Name == product.Name && existingProduct.Image == product.Image && existingProduct.Price == product.Price && existingProduct.Stock == product.Stock
 	if emptyData || sameData {
-		return nil, errors.New("no data to update")
+		return nil, domain.ErrNoUpdatedData
 	}
 
 	if product.CategoryID == 0 {
@@ -97,7 +103,14 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 
 	product.Category = category
 
-	return ps.productRepo.UpdateProduct(ctx, product)
+	_, err = ps.productRepo.UpdateProduct(ctx, product)
+	if err != nil {
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
+		}
+	}
+
+	return product, nil
 }
 
 // DeleteProduct deletes a product

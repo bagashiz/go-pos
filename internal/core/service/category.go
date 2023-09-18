@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
@@ -25,7 +24,14 @@ func NewCategoryService(repo port.CategoryRepository) *CategoryService {
 
 // CreateCategory creates a new category
 func (cs *CategoryService) CreateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error) {
-	return cs.repo.CreateCategory(ctx, category)
+	_, err := cs.repo.CreateCategory(ctx, category)
+	if err != nil {
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
+		}
+	}
+
+	return category, nil
 }
 
 // GetCategory retrieves a category by id
@@ -48,10 +54,17 @@ func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.
 	emptyData := category.Name == ""
 	sameData := existingCategory.Name == category.Name
 	if emptyData || sameData {
-		return nil, errors.New("no data to update")
+		return nil, domain.ErrNoUpdatedData
 	}
 
-	return cs.repo.UpdateCategory(ctx, category)
+	_, err = cs.repo.UpdateCategory(ctx, category)
+	if err != nil {
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
+		}
+	}
+
+	return category, nil
 }
 
 // DeleteCategory deletes a category
