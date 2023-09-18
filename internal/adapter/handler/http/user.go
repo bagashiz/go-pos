@@ -64,12 +64,7 @@ func (uh *UserHandler) Register(ctx *gin.Context) {
 
 	_, err := uh.svc.Register(ctx, &user)
 	if err != nil {
-		if err == port.ErrConflictingData {
-			errorResponse(ctx, http.StatusConflict, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -96,7 +91,7 @@ func (uh *UserHandler) ListUsers(ctx *gin.Context) {
 
 	users, err := uh.svc.ListUsers(ctx, req.Skip, req.Limit)
 	if err != nil {
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -126,12 +121,7 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 
 	user, err := uh.svc.GetUser(ctx, req.ID)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -173,22 +163,7 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 
 	_, err = uh.svc.UpdateUser(ctx, &user)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		if err == port.ErrNoUpdatedData {
-			errorResponse(ctx, http.StatusBadRequest, err)
-			return
-		}
-
-		if err == port.ErrConflictingData {
-			errorResponse(ctx, http.StatusConflict, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -212,12 +187,7 @@ func (uh *UserHandler) DeleteUser(ctx *gin.Context) {
 
 	err := uh.svc.DeleteUser(ctx, req.ID)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 

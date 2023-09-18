@@ -61,12 +61,7 @@ func (ph *PaymentHandler) CreatePayment(ctx *gin.Context) {
 
 	_, err := ph.svc.CreatePayment(ctx, &payment)
 	if err != nil {
-		if err == port.ErrConflictingData {
-			errorResponse(ctx, http.StatusConflict, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -90,12 +85,7 @@ func (ph *PaymentHandler) GetPayment(ctx *gin.Context) {
 
 	payment, err := ph.svc.GetPayment(ctx, req.ID)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -122,7 +112,7 @@ func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 
 	payments, err := ph.svc.ListPayments(ctx, req.Skip, req.Limit)
 	if err != nil {
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -168,22 +158,7 @@ func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 
 	_, err = ph.svc.UpdatePayment(ctx, &payment)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		if err == port.ErrNoUpdatedData {
-			errorResponse(ctx, http.StatusBadRequest, err)
-			return
-		}
-
-		if err == port.ErrConflictingData {
-			errorResponse(ctx, http.StatusConflict, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -207,12 +182,7 @@ func (ph *PaymentHandler) DeletePayment(ctx *gin.Context) {
 
 	err := ph.svc.DeletePayment(ctx, req.ID)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 

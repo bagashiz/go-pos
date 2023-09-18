@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
+	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,6 +43,25 @@ func toMap(m meta, data any, key string) map[string]any {
 		"meta": m,
 		key:    data,
 	}
+}
+
+// errorStatusMap is a map of defined error messages and their corresponding http status codes
+var errorStatusMap = map[error]int{
+	port.ErrDataNotFound:        http.StatusNotFound,
+	port.ErrConflictingData:     http.StatusConflict,
+	port.ErrNoUpdatedData:       http.StatusBadRequest,
+	port.ErrInsufficientStock:   http.StatusBadRequest,
+	port.ErrInsufficientPayment: http.StatusBadRequest,
+}
+
+// handleError determines the status code of an error and returns a JSON response with the error message and status code
+func handleError(ctx *gin.Context, err error) {
+	statusCode, ok := errorStatusMap[err]
+	if !ok {
+		statusCode = http.StatusInternalServerError
+	}
+
+	errorResponse(ctx, statusCode, err)
 }
 
 // errorResponse returns a JSON response with the error message and status code

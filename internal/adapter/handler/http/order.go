@@ -134,17 +134,7 @@ func (oh *OrderHandler) CreateOrder(ctx *gin.Context) {
 
 	_, err := oh.svc.CreateOrder(ctx, &order)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		if err == port.ErrInsufficientStock || err == port.ErrInsufficientPayment {
-			errorResponse(ctx, http.StatusBadRequest, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -168,12 +158,7 @@ func (oh *OrderHandler) GetOrder(ctx *gin.Context) {
 
 	order, err := oh.svc.GetOrder(ctx, req.ID)
 	if err != nil {
-		if err == port.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -200,7 +185,7 @@ func (oh *OrderHandler) ListOrders(ctx *gin.Context) {
 
 	orders, err := oh.svc.ListOrders(ctx, req.Skip, req.Limit)
 	if err != nil {
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 

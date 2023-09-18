@@ -47,12 +47,7 @@ func (ah *AuthHandler) Login(ctx *gin.Context) {
 
 	token, err := ah.svc.Login(ctx, req.Email, req.Password)
 	if err != nil {
-		if err == port.ErrInvalidCredentials {
-			errorResponse(ctx, http.StatusUnauthorized, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
