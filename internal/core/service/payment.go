@@ -26,8 +26,8 @@ func NewPaymentService(repo port.PaymentRepository) *PaymentService {
 func (ps *PaymentService) CreatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
 	_, err := ps.repo.CreatePayment(ctx, payment)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if port.IsUniqueConstraintViolationError(err) {
+			return nil, port.ErrConflictingData
 		}
 	}
 
@@ -54,13 +54,13 @@ func (ps *PaymentService) UpdatePayment(ctx context.Context, payment *domain.Pay
 	emptyData := payment.Name == "" && payment.Type == "" && payment.Logo == ""
 	sameData := existingPayment.Name == payment.Name && existingPayment.Type == payment.Type && existingPayment.Logo == payment.Logo
 	if emptyData || sameData {
-		return nil, domain.ErrNoUpdatedData
+		return nil, port.ErrNoUpdatedData
 	}
 
 	_, err = ps.repo.UpdatePayment(ctx, payment)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if port.IsUniqueConstraintViolationError(err) {
+			return nil, port.ErrConflictingData
 		}
 	}
 

@@ -41,7 +41,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, order *domain.Order) (*
 		}
 
 		if product.Stock < orderProduct.Quantity {
-			return nil, domain.ErrInsufficientStock
+			return nil, port.ErrInsufficientStock
 		}
 
 		order.Products[i].TotalPrice = product.Price * float64(orderProduct.Quantity)
@@ -49,7 +49,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, order *domain.Order) (*
 	}
 
 	if order.TotalPaid < totalPrice {
-		return nil, domain.ErrInsufficientPayment
+		return nil, port.ErrInsufficientPayment
 	}
 
 	order.TotalPrice = totalPrice

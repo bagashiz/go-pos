@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 
-	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-gonic/gin"
 )
@@ -48,7 +47,7 @@ func (ah *AuthHandler) Login(ctx *gin.Context) {
 
 	token, err := ah.svc.Login(ctx, req.Email, req.Password)
 	if err != nil {
-		if err == domain.ErrInvalidCredentials {
+		if err == port.ErrInvalidCredentials {
 			errorResponse(ctx, http.StatusUnauthorized, err)
 			return
 		}

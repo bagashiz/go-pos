@@ -53,7 +53,7 @@ func (ch *CategoryHandler) CreateCategory(ctx *gin.Context) {
 
 	_, err := ch.svc.CreateCategory(ctx, &category)
 	if err != nil {
-		if err == domain.ErrConflictingData {
+		if err == port.ErrConflictingData {
 			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
@@ -82,7 +82,7 @@ func (ch *CategoryHandler) GetCategory(ctx *gin.Context) {
 
 	category, err := ch.svc.GetCategory(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
@@ -156,17 +156,17 @@ func (ch *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 
 	_, err = ch.svc.UpdateCategory(ctx, &category)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
 
-		if err == domain.ErrNoUpdatedData {
+		if err == port.ErrNoUpdatedData {
 			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
 
-		if err == domain.ErrConflictingData {
+		if err == port.ErrConflictingData {
 			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
@@ -195,7 +195,7 @@ func (ch *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 
 	err := ch.svc.DeleteCategory(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}

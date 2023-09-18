@@ -76,7 +76,7 @@ func (ph *ProductHandler) CreateProduct(ctx *gin.Context) {
 
 	_, err := ph.svc.CreateProduct(ctx, &product)
 	if err != nil {
-		if err == domain.ErrConflictingData {
+		if err == port.ErrConflictingData {
 			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
@@ -105,7 +105,7 @@ func (ph *ProductHandler) GetProduct(ctx *gin.Context) {
 
 	product, err := ph.svc.GetProduct(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
@@ -189,17 +189,17 @@ func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 
 	_, err = ph.svc.UpdateProduct(ctx, &product)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
 
-		if err == domain.ErrNoUpdatedData {
+		if err == port.ErrNoUpdatedData {
 			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
 
-		if err == domain.ErrConflictingData {
+		if err == port.ErrConflictingData {
 			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
@@ -228,7 +228,7 @@ func (ph *ProductHandler) DeleteProduct(ctx *gin.Context) {
 
 	err := ph.svc.DeleteProduct(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}

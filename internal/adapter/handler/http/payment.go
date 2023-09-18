@@ -61,7 +61,7 @@ func (ph *PaymentHandler) CreatePayment(ctx *gin.Context) {
 
 	_, err := ph.svc.CreatePayment(ctx, &payment)
 	if err != nil {
-		if err == domain.ErrConflictingData {
+		if err == port.ErrConflictingData {
 			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
@@ -90,7 +90,7 @@ func (ph *PaymentHandler) GetPayment(ctx *gin.Context) {
 
 	payment, err := ph.svc.GetPayment(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
@@ -168,17 +168,17 @@ func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 
 	_, err = ph.svc.UpdatePayment(ctx, &payment)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
 
-		if err == domain.ErrNoUpdatedData {
+		if err == port.ErrNoUpdatedData {
 			errorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
 
-		if err == domain.ErrConflictingData {
+		if err == port.ErrConflictingData {
 			errorResponse(ctx, http.StatusConflict, err)
 			return
 		}
@@ -207,7 +207,7 @@ func (ph *PaymentHandler) DeletePayment(ctx *gin.Context) {
 
 	err := ph.svc.DeletePayment(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
+		if err == port.ErrDataNotFound {
 			errorResponse(ctx, http.StatusNotFound, err)
 			return
 		}
