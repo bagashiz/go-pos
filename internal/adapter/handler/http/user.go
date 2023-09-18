@@ -64,12 +64,7 @@ func (uh *UserHandler) Register(ctx *gin.Context) {
 
 	_, err := uh.svc.Register(ctx, &user)
 	if err != nil {
-		if err == domain.ErrConflictingData {
-			errorResponse(ctx, http.StatusConflict, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -96,7 +91,7 @@ func (uh *UserHandler) ListUsers(ctx *gin.Context) {
 
 	users, err := uh.svc.ListUsers(ctx, req.Skip, req.Limit)
 	if err != nil {
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -126,12 +121,7 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 
 	user, err := uh.svc.GetUser(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -142,9 +132,10 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 
 // updateUserRequest represents the request body for updating a user
 type updateUserRequest struct {
-	Name     string `json:"name" binding:"omitempty,required"`
-	Email    string `json:"email" binding:"omitempty,required,email"`
-	Password string `json:"password" binding:"omitempty,required,min=8"`
+	Name     string          `json:"name" binding:"omitempty,required"`
+	Email    string          `json:"email" binding:"omitempty,required,email"`
+	Password string          `json:"password" binding:"omitempty,required,min=8"`
+	Role     domain.UserRole `json:"role" binding:"omitempty,required,user_role"`
 }
 
 // UpdateUser updates a user's name, email, and password
@@ -167,26 +158,12 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
+		Role:     req.Role,
 	}
 
 	_, err = uh.svc.UpdateUser(ctx, &user)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		if err == domain.ErrNoUpdatedData {
-			errorResponse(ctx, http.StatusBadRequest, err)
-			return
-		}
-
-		if err == domain.ErrConflictingData {
-			errorResponse(ctx, http.StatusConflict, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 
@@ -210,12 +187,7 @@ func (uh *UserHandler) DeleteUser(ctx *gin.Context) {
 
 	err := uh.svc.DeleteUser(ctx, req.ID)
 	if err != nil {
-		if err == domain.ErrDataNotFound {
-			errorResponse(ctx, http.StatusNotFound, err)
-			return
-		}
-
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		handleError(ctx, err)
 		return
 	}
 

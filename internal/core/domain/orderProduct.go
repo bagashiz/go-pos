@@ -2,6 +2,7 @@ package domain
 
 import "time"
 
+// OrderProduct is an entity that represents pivot table between order and product
 type OrderProduct struct {
 	ID         uint64    `json:"id"`
 	OrderID    uint64    `json:"order_id"`

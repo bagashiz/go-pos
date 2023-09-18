@@ -26,8 +26,8 @@ func NewCategoryService(repo port.CategoryRepository) *CategoryService {
 func (cs *CategoryService) CreateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error) {
 	_, err := cs.repo.CreateCategory(ctx, category)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if port.IsUniqueConstraintViolationError(err) {
+			return nil, port.ErrConflictingData
 		}
 	}
 
@@ -54,13 +54,13 @@ func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.
 	emptyData := category.Name == ""
 	sameData := existingCategory.Name == category.Name
 	if emptyData || sameData {
-		return nil, domain.ErrNoUpdatedData
+		return nil, port.ErrNoUpdatedData
 	}
 
 	_, err = cs.repo.UpdateCategory(ctx, category)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if port.IsUniqueConstraintViolationError(err) {
+			return nil, port.ErrConflictingData
 		}
 	}
 

@@ -60,12 +60,12 @@ func (pt *PasetoToken) VerifyToken(token string) (*domain.TokenPayload, error) {
 
 	err := pt.paseto.Decrypt(token, pt.symmetricKey, &payload, nil)
 	if err != nil {
-		return nil, domain.ErrInvalidToken
+		return nil, port.ErrInvalidToken
 	}
 
 	isExpired := time.Now().After(payload.ExpiredAt)
 	if isExpired {
-		return nil, domain.ErrExpiredToken
+		return nil, port.ErrExpiredToken
 	}
 
 	return &payload, nil

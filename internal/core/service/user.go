@@ -31,7 +31,7 @@ func (us *UserService) Register(ctx context.Context, user *domain.User) (*domain
 	}
 
 	if exists {
-		return nil, domain.ErrConflictingData
+		return nil, port.ErrConflictingData
 	}
 
 	hashedPassword, err := util.HashPassword(user.Password)
@@ -61,10 +61,10 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 		return nil, err
 	}
 
-	emptyData := user.Name == "" && user.Email == "" && user.Password == ""
-	sameData := existingUser.Name == user.Name && existingUser.Email == user.Email
+	emptyData := user.Name == "" && user.Email == "" && user.Password == "" && user.Role == ""
+	sameData := existingUser.Name == user.Name && existingUser.Email == user.Email && existingUser.Role == user.Role
 	if emptyData || sameData {
-		return nil, domain.ErrNoUpdatedData
+		return nil, port.ErrNoUpdatedData
 	}
 
 	var hashedPassword string
@@ -80,8 +80,8 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 
 	_, err = us.repo.UpdateUser(ctx, user)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if port.IsUniqueConstraintViolationError(err) {
+			return nil, port.ErrConflictingData
 		}
 	}
 

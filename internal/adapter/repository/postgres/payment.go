@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/core/domain"
+	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -75,7 +76,7 @@ func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*do
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, domain.ErrDataNotFound
+			return nil, port.ErrDataNotFound
 		}
 		return nil, err
 	}
@@ -126,7 +127,7 @@ func (pr *PaymentRepository) ListPayments(ctx context.Context, skip, limit uint6
 // UpdatePayment updates a payment record in the database
 func (pr *PaymentRepository) UpdatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
 	name := nullString(payment.Name)
-	paymentType := nullString(payment.Type)
+	paymentType := nullString(string(payment.Type))
 	logo := nullString(payment.Logo)
 
 	query := psql.Update("payments").

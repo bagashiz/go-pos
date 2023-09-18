@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/core/domain"
+	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -99,7 +100,7 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.U
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, domain.ErrDataNotFound
+			return nil, port.ErrDataNotFound
 		}
 		return nil, err
 	}
@@ -184,11 +185,13 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 	name := nullString(user.Name)
 	email := nullString(user.Email)
 	password := nullString(user.Password)
+	role := nullString(string(user.Role))
 
 	query := psql.Update("users").
 		Set("name", sq.Expr("COALESCE(?, name)", name)).
 		Set("email", sq.Expr("COALESCE(?, email)", email)).
 		Set("password", sq.Expr("COALESCE(?, password)", password)).
+		Set("role", sq.Expr("COALESCE(?, role)", role)).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": user.ID}).
 		Suffix("RETURNING *")

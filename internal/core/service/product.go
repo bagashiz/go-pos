@@ -35,8 +35,8 @@ func (ps *ProductService) CreateProduct(ctx context.Context, product *domain.Pro
 
 	_, err = ps.productRepo.CreateProduct(ctx, product)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if port.IsUniqueConstraintViolationError(err) {
+			return nil, port.ErrConflictingData
 		}
 	}
 
@@ -89,7 +89,7 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 	emptyData := product.CategoryID == 0 && product.Name == "" && product.Image == "" && product.Price == 0 && product.Stock == 0
 	sameData := existingProduct.CategoryID == product.CategoryID && existingProduct.Name == product.Name && existingProduct.Image == product.Image && existingProduct.Price == product.Price && existingProduct.Stock == product.Stock
 	if emptyData || sameData {
-		return nil, domain.ErrNoUpdatedData
+		return nil, port.ErrNoUpdatedData
 	}
 
 	if product.CategoryID == 0 {
@@ -105,8 +105,8 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 
 	_, err = ps.productRepo.UpdateProduct(ctx, product)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if port.IsUniqueConstraintViolationError(err) {
+			return nil, port.ErrConflictingData
 		}
 	}
 

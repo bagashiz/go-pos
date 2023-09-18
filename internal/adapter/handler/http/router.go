@@ -10,6 +10,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 // Router is a wrapper for HTTP router
@@ -26,7 +28,7 @@ func NewRouter(
 	categoryHandler CategoryHandler,
 	productHandler ProductHandler,
 	orderHandler OrderHandler,
-) *Router {
+) (*Router, error) {
 	// Disable debug mode and write logs to file in production
 	env := os.Getenv("APP_ENV")
 	if env == "production" {
@@ -44,6 +46,19 @@ func NewRouter(
 
 	router := gin.New()
 	router.Use(gin.LoggerWithFormatter(customLogger), gin.Recovery(), cors.New(config))
+
+	// Custom validators
+	v, ok := binding.Validator.Engine().(*validator.Validate)
+	if ok {
+		if err := v.RegisterValidation("user_role", userRoleValidator); err != nil {
+			return nil, err
+		}
+
+		if err := v.RegisterValidation("payment_type", paymentTypeValidator); err != nil {
+			return nil, err
+		}
+
+	}
 
 	v1 := router.Group("/v1")
 	{
@@ -110,7 +125,7 @@ func NewRouter(
 
 	return &Router{
 		router,
-	}
+	}, nil
 }
 
 // Serve starts the HTTP server
