@@ -10,6 +10,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 // Router is a wrapper for HTTP router
@@ -44,6 +46,13 @@ func NewRouter(
 
 	router := gin.New()
 	router.Use(gin.LoggerWithFormatter(customLogger), gin.Recovery(), cors.New(config))
+
+	// Custom validators
+	v, ok := binding.Validator.Engine().(*validator.Validate)
+	if ok {
+		v.RegisterValidation("user_role", userRoleValidator)
+		v.RegisterValidation("payment_type", paymentTypeValidator)
+	}
 
 	v1 := router.Group("/v1")
 	{
