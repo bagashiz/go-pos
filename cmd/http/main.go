@@ -96,7 +96,7 @@ func main() {
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	// Init router
-	router := handler.NewRouter(
+	router, err := handler.NewRouter(
 		tokenService,
 		*userHandler,
 		*authHandler,
@@ -105,6 +105,10 @@ func main() {
 		*productHandler,
 		*orderHandler,
 	)
+	if err != nil {
+		slog.Error("Error initializing router", "error", err)
+		os.Exit(1)
+	}
 
 	// Start server
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
