@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +19,9 @@ type Router struct {
 
 // NewRouter creates a new HTTP router
 func NewRouter(
+	tokenService port.TokenService,
 	userHandler UserHandler,
+	authHandler AuthHandler,
 	paymentHandler PaymentHandler,
 	categoryHandler CategoryHandler,
 	productHandler ProductHandler,
@@ -47,36 +50,57 @@ func NewRouter(
 		user := v1.Group("/users")
 		{
 			user.POST("/", userHandler.Register)
-			user.GET("/", userHandler.ListUsers)
-			user.GET("/:id", userHandler.GetUser)
-			user.PUT("/:id", userHandler.UpdateUser)
-			user.DELETE("/:id", userHandler.DeleteUser)
+			user.POST("/login", authHandler.Login)
+
+			authUser := user.Group("/").Use(authMiddleware(tokenService))
+			{
+				authUser.GET("/", userHandler.ListUsers)
+				authUser.GET("/:id", userHandler.GetUser)
+
+				admin := authUser.Use(adminMiddleware())
+				{
+					admin.PUT("/:id", userHandler.UpdateUser)
+					admin.DELETE("/:id", userHandler.DeleteUser)
+				}
+			}
 		}
-		payment := v1.Group("/payments")
+		payment := v1.Group("/payments").Use(authMiddleware(tokenService))
 		{
-			payment.POST("/", paymentHandler.CreatePayment)
 			payment.GET("/", paymentHandler.ListPayments)
 			payment.GET("/:id", paymentHandler.GetPayment)
-			payment.PUT("/:id", paymentHandler.UpdatePayment)
-			payment.DELETE("/:id", paymentHandler.DeletePayment)
+
+			admin := payment.Use(adminMiddleware())
+			{
+				admin.POST("/", paymentHandler.CreatePayment)
+				admin.PUT("/:id", paymentHandler.UpdatePayment)
+				admin.DELETE("/:id", paymentHandler.DeletePayment)
+			}
 		}
-		category := v1.Group("/categories")
+		category := v1.Group("/categories").Use(authMiddleware(tokenService))
 		{
-			category.POST("/", categoryHandler.CreateCategory)
 			category.GET("/", categoryHandler.ListCategories)
 			category.GET("/:id", categoryHandler.GetCategory)
-			category.PUT("/:id", categoryHandler.UpdateCategory)
-			category.DELETE("/:id", categoryHandler.DeleteCategory)
+
+			admin := category.Use(adminMiddleware())
+			{
+				admin.POST("/", categoryHandler.CreateCategory)
+				admin.PUT("/:id", categoryHandler.UpdateCategory)
+				admin.DELETE("/:id", categoryHandler.DeleteCategory)
+			}
 		}
-		product := v1.Group("/products")
+		product := v1.Group("/products").Use(authMiddleware(tokenService))
 		{
-			product.POST("/", productHandler.CreateProduct)
 			product.GET("/", productHandler.ListProducts)
 			product.GET("/:id", productHandler.GetProduct)
-			product.PUT("/:id", productHandler.UpdateProduct)
-			product.DELETE("/:id", productHandler.DeleteProduct)
+
+			admin := product.Use(adminMiddleware())
+			{
+				admin.POST("/", productHandler.CreateProduct)
+				admin.PUT("/:id", productHandler.UpdateProduct)
+				admin.DELETE("/:id", productHandler.DeleteProduct)
+			}
 		}
-		order := v1.Group("/orders")
+		order := v1.Group("/orders").Use(authMiddleware(tokenService))
 		{
 			order.POST("/", orderHandler.CreateOrder)
 			order.GET("/", orderHandler.ListOrders)

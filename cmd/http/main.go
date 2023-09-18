@@ -7,6 +7,7 @@ import (
 
 	handler "github.com/bagashiz/go-pos/internal/adapter/handler/http"
 	repo "github.com/bagashiz/go-pos/internal/adapter/repository/postgres"
+	token "github.com/bagashiz/go-pos/internal/adapter/token/paseto"
 	"github.com/bagashiz/go-pos/internal/core/service"
 	"github.com/joho/godotenv"
 )
@@ -39,6 +40,7 @@ func main() {
 	appName := os.Getenv("APP_NAME")
 	env := os.Getenv("APP_ENV")
 	dbConn := os.Getenv("DB_CONNECTION")
+	tokenSymmetricKey := os.Getenv("TOKEN_SYMMETRIC_KEY")
 	httpUrl := os.Getenv("HTTP_URL")
 	httpPort := os.Getenv("HTTP_PORT")
 	listenAddr := httpUrl + ":" + httpPort
@@ -56,11 +58,22 @@ func main() {
 
 	slog.Info("Successfully connected to the database", "db", dbConn)
 
+	// Init token service
+	tokenService, err := token.NewToken(tokenSymmetricKey)
+	if err != nil {
+		slog.Error("Error initializing token service", "error", err)
+		os.Exit(1)
+	}
+
 	// Dependency injection
 	// User
 	userRepo := repo.NewUserRepository(db)
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
+
+	// Auth
+	authService := service.NewAuthService(userRepo, tokenService)
+	authHandler := handler.NewAuthHandler(authService)
 
 	// Payment
 	paymentRepo := repo.NewPaymentRepository(db)
@@ -84,7 +97,9 @@ func main() {
 
 	// Init router
 	router := handler.NewRouter(
+		tokenService,
 		*userHandler,
+		*authHandler,
 		*paymentHandler,
 		*categoryHandler,
 		*productHandler,

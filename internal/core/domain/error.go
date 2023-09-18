@@ -16,6 +16,20 @@ var (
 	ErrInsufficientStock = errors.New("product stock is not enough")
 	// ErrInsufficientPayment is an error for when total paid is less than total price
 	ErrInsufficientPayment = errors.New("total paid is less than total price")
+	// ErrExpiredToken is an error for when the access token is expired
+	ErrExpiredToken = errors.New("access token has expired")
+	// ErrInvalidToken is an error for when the access token is invalid
+	ErrInvalidToken = errors.New("access token is invalid")
+	// ErrInvalidCredentials is an error for when the credentials are invalid
+	ErrInvalidCredentials = errors.New("invalid email or password")
+	// ErrEmptyAuthorizationHeader is an error for when the authorization header is empty
+	ErrEmptyAuthorizationHeader = errors.New("authorization header is not provided")
+	// ErrInvalidAuthorizationHeader is an error for when the authorization header is invalid
+	ErrInvalidAuthorizationHeader = errors.New("authorization header format is invalid")
+	// ErrInvalidAuthorizationType is an error for when the authorization type is invalid
+	ErrInvalidAuthorizationType = errors.New("authorization type is not supported")
+	// ErrUnauthorized is an error for when the user is unauthorized
+	ErrUnauthorized = errors.New("user is unauthorized to access the resource")
 )
 
 // IsUniqueConstraintViolationError checks if the error is a unique constraint violation error

@@ -115,8 +115,6 @@ func (oh *OrderHandler) CreateOrder(ctx *gin.Context) {
 		return
 	}
 
-	userID := 1 // TODO: get user ID from JWT
-
 	for _, product := range req.Products {
 		products = append(products, domain.OrderProduct{
 			ProductID: product.ProductID,
@@ -124,8 +122,10 @@ func (oh *OrderHandler) CreateOrder(ctx *gin.Context) {
 		})
 	}
 
+	authPayload := getAuthPayload(ctx, authorizationPayloadKey)
+
 	order := domain.Order{
-		UserID:       uint64(userID),
+		UserID:       authPayload.UserID,
 		PaymentID:    req.PaymentID,
 		CustomerName: req.CustomerName,
 		TotalPaid:    float64(req.TotalPaid),

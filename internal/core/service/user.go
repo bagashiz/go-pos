@@ -44,12 +44,6 @@ func (us *UserService) Register(ctx context.Context, user *domain.User) (*domain
 	return us.repo.CreateUser(ctx, user)
 }
 
-// Login authenticates a user
-func (us *UserService) Login(ctx context.Context, email, password string) (*domain.User, error) {
-	// TODO: Implement login with token
-	return us.repo.GetUserByEmail(ctx, email)
-}
-
 // GetUser gets a user by ID
 func (us *UserService) GetUser(ctx context.Context, id uint64) (*domain.User, error) {
 	return us.repo.GetUserByID(ctx, id)
