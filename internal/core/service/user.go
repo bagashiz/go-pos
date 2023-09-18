@@ -61,8 +61,8 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 		return nil, err
 	}
 
-	emptyData := user.Name == "" && user.Email == "" && user.Password == ""
-	sameData := existingUser.Name == user.Name && existingUser.Email == user.Email
+	emptyData := user.Name == "" && user.Email == "" && user.Password == "" && user.Role == ""
+	sameData := existingUser.Name == user.Name && existingUser.Email == user.Email && existingUser.Role == user.Role
 	if emptyData || sameData {
 		return nil, port.ErrNoUpdatedData
 	}

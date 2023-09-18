@@ -142,9 +142,10 @@ func (uh *UserHandler) GetUser(ctx *gin.Context) {
 
 // updateUserRequest represents the request body for updating a user
 type updateUserRequest struct {
-	Name     string `json:"name" binding:"omitempty,required"`
-	Email    string `json:"email" binding:"omitempty,required,email"`
-	Password string `json:"password" binding:"omitempty,required,min=8"`
+	Name     string          `json:"name" binding:"omitempty,required"`
+	Email    string          `json:"email" binding:"omitempty,required,email"`
+	Password string          `json:"password" binding:"omitempty,required,min=8"`
+	Role     domain.UserRole `json:"role" binding:"omitempty,required,user_role"`
 }
 
 // UpdateUser updates a user's name, email, and password
@@ -167,6 +168,7 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
+		Role:     req.Role,
 	}
 
 	_, err = uh.svc.UpdateUser(ctx, &user)
