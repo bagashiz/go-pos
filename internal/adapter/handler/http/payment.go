@@ -22,10 +22,10 @@ func NewPaymentHandler(svc port.PaymentService) *PaymentHandler {
 
 // paymentResponse represents a payment response body
 type paymentResponse struct {
-	ID   uint64 `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Logo string `json:"logo"`
+	ID   uint64             `json:"id"`
+	Name string             `json:"name"`
+	Type domain.PaymentType `json:"type"`
+	Logo string             `json:"logo"`
 }
 
 // newPaymentResponse is a helper function to create a response body for handling payment data
@@ -40,9 +40,9 @@ func newPaymentResponse(payment *domain.Payment) paymentResponse {
 
 // createPaymentRequest represents a request body for creating a new payment
 type createPaymentRequest struct {
-	Name string `json:"name" binding:"required"`
-	Type string `json:"type" binding:"required"`
-	Logo string `json:"logo" binding:"omitempty,required"`
+	Name string             `json:"name" binding:"required"`
+	Type domain.PaymentType `json:"type" binding:"required"`
+	Logo string             `json:"logo" binding:"omitempty,required"`
 }
 
 // CreatePayment creates a new payment
@@ -139,9 +139,9 @@ func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 
 // updatePaymentRequest represents a request body for updating a payment
 type updatePaymentRequest struct {
-	Name string `json:"name" binding:"omitempty,required"`
-	Type string `json:"type" binding:"omitempty,required"`
-	Logo string `json:"logo" binding:"omitempty,required"`
+	Name string             `json:"name" binding:"omitempty,required"`
+	Type domain.PaymentType `json:"type" binding:"omitempty,required,payment_type"`
+	Logo string             `json:"logo" binding:"omitempty,required"`
 }
 
 // UpdatePayment updates a payment
