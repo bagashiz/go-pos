@@ -14,5 +14,11 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
 
+  redis_gopos:
+    image: redis:7.2-alpine
+    container_name: redis_gopos
+    ports:
+      - 6379:6379
+
 volumes:
   data:

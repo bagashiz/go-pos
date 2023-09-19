@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	cache "github.com/bagashiz/go-pos/internal/adapter/cache/redis"
 	handler "github.com/bagashiz/go-pos/internal/adapter/handler/http"
 	repo "github.com/bagashiz/go-pos/internal/adapter/repository/postgres"
 	token "github.com/bagashiz/go-pos/internal/adapter/token/paseto"
@@ -58,8 +59,16 @@ func main() {
 
 	slog.Info("Successfully connected to the database", "db", dbConn)
 
+	// Init cache service
+	cache, err := cache.NewCache(ctx)
+	if err != nil {
+		slog.Error("Error initializing cache connection", "error", err)
+		os.Exit(1)
+	}
+	defer cache.Close()
+
 	// Init token service
-	tokenService, err := token.NewToken(tokenSymmetricKey)
+	token, err := token.NewToken(tokenSymmetricKey)
 	if err != nil {
 		slog.Error("Error initializing token service", "error", err)
 		os.Exit(1)
@@ -68,36 +77,36 @@ func main() {
 	// Dependency injection
 	// User
 	userRepo := repo.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, cache)
 	userHandler := handler.NewUserHandler(userService)
 
 	// Auth
-	authService := service.NewAuthService(userRepo, tokenService)
+	authService := service.NewAuthService(userRepo, token)
 	authHandler := handler.NewAuthHandler(authService)
 
 	// Payment
 	paymentRepo := repo.NewPaymentRepository(db)
-	paymentService := service.NewPaymentService(paymentRepo)
+	paymentService := service.NewPaymentService(paymentRepo, cache)
 	paymentHandler := handler.NewPaymentHandler(paymentService)
 
 	// Category
 	categoryRepo := repo.NewCategoryRepository(db)
-	categoryService := service.NewCategoryService(categoryRepo)
+	categoryService := service.NewCategoryService(categoryRepo, cache)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	// Product
 	productRepo := repo.NewProductRepository(db)
-	productService := service.NewProductService(productRepo, categoryRepo)
+	productService := service.NewProductService(productRepo, categoryRepo, cache)
 	productHandler := handler.NewProductHandler(productService)
 
 	// Order
 	orderRepo := repo.NewOrderRepository(db)
-	orderService := service.NewOrderService(orderRepo, productRepo, categoryRepo, userRepo, paymentRepo)
+	orderService := service.NewOrderService(orderRepo, productRepo, categoryRepo, userRepo, paymentRepo, cache)
 	orderHandler := handler.NewOrderHandler(orderService)
 
 	// Init router
 	router, err := handler.NewRouter(
-		tokenService,
+		token,
 		*userHandler,
 		*authHandler,
 		*paymentHandler,

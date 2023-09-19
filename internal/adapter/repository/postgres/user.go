@@ -25,28 +25,6 @@ func NewUserRepository(db *DB) *UserRepository {
 	}
 }
 
-// CheckUserExists checks if a user exists in the database using the email
-func (ur *UserRepository) CheckUserExists(ctx context.Context, email string) (bool, error) {
-	var count int
-
-	query := psql.Select("COUNT(*)").
-		From("users").
-		Where(sq.Eq{"email": email}).
-		Limit(1)
-
-	sql, args, err := query.ToSql()
-	if err != nil {
-		return false, err
-	}
-
-	err = ur.db.QueryRow(ctx, sql, args...).Scan(&count)
-	if err != nil {
-		return false, err
-	}
-
-	return count > 0, nil
-}
-
 // CreateUser creates a new user in the database
 func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	query := psql.Insert("users").
