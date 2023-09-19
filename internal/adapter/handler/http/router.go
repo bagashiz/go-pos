@@ -21,7 +21,7 @@ type Router struct {
 
 // NewRouter creates a new HTTP router
 func NewRouter(
-	tokenService port.TokenService,
+	token port.TokenService,
 	userHandler UserHandler,
 	authHandler AuthHandler,
 	paymentHandler PaymentHandler,
@@ -67,7 +67,7 @@ func NewRouter(
 			user.POST("/", userHandler.Register)
 			user.POST("/login", authHandler.Login)
 
-			authUser := user.Group("/").Use(authMiddleware(tokenService))
+			authUser := user.Group("/").Use(authMiddleware(token))
 			{
 				authUser.GET("/", userHandler.ListUsers)
 				authUser.GET("/:id", userHandler.GetUser)
@@ -79,7 +79,7 @@ func NewRouter(
 				}
 			}
 		}
-		payment := v1.Group("/payments").Use(authMiddleware(tokenService))
+		payment := v1.Group("/payments").Use(authMiddleware(token))
 		{
 			payment.GET("/", paymentHandler.ListPayments)
 			payment.GET("/:id", paymentHandler.GetPayment)
@@ -91,7 +91,7 @@ func NewRouter(
 				admin.DELETE("/:id", paymentHandler.DeletePayment)
 			}
 		}
-		category := v1.Group("/categories").Use(authMiddleware(tokenService))
+		category := v1.Group("/categories").Use(authMiddleware(token))
 		{
 			category.GET("/", categoryHandler.ListCategories)
 			category.GET("/:id", categoryHandler.GetCategory)
@@ -103,7 +103,7 @@ func NewRouter(
 				admin.DELETE("/:id", categoryHandler.DeleteCategory)
 			}
 		}
-		product := v1.Group("/products").Use(authMiddleware(tokenService))
+		product := v1.Group("/products").Use(authMiddleware(token))
 		{
 			product.GET("/", productHandler.ListProducts)
 			product.GET("/:id", productHandler.GetProduct)
@@ -115,7 +115,7 @@ func NewRouter(
 				admin.DELETE("/:id", productHandler.DeleteProduct)
 			}
 		}
-		order := v1.Group("/orders").Use(authMiddleware(tokenService))
+		order := v1.Group("/orders").Use(authMiddleware(token))
 		{
 			order.POST("/", orderHandler.CreateOrder)
 			order.GET("/", orderHandler.ListOrders)

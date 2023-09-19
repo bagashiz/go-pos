@@ -8,8 +8,6 @@ import (
 
 // UserRepository is an interface for interacting with user-related data
 type UserRepository interface {
-	// CheckUserExists selects a user by email and returns true if it exists
-	CheckUserExists(ctx context.Context, email string) (bool, error)
 	// CreateUser inserts a new user into the database
 	CreateUser(ctx context.Context, user *domain.User) (*domain.User, error)
 	// GetUserByID selects a user by id

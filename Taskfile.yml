@@ -14,10 +14,25 @@ tasks:
     desc: "Gettings started"
     cmds:
       - task: install
-      - task: db:up
+      - task: service:up
       - task: db:create
       - task: migrate:up
       - task: dev
+
+  install:
+    desc: "Install dependencies"
+    cmds:
+      - go install github.com/go-task/task/v3/cmd/task@latest
+      - go install github.com/cosmtrek/air@latest
+      - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+  service:up:
+    desc: "Start services containers"
+    cmd: podman-compose up -d
+
+  service:down:
+    desc: "Stop services and remove containers"
+    cmd: podman-compose down
 
   db:docs:
     desc: "Generate database documentation from DBML file"
@@ -26,13 +41,25 @@ tasks:
       vars:
         - DBML_FILE
 
-  db:up:
-    desc: "Start database container"
-    cmd: podman-compose up -d
-
   db:create:
     desc: "Create database schema"
     cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'CREATE DATABASE {{.DB_DATABASE}};'"
+    requires:
+      vars:
+        - DB_USERNAME
+        - DB_DATABASE
+
+  db:drop:
+    desc: "Drop database schema"
+    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'DROP DATABASE {{.DB_DATABASE}};'"
+    requires:
+      vars:
+        - DB_USERNAME
+        - DB_DATABASE
+
+  db:cli:
+    desc: "Connect to database using command line interface"
+    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -d {{.DB_DATABASE}}"
     requires:
       vars:
         - DB_USERNAME
@@ -52,17 +79,9 @@ tasks:
       vars:
         - DSN
 
-  db:drop:
-    desc: "Drop database schema"
-    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'DROP DATABASE {{.DB_DATABASE}};'"
-    requires:
-      vars:
-        - DB_USERNAME
-        - DB_DATABASE
-
-  db:down:
-    desc: "Stop database container"
-    cmd: podman-compose down
+  redis:cli:
+    desc: "Connect to redis using command line interface"
+    cmd: podman exec -it redis_gopos redis-cli
 
   dev:
     desc: "Start development server"
@@ -91,10 +110,3 @@ tasks:
   # test:
   #   desc: "Run tests"
   #   cmd: ginkgo -v -r --cover --race --keep-going --timeout=30s
-
-  install:
-    desc: "Install dependencies"
-    cmds:
-      - go install github.com/go-task/task/v3/cmd/task@latest
-      - go install github.com/cosmtrek/air@latest
-      - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
