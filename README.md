@@ -1,12 +1,10 @@
 # Go POS
 
-## **⚠️WIP⚠️**
-
 ## Description
 
-A simple RESTful Point of Sale (POS) web service written in Go programming language. This project is a part of my learning process in understanding [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) in Go. The project is still in progress and will be updated from time to time.
+A simple RESTful Point of Sale (POS) web service written in Go programming language. This project is a part of my learning process in understanding [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture/) in Go.
 
-It uses [Gin](https://gin-gonic.com/) as the HTTP framework and [PostgreSQL](https://www.postgresql.org/) as the database with [pgx](https://github.com/jackc/pgx/) as the driver and [Squirrel](https://github.com/Masterminds/squirrel) as the query builder.
+It uses [Gin](https://gin-gonic.com/) as the HTTP framework and [PostgreSQL](https://www.postgresql.org/) as the database with [pgx](https://github.com/jackc/pgx/) as the driver and [Squirrel](https://github.com/Masterminds/squirrel/) as the query builder. It also utilizes [Redis](https://redis.io/) as the caching layer with [go-redis](https://github.com/redis/go-redis/) as the client.
 
 ## Getting Started
 
@@ -30,15 +28,15 @@ It uses [Gin](https://gin-gonic.com/) as the HTTP framework and [PostgreSQL](htt
 
     Update configuration values as needed.
 
-4. Run the PostgreSQL container:
+4. Run the service containers:
 
     ```bash
-    task db:up
+    task service:up
     task db:create
     task migrate:up
     ```
 
-    **NOTE**: the command use `podman-compose` by default. If you want to use `docker compose`, manually run `docker compose up -d` instead or replace `podman-compose` with `docker compose` in the `db:up` task inside `Taskfile.yml` file.
+    **NOTE**: the command use `podman` and `podman-compose` by default. If you want to use `docker` or `docker compose`, manually run `docker` commands instead or replace `podman` and `podman-compose` with `docker` or `docker compose` in the tasks inside `Taskfile.yml` file.
 
 5. Run the project in development mode:
 
@@ -50,7 +48,7 @@ It uses [Gin](https://gin-gonic.com/) as the HTTP framework and [PostgreSQL](htt
 
 For database schema documentation, see [here](https://dbdocs.io/bagashiz/Go-POS/), powered by [dbdocs.io](https://dbdocs.io/).
 
-API documentation is still in progress.
+API documentation can be found in `docs/` directory. To view the documentation, open the browser and go to `http://localhost:8080/swagger/index.html`. The documentation is generated using [swaggo](https://github.com/swaggo/swag/) using [swaggo/gin-swagger](https://github.com/swaggo/gin-swagger/) middleware.
 
 ## Contributing
 
