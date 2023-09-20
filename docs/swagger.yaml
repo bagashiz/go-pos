@@ -1,0 +1,1324 @@
+basePath: /v1
+definitions:
+  domain.PaymentType:
+    enum:
+    - CASH
+    - E-WALLET
+    - EDC
+    type: string
+    x-enum-varnames:
+    - Cash
+    - EWallet
+    - EDC
+  domain.UserRole:
+    enum:
+    - admin
+    - cashier
+    type: string
+    x-enum-varnames:
+    - Admin
+    - Cashier
+  handler.authResponse:
+    properties:
+      token:
+        example: v2.local.Gdh5kiOTyyaQ3_bNykYDeYHO21Jg2...
+        type: string
+    type: object
+  handler.categoryResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Foods
+        type: string
+    type: object
+  handler.createCategoryRequest:
+    properties:
+      name:
+        example: Foods
+        type: string
+    required:
+    - name
+    type: object
+  handler.createOrderRequest:
+    properties:
+      customer_name:
+        example: John Doe
+        type: string
+      payment_id:
+        example: 1
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/handler.orderProductRequest'
+        type: array
+      total_paid:
+        example: 100000
+        type: integer
+    required:
+    - customer_name
+    - payment_id
+    - products
+    - total_paid
+    type: object
+  handler.createPaymentRequest:
+    properties:
+      logo:
+        example: https://example.com/cash.png
+        type: string
+      name:
+        example: Tunai
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/domain.PaymentType'
+        example: CASH
+    required:
+    - logo
+    - name
+    - type
+    type: object
+  handler.createProductRequest:
+    properties:
+      category_id:
+        example: 1
+        minimum: 1
+        type: integer
+      image:
+        example: https://example.com/chiki-ball.png
+        type: string
+      name:
+        example: Chiki Ball
+        type: string
+      price:
+        example: 5000
+        minimum: 0
+        type: number
+      stock:
+        example: 100
+        minimum: 0
+        type: integer
+    required:
+    - category_id
+    - image
+    - name
+    - price
+    - stock
+    type: object
+  handler.loginRequest:
+    properties:
+      email:
+        example: test@example.com
+        type: string
+      password:
+        example: "12345678"
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handler.orderProductRequest:
+    properties:
+      product_id:
+        example: 1
+        minimum: 1
+        type: integer
+      qty:
+        example: 1
+        type: integer
+    required:
+    - product_id
+    - qty
+    type: object
+  handler.orderProductResponse:
+    properties:
+      created_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      order_id:
+        example: 1
+        type: integer
+      price:
+        example: 100000
+        type: number
+      product:
+        $ref: '#/definitions/handler.productResponse'
+      product_id:
+        example: 1
+        type: integer
+      qty:
+        example: 1
+        type: integer
+      total_final_price:
+        example: 100000
+        type: number
+      total_normal_price:
+        example: 100000
+        type: number
+      updated_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+    type: object
+  handler.orderResponse:
+    properties:
+      created_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+      customer_name:
+        example: John Doe
+        type: string
+      id:
+        example: 1
+        type: integer
+      payment_type:
+        $ref: '#/definitions/handler.paymentResponse'
+      payment_type_id:
+        example: 1
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/handler.orderProductResponse'
+        type: array
+      receipt_id:
+        example: 4979cf6e-d215-4ff8-9d0d-b3e99bcc7750
+        type: string
+      total_paid:
+        example: 100000
+        type: number
+      total_price:
+        example: 100000
+        type: number
+      total_return:
+        example: 0
+        type: number
+      updated_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+      user_id:
+        example: 1
+        type: integer
+    type: object
+  handler.paymentResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      logo:
+        example: https://example.com/cash.png
+        type: string
+      name:
+        example: Tunai
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/domain.PaymentType'
+        example: CASH
+    type: object
+  handler.productResponse:
+    properties:
+      category:
+        $ref: '#/definitions/handler.categoryResponse'
+      created_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      image:
+        example: https://example.com/chiki-ball.png
+        type: string
+      name:
+        example: Chiki Ball
+        type: string
+      price:
+        example: 5000
+        type: number
+      sku:
+        example: 9a4c25d3-9786-492c-b084-85cb75c1ee3e
+        type: string
+      stock:
+        example: 100
+        type: integer
+      updated_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+    type: object
+  handler.registerRequest:
+    properties:
+      email:
+        example: test@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "12345678"
+        minLength: 8
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  handler.response:
+    properties:
+      data: {}
+      message:
+        example: Success || {Error message}
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  handler.updateCategoryRequest:
+    properties:
+      name:
+        example: Beverages
+        type: string
+    required:
+    - name
+    type: object
+  handler.updatePaymentRequest:
+    properties:
+      logo:
+        example: https://example.com/gopay.png
+        type: string
+      name:
+        example: Gopay
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/domain.PaymentType'
+        example: E-WALLET
+    required:
+    - logo
+    - name
+    - type
+    type: object
+  handler.updateProductRequest:
+    properties:
+      category_id:
+        example: 1
+        minimum: 1
+        type: integer
+      image:
+        example: https://example.com/nutrisari-jeruk.png
+        type: string
+      name:
+        example: Nutrisari Jeruk
+        type: string
+      price:
+        example: 2000
+        minimum: 0
+        type: number
+      stock:
+        example: 200
+        minimum: 0
+        type: integer
+    required:
+    - category_id
+    - image
+    - name
+    - price
+    - stock
+    type: object
+  handler.updateUserRequest:
+    properties:
+      email:
+        example: test@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      password:
+        example: "12345678"
+        minLength: 8
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/domain.UserRole'
+        example: admin
+    required:
+    - email
+    - name
+    - password
+    - role
+    type: object
+  handler.userResponse:
+    properties:
+      c0eated_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+      email:
+        example: test@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: John Doe
+        type: string
+      updated_at:
+        example: "1970-01-01T00:00:00Z"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: bagash.office@simplelogin.com
+    name: Bagas Hizbullah
+    url: https://github.com/bagashiz/go-pos
+  description: This is a simple RESTful Point of Sale (POS) Service API written in
+    Go using Gin web framework, PostgreSQL database, and Redis cache.
+  license:
+    name: MIT
+    url: https://github.com/bagashiz/go-pos/blob/main/LICENSE
+  title: Go POS (Point of Sale) API
+  version: "1.0"
+paths:
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: List categories with pagination
+      parameters:
+      - description: Skip
+        in: query
+        name: skip
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Categories displayed
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: List categories
+      tags:
+      - Categories
+    post:
+      consumes:
+      - application/json
+      description: create a new category with name
+      parameters:
+      - description: Create category request
+        in: body
+        name: createCategoryRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Category created
+          schema:
+            $ref: '#/definitions/handler.categoryResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Create a new category
+      tags:
+      - Categories
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category by id
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category deleted
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Delete a category
+      tags:
+      - Categories
+    get:
+      consumes:
+      - application/json
+      description: get a category by id
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category retrieved
+          schema:
+            $ref: '#/definitions/handler.categoryResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get a category
+      tags:
+      - Categories
+    put:
+      consumes:
+      - application/json
+      description: update a category's name by id
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update category request
+        in: body
+        name: updateCategoryRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category updated
+          schema:
+            $ref: '#/definitions/handler.categoryResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Update a category
+      tags:
+      - Categories
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: List orders and return an array of order data with purchase details
+      parameters:
+      - description: Skip records
+        in: query
+        name: skip
+        required: true
+        type: integer
+      - description: Limit records
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Orders displayed
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: List orders
+      tags:
+      - Orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order and return the order data with purchase details
+      parameters:
+      - description: Create order request
+        in: body
+        name: createOrderRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Order created
+          schema:
+            $ref: '#/definitions/handler.orderResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Create a new order
+      tags:
+      - Orders
+  /orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get an order by id and return the order data with purchase details
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order displayed
+          schema:
+            $ref: '#/definitions/handler.orderResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get an order
+      tags:
+      - Orders
+  /payments:
+    get:
+      consumes:
+      - application/json
+      description: List payments with pagination
+      parameters:
+      - description: Skip
+        in: query
+        name: skip
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payments displayed
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: List payments
+      tags:
+      - Payments
+    post:
+      consumes:
+      - application/json
+      description: create a new payment with name, type, and logo
+      parameters:
+      - description: Create payment request
+        in: body
+        name: createPaymentRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createPaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Payment created
+          schema:
+            $ref: '#/definitions/handler.paymentResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Create a new payment
+      tags:
+      - Payments
+  /payments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a payment by id
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment deleted
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Delete a payment
+      tags:
+      - Payments
+    get:
+      consumes:
+      - application/json
+      description: get a payment by id
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment retrieved
+          schema:
+            $ref: '#/definitions/handler.paymentResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get a payment
+      tags:
+      - Payments
+    put:
+      consumes:
+      - application/json
+      description: update a payment's name, type, or logo by id
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update payment request
+        in: body
+        name: updatePaymentRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updatePaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payment updated
+          schema:
+            $ref: '#/definitions/handler.paymentResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Update a payment
+      tags:
+      - Payments
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: List products with pagination
+      parameters:
+      - description: Category ID
+        in: query
+        name: category_id
+        type: integer
+      - description: Query
+        in: query
+        name: q
+        type: string
+      - description: Skip
+        in: query
+        name: skip
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Products retrieved
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: List products
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: create a new product with name, image, price, and stock
+      parameters:
+      - description: Create product request
+        in: body
+        name: createProductRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Product created
+          schema:
+            $ref: '#/definitions/handler.productResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Create a new product
+      tags:
+      - Products
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product by id
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product deleted
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Delete a product
+      tags:
+      - Products
+    get:
+      consumes:
+      - application/json
+      description: get a product by id with its category
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product retrieved
+          schema:
+            $ref: '#/definitions/handler.productResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get a product
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: update a product's name, image, price, or stock by id
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update product request
+        in: body
+        name: updateProductRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product updated
+          schema:
+            $ref: '#/definitions/handler.productResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Update a product
+      tags:
+      - Products
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: List users with pagination
+      parameters:
+      - description: Skip
+        in: query
+        name: skip
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users displayed
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: List users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: create a new user account with default role "cashier"
+      parameters:
+      - description: Register request
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created
+          schema:
+            $ref: '#/definitions/handler.userResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "409":
+          description: Data conflict error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Register a new user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Get a user by id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User displayed
+          schema:
+            $ref: '#/definitions/handler.userResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get a user
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update a user's name, email, password, or role by id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update user request
+        in: body
+        name: updateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated
+          schema:
+            $ref: '#/definitions/handler.userResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Data not found error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - BearerAuth: []
+      summary: Update a user
+      tags:
+      - Users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a registered user and returns an access token if the credentials
+        are valid.
+      parameters:
+      - description: Login request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succesfully logged in
+          schema:
+            $ref: '#/definitions/handler.authResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Login and get an access token
+      tags:
+      - Users
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and the access token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

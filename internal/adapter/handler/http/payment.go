@@ -22,10 +22,10 @@ func NewPaymentHandler(svc port.PaymentService) *PaymentHandler {
 
 // paymentResponse represents a payment response body
 type paymentResponse struct {
-	ID   uint64             `json:"id"`
-	Name string             `json:"name"`
-	Type domain.PaymentType `json:"type"`
-	Logo string             `json:"logo"`
+	ID   uint64             `json:"id" example:"1"`
+	Name string             `json:"name" example:"Tunai"`
+	Type domain.PaymentType `json:"type" example:"CASH"`
+	Logo string             `json:"logo" example:"https://example.com/cash.png"`
 }
 
 // newPaymentResponse is a helper function to create a response body for handling payment data
@@ -40,12 +40,27 @@ func newPaymentResponse(payment *domain.Payment) paymentResponse {
 
 // createPaymentRequest represents a request body for creating a new payment
 type createPaymentRequest struct {
-	Name string             `json:"name" binding:"required"`
-	Type domain.PaymentType `json:"type" binding:"required"`
-	Logo string             `json:"logo" binding:"omitempty,required"`
+	Name string             `json:"name" binding:"required" example:"Tunai"`
+	Type domain.PaymentType `json:"type" binding:"required" example:"CASH"`
+	Logo string             `json:"logo" binding:"omitempty,required" example:"https://example.com/cash.png"`
 }
 
-// CreatePayment creates a new payment
+// CreatePayment godoc
+//
+//	@Summary		Create a new payment
+//	@Description	create a new payment with name, type, and logo
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			createPaymentRequest	body		createPaymentRequest	true	"Create payment request"
+//	@Success		201						{object}	paymentResponse			"Payment created"
+//	@Failure		400						{object}	response				"Validation error"
+//	@Failure		401						{object}	response				"Unauthorized error"
+//	@Failure		404						{object}	response				"Data not found error"
+//	@Failure		409						{object}	response				"Data conflict error"
+//	@Failure		500						{object}	response				"Internal server error"
+//	@Router			/payments [post]
+//	@Security		BearerAuth
 func (ph *PaymentHandler) CreatePayment(ctx *gin.Context) {
 	var req createPaymentRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -72,10 +87,22 @@ func (ph *PaymentHandler) CreatePayment(ctx *gin.Context) {
 
 // getPaymentRequest represents a request body for retrieving a payment
 type getPaymentRequest struct {
-	ID uint64 `uri:"id" binding:"required,min=1"`
+	ID uint64 `uri:"id" binding:"required,min=1" example:"1"`
 }
 
-// GetPayment retrieves a payment by id
+// GetPayment godoc
+//
+//	@Summary		Get a payment
+//	@Description	get a payment by id
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int				true	"Payment ID"
+//	@Success		200	{object}	paymentResponse	"Payment retrieved"
+//	@Failure		400	{object}	response		"Validation error"
+//	@Failure		404	{object}	response		"Data not found error"
+//	@Failure		500	{object}	response		"Internal server error"
+//	@Router			/payments/{id} [get]
 func (ph *PaymentHandler) GetPayment(ctx *gin.Context) {
 	var req getPaymentRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -96,11 +123,23 @@ func (ph *PaymentHandler) GetPayment(ctx *gin.Context) {
 
 // listPaymentsRequest represents a request body for listing payments
 type listPaymentsRequest struct {
-	Skip  uint64 `form:"skip" binding:"required,min=0"`
-	Limit uint64 `form:"limit" binding:"required,min=5"`
+	Skip  uint64 `form:"skip" binding:"required,min=0" example:"0"`
+	Limit uint64 `form:"limit" binding:"required,min=5" example:"5"`
 }
 
-// ListPayments lists all payments with pagination
+// ListPayments godoc
+//
+//	@Summary		List payments
+//	@Description	List payments with pagination
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			skip	query		uint64		true	"Skip"
+//	@Param			limit	query		uint64		true	"Limit"
+//	@Success		200		{object}	response	"Payments displayed"
+//	@Failure		400		{object}	response	"Validation error"
+//	@Failure		500		{object}	response	"Internal server error"
+//	@Router			/payments [get]
 func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 	var req listPaymentsRequest
 	var paymentsList []paymentResponse
@@ -129,12 +168,28 @@ func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 
 // updatePaymentRequest represents a request body for updating a payment
 type updatePaymentRequest struct {
-	Name string             `json:"name" binding:"omitempty,required"`
-	Type domain.PaymentType `json:"type" binding:"omitempty,required,payment_type"`
-	Logo string             `json:"logo" binding:"omitempty,required"`
+	Name string             `json:"name" binding:"omitempty,required" example:"Gopay"`
+	Type domain.PaymentType `json:"type" binding:"omitempty,required,payment_type" example:"E-WALLET"`
+	Logo string             `json:"logo" binding:"omitempty,required" example:"https://example.com/gopay.png"`
 }
 
-// UpdatePayment updates a payment
+// UpdatePayment godoc
+//
+//	@Summary		Update a payment
+//	@Description	update a payment's name, type, or logo by id
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			id						path		int						true	"Payment ID"
+//	@Param			updatePaymentRequest	body		updatePaymentRequest	true	"Update payment request"
+//	@Success		200						{object}	paymentResponse			"Payment updated"
+//	@Failure		400						{object}	response				"Validation error"
+//	@Failure		401						{object}	response				"Unauthorized error"
+//	@Failure		404						{object}	response				"Data not found error"
+//	@Failure		409						{object}	response				"Data conflict error"
+//	@Failure		500						{object}	response				"Internal server error"
+//	@Router			/payments/{id} [put]
+//	@Security		BearerAuth
 func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 	var req updatePaymentRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -169,10 +224,24 @@ func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 
 // deletePaymentRequest represents a request body for deleting a payment
 type deletePaymentRequest struct {
-	ID uint64 `uri:"id" binding:"required,min=1"`
+	ID uint64 `uri:"id" binding:"required,min=1" example:"1"`
 }
 
-// DeletePayment deletes a payment
+// DeletePayment godoc
+//
+//	@Summary		Delete a payment
+//	@Description	Delete a payment by id
+//	@Tags			Payments
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		uint64		true	"Payment ID"
+//	@Success		200	{object}	response	"Payment deleted"
+//	@Failure		400	{object}	response	"Validation error"
+//	@Failure		401	{object}	response	"Unauthorized error"
+//	@Failure		404	{object}	response	"Data not found error"
+//	@Failure		500	{object}	response	"Internal server error"
+//	@Router			/payments/{id} [delete]
+//	@Security		BearerAuth
 func (ph *PaymentHandler) DeletePayment(ctx *gin.Context) {
 	var req deletePaymentRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {

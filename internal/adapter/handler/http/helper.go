@@ -45,10 +45,18 @@ func toMap(m meta, data any, key string) map[string]any {
 	}
 }
 
+// response represents a response body format
+type response struct {
+	Success bool   `json:"success" example:"true"`
+	Message string `json:"message,omitempty" example:"Success || {Error message}"`
+	Data    any    `json:"data,omitempty"`
+}
+
 // errorStatusMap is a map of defined error messages and their corresponding http status codes
 var errorStatusMap = map[error]int{
 	port.ErrDataNotFound:        http.StatusNotFound,
 	port.ErrConflictingData:     http.StatusConflict,
+	port.ErrInvalidCredentials:  http.StatusUnauthorized,
 	port.ErrNoUpdatedData:       http.StatusBadRequest,
 	port.ErrInsufficientStock:   http.StatusBadRequest,
 	port.ErrInsufficientPayment: http.StatusBadRequest,
@@ -64,34 +72,30 @@ func handleError(ctx *gin.Context, err error) {
 	errorResponse(ctx, statusCode, err)
 }
 
-// errorResponse returns a JSON response with the error message and status code
+// errorResponse sends an error response with the specified status code and error message
 func errorResponse(ctx *gin.Context, statusCode int, err error) {
-	ctx.JSON(statusCode, gin.H{
-		"success": false,
-		"error":   err.Error(),
-	})
-}
-
-// abortResponse returns an abort JSON response with the error message and status code
-func abortResponse(ctx *gin.Context, statusCode int, err error) {
-	ctx.AbortWithStatusJSON(statusCode, gin.H{
-		"success": false,
-		"error":   err.Error(),
-	})
-}
-
-// successResponse returns a JSON response with the success message and data
-func successResponse(ctx *gin.Context, statusCode int, data any) {
-	if data == nil {
-		ctx.JSON(statusCode, gin.H{
-			"success": true,
-			"message": "Success",
-		})
-	} else {
-		ctx.JSON(statusCode, gin.H{
-			"success": true,
-			"message": "Success",
-			"data":    data,
-		})
+	rsp := response{
+		Success: false,
+		Message: err.Error(),
 	}
+	ctx.JSON(statusCode, rsp)
+}
+
+// abortResponse sends an error response and aborts the request with the specified status code and error message
+func abortResponse(ctx *gin.Context, statusCode int, err error) {
+	rsp := response{
+		Success: false,
+		Message: err.Error(),
+	}
+	ctx.AbortWithStatusJSON(statusCode, rsp)
+}
+
+// successResponse sends a success response with the specified status code and optional data
+func successResponse(ctx *gin.Context, statusCode int, data interface{}) {
+	rsp := response{
+		Success: true,
+		Message: "Success",
+		Data:    data,
+	}
+	ctx.JSON(statusCode, rsp)
 }
