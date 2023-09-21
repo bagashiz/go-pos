@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-gonic/gin"
@@ -17,24 +15,6 @@ type PaymentHandler struct {
 func NewPaymentHandler(svc port.PaymentService) *PaymentHandler {
 	return &PaymentHandler{
 		svc,
-	}
-}
-
-// paymentResponse represents a payment response body
-type paymentResponse struct {
-	ID   uint64             `json:"id" example:"1"`
-	Name string             `json:"name" example:"Tunai"`
-	Type domain.PaymentType `json:"type" example:"CASH"`
-	Logo string             `json:"logo" example:"https://example.com/cash.png"`
-}
-
-// newPaymentResponse is a helper function to create a response body for handling payment data
-func newPaymentResponse(payment *domain.Payment) paymentResponse {
-	return paymentResponse{
-		ID:   payment.ID,
-		Name: payment.Name,
-		Type: payment.Type,
-		Logo: payment.Logo,
 	}
 }
 
@@ -53,18 +33,18 @@ type createPaymentRequest struct {
 //	@Accept			json
 //	@Produce		json
 //	@Param			createPaymentRequest	body		createPaymentRequest	true	"Create payment request"
-//	@Success		201						{object}	paymentResponse			"Payment created"
-//	@Failure		400						{object}	response				"Validation error"
-//	@Failure		401						{object}	response				"Unauthorized error"
-//	@Failure		404						{object}	response				"Data not found error"
-//	@Failure		409						{object}	response				"Data conflict error"
-//	@Failure		500						{object}	response				"Internal server error"
+//	@Success		200						{object}	paymentResponse			"Payment created"
+//	@Failure		400						{object}	errorResponse			"Validation error"
+//	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		404						{object}	errorResponse			"Data not found error"
+//	@Failure		409						{object}	errorResponse			"Data conflict error"
+//	@Failure		500						{object}	errorResponse			"Internal server error"
 //	@Router			/payments [post]
 //	@Security		BearerAuth
 func (ph *PaymentHandler) CreatePayment(ctx *gin.Context) {
 	var req createPaymentRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -82,7 +62,7 @@ func (ph *PaymentHandler) CreatePayment(ctx *gin.Context) {
 
 	rsp := newPaymentResponse(&payment)
 
-	successResponse(ctx, http.StatusCreated, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // getPaymentRequest represents a request body for retrieving a payment
@@ -99,14 +79,14 @@ type getPaymentRequest struct {
 //	@Produce		json
 //	@Param			id	path		int				true	"Payment ID"
 //	@Success		200	{object}	paymentResponse	"Payment retrieved"
-//	@Failure		400	{object}	response		"Validation error"
-//	@Failure		404	{object}	response		"Data not found error"
-//	@Failure		500	{object}	response		"Internal server error"
+//	@Failure		400	{object}	errorResponse	"Validation error"
+//	@Failure		404	{object}	errorResponse	"Data not found error"
+//	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/payments/{id} [get]
 func (ph *PaymentHandler) GetPayment(ctx *gin.Context) {
 	var req getPaymentRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -118,7 +98,7 @@ func (ph *PaymentHandler) GetPayment(ctx *gin.Context) {
 
 	rsp := newPaymentResponse(payment)
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // listPaymentsRequest represents a request body for listing payments
@@ -134,18 +114,18 @@ type listPaymentsRequest struct {
 //	@Tags			Payments
 //	@Accept			json
 //	@Produce		json
-//	@Param			skip	query		uint64		true	"Skip"
-//	@Param			limit	query		uint64		true	"Limit"
-//	@Success		200		{object}	response	"Payments displayed"
-//	@Failure		400		{object}	response	"Validation error"
-//	@Failure		500		{object}	response	"Internal server error"
+//	@Param			skip	query		uint64			true	"Skip"
+//	@Param			limit	query		uint64			true	"Limit"
+//	@Success		200		{object}	meta			"Payments displayed"
+//	@Failure		400		{object}	errorResponse	"Validation error"
+//	@Failure		500		{object}	errorResponse	"Internal server error"
 //	@Router			/payments [get]
 func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 	var req listPaymentsRequest
 	var paymentsList []paymentResponse
 
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -163,7 +143,7 @@ func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 	meta := newMeta(total, req.Limit, req.Skip)
 	rsp := toMap(meta, paymentsList, "payments")
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // updatePaymentRequest represents a request body for updating a payment
@@ -183,24 +163,24 @@ type updatePaymentRequest struct {
 //	@Param			id						path		int						true	"Payment ID"
 //	@Param			updatePaymentRequest	body		updatePaymentRequest	true	"Update payment request"
 //	@Success		200						{object}	paymentResponse			"Payment updated"
-//	@Failure		400						{object}	response				"Validation error"
-//	@Failure		401						{object}	response				"Unauthorized error"
-//	@Failure		404						{object}	response				"Data not found error"
-//	@Failure		409						{object}	response				"Data conflict error"
-//	@Failure		500						{object}	response				"Internal server error"
+//	@Failure		400						{object}	errorResponse			"Validation error"
+//	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		404						{object}	errorResponse			"Data not found error"
+//	@Failure		409						{object}	errorResponse			"Data conflict error"
+//	@Failure		500						{object}	errorResponse			"Internal server error"
 //	@Router			/payments/{id} [put]
 //	@Security		BearerAuth
 func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 	var req updatePaymentRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
 	idStr := ctx.Param("id")
 	id, err := stringToUint64(idStr)
 	if err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -219,7 +199,7 @@ func (ph *PaymentHandler) UpdatePayment(ctx *gin.Context) {
 
 	rsp := newPaymentResponse(&payment)
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // deletePaymentRequest represents a request body for deleting a payment
@@ -234,18 +214,18 @@ type deletePaymentRequest struct {
 //	@Tags			Payments
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		uint64		true	"Payment ID"
-//	@Success		200	{object}	response	"Payment deleted"
-//	@Failure		400	{object}	response	"Validation error"
-//	@Failure		401	{object}	response	"Unauthorized error"
-//	@Failure		404	{object}	response	"Data not found error"
-//	@Failure		500	{object}	response	"Internal server error"
+//	@Param			id	path		uint64			true	"Payment ID"
+//	@Success		200	{object}	response		"Payment deleted"
+//	@Failure		400	{object}	errorResponse	"Validation error"
+//	@Failure		401	{object}	errorResponse	"Unauthorized error"
+//	@Failure		404	{object}	errorResponse	"Data not found error"
+//	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/payments/{id} [delete]
 //	@Security		BearerAuth
 func (ph *PaymentHandler) DeletePayment(ctx *gin.Context) {
 	var req deletePaymentRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -255,5 +235,5 @@ func (ph *PaymentHandler) DeletePayment(ctx *gin.Context) {
 		return
 	}
 
-	successResponse(ctx, http.StatusOK, nil)
+	handleSuccess(ctx, nil)
 }

@@ -56,19 +56,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Categories displayed",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.meta"
                         }
                     },
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -102,7 +102,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Category created",
                         "schema": {
                             "$ref": "#/definitions/handler.categoryResponse"
@@ -111,31 +111,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -173,19 +173,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -235,31 +235,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -300,25 +300,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -362,25 +362,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Orders displayed",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.meta"
                         }
                     },
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -409,7 +409,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Order created",
                         "schema": {
                             "$ref": "#/definitions/handler.orderResponse"
@@ -418,25 +418,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -474,19 +474,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -525,19 +525,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Payments displayed",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.meta"
                         }
                     },
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -571,7 +571,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Payment created",
                         "schema": {
                             "$ref": "#/definitions/handler.paymentResponse"
@@ -580,31 +580,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -642,19 +642,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -704,31 +704,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -769,25 +769,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -838,19 +838,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Products retrieved",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.meta"
                         }
                     },
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -884,7 +884,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Product created",
                         "schema": {
                             "$ref": "#/definitions/handler.productResponse"
@@ -893,31 +893,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -955,19 +955,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1017,31 +1017,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1082,25 +1082,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1139,19 +1139,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Users displayed",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.meta"
                         }
                     },
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1180,7 +1180,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "User created",
                         "schema": {
                             "$ref": "#/definitions/handler.userResponse"
@@ -1189,31 +1189,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "409": {
                         "description": "Data conflict error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1253,19 +1253,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1303,19 +1303,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1365,25 +1365,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1424,25 +1424,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Validation error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/handler.response"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -1598,6 +1598,19 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.errorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Error message"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
         "handler.loginRequest": {
             "type": "object",
             "required": [
@@ -1613,6 +1626,23 @@ const docTemplate = `{
                     "type": "string",
                     "minLength": 8,
                     "example": "12345678"
+                }
+            }
+        },
+        "handler.meta": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "skip": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "total": {
+                    "type": "integer",
+                    "example": 100
                 }
             }
         },
@@ -1826,7 +1856,7 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string",
-                    "example": "Success || {Error message}"
+                    "example": "Success"
                 },
                 "success": {
                     "type": "boolean",

@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-gonic/gin"
@@ -20,20 +18,6 @@ func NewCategoryHandler(svc port.CategoryService) *CategoryHandler {
 	}
 }
 
-// categoryResponse represents a category response body
-type categoryResponse struct {
-	ID   uint64 `json:"id" example:"1"`
-	Name string `json:"name" example:"Foods"`
-}
-
-// newCategoryResponse is a helper function to create a response body for handling category data
-func newCategoryResponse(category *domain.Category) categoryResponse {
-	return categoryResponse{
-		ID:   category.ID,
-		Name: category.Name,
-	}
-}
-
 // createCategoryRequest represents a request body for creating a new category
 type createCategoryRequest struct {
 	Name string `json:"name" binding:"required" example:"Foods"`
@@ -47,18 +31,18 @@ type createCategoryRequest struct {
 //	@Accept			json
 //	@Produce		json
 //	@Param			createCategoryRequest	body		createCategoryRequest	true	"Create category request"
-//	@Success		201						{object}	categoryResponse		"Category created"
-//	@Failure		400						{object}	response				"Validation error"
-//	@Failure		401						{object}	response				"Unauthorized error"
-//	@Failure		404						{object}	response				"Data not found error"
-//	@Failure		409						{object}	response				"Data conflict error"
-//	@Failure		500						{object}	response				"Internal server error"
+//	@Success		200						{object}	categoryResponse		"Category created"
+//	@Failure		400						{object}	errorResponse			"Validation error"
+//	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		404						{object}	errorResponse			"Data not found error"
+//	@Failure		409						{object}	errorResponse			"Data conflict error"
+//	@Failure		500						{object}	errorResponse			"Internal server error"
 //	@Router			/categories [post]
 //	@Security		BearerAuth
 func (ch *CategoryHandler) CreateCategory(ctx *gin.Context) {
 	var req createCategoryRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -74,7 +58,7 @@ func (ch *CategoryHandler) CreateCategory(ctx *gin.Context) {
 
 	rsp := newCategoryResponse(&category)
 
-	successResponse(ctx, http.StatusCreated, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // getCategoryRequest represents a request body for retrieving a category
@@ -91,14 +75,14 @@ type getCategoryRequest struct {
 //	@Produce		json
 //	@Param			id	path		uint64				true	"Category ID"
 //	@Success		200	{object}	categoryResponse	"Category retrieved"
-//	@Failure		400	{object}	response			"Validation error"
-//	@Failure		404	{object}	response			"Data not found error"
-//	@Failure		500	{object}	response			"Internal server error"
+//	@Failure		400	{object}	errorResponse		"Validation error"
+//	@Failure		404	{object}	errorResponse		"Data not found error"
+//	@Failure		500	{object}	errorResponse		"Internal server error"
 //	@Router			/categories/{id} [get]
 func (ch *CategoryHandler) GetCategory(ctx *gin.Context) {
 	var req getCategoryRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -110,7 +94,7 @@ func (ch *CategoryHandler) GetCategory(ctx *gin.Context) {
 
 	rsp := newCategoryResponse(category)
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // listCategoriesRequest represents a request body for listing categories
@@ -126,18 +110,18 @@ type listCategoriesRequest struct {
 //	@Tags			Categories
 //	@Accept			json
 //	@Produce		json
-//	@Param			skip	query		uint64		true	"Skip"
-//	@Param			limit	query		uint64		true	"Limit"
-//	@Success		200		{object}	response	"Categories displayed"
-//	@Failure		400		{object}	response	"Validation error"
-//	@Failure		500		{object}	response	"Internal server error"
+//	@Param			skip	query		uint64			true	"Skip"
+//	@Param			limit	query		uint64			true	"Limit"
+//	@Success		200		{object}	meta			"Categories displayed"
+//	@Failure		400		{object}	errorResponse	"Validation error"
+//	@Failure		500		{object}	errorResponse	"Internal server error"
 //	@Router			/categories [get]
 func (ch *CategoryHandler) ListCategories(ctx *gin.Context) {
 	var req listCategoriesRequest
 	var categoriesList []categoryResponse
 
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -155,7 +139,7 @@ func (ch *CategoryHandler) ListCategories(ctx *gin.Context) {
 	meta := newMeta(total, req.Limit, req.Skip)
 	rsp := toMap(meta, categoriesList, "categories")
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // updateCategoryRequest represents a request body for updating a category
@@ -173,24 +157,24 @@ type updateCategoryRequest struct {
 //	@Param			id						path		uint64					true	"Category ID"
 //	@Param			updateCategoryRequest	body		updateCategoryRequest	true	"Update category request"
 //	@Success		200						{object}	categoryResponse		"Category updated"
-//	@Failure		400						{object}	response				"Validation error"
-//	@Failure		401						{object}	response				"Unauthorized error"
-//	@Failure		404						{object}	response				"Data not found error"
-//	@Failure		409						{object}	response				"Data conflict error"
-//	@Failure		500						{object}	response				"Internal server error"
+//	@Failure		400						{object}	errorResponse			"Validation error"
+//	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		404						{object}	errorResponse			"Data not found error"
+//	@Failure		409						{object}	errorResponse			"Data conflict error"
+//	@Failure		500						{object}	errorResponse			"Internal server error"
 //	@Router			/categories/{id} [put]
 //	@Security		BearerAuth
 func (ch *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 	var req updateCategoryRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
 	idStr := ctx.Param("id")
 	id, err := stringToUint64(idStr)
 	if err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -207,7 +191,7 @@ func (ch *CategoryHandler) UpdateCategory(ctx *gin.Context) {
 
 	rsp := newCategoryResponse(&category)
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // deleteCategoryRequest represents a request body for deleting a category
@@ -222,18 +206,18 @@ type deleteCategoryRequest struct {
 //	@Tags			Categories
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		uint64		true	"Category ID"
-//	@Success		200	{object}	response	"Category deleted"
-//	@Failure		400	{object}	response	"Validation error"
-//	@Failure		401	{object}	response	"Unauthorized error"
-//	@Failure		404	{object}	response	"Data not found error"
-//	@Failure		500	{object}	response	"Internal server error"
+//	@Param			id	path		uint64			true	"Category ID"
+//	@Success		200	{object}	response		"Category deleted"
+//	@Failure		400	{object}	errorResponse	"Validation error"
+//	@Failure		401	{object}	errorResponse	"Unauthorized error"
+//	@Failure		404	{object}	errorResponse	"Data not found error"
+//	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/categories/{id} [delete]
 //	@Security		BearerAuth
 func (ch *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 	var req deleteCategoryRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -243,5 +227,5 @@ func (ch *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	successResponse(ctx, http.StatusOK, nil)
+	handleSuccess(ctx, nil)
 }

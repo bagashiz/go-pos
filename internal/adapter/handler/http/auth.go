@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-gonic/gin"
 )
@@ -16,18 +14,6 @@ type AuthHandler struct {
 func NewAuthHandler(svc port.AuthService) *AuthHandler {
 	return &AuthHandler{
 		svc,
-	}
-}
-
-// authResponse represents an authentication response body
-type authResponse struct {
-	AccessToken string `json:"token" example:"v2.local.Gdh5kiOTyyaQ3_bNykYDeYHO21Jg2..."`
-}
-
-// newAuthResponse is a helper function to create a response body for handling authentication data
-func newAuthResponse(token string) authResponse {
-	return authResponse{
-		AccessToken: token,
 	}
 }
 
@@ -46,14 +32,14 @@ type loginRequest struct {
 //	@Produce		json
 //	@Param			request	body		loginRequest	true	"Login request body"
 //	@Success		200		{object}	authResponse	"Succesfully logged in"
-//	@Failure		400		{object}	response		"Validation error"
-//	@Failure		401		{object}	response		"Unauthorized error"
-//	@Failure		500		{object}	response		"Internal server error"
+//	@Failure		400		{object}	errorResponse	"Validation error"
+//	@Failure		401		{object}	errorResponse	"Unauthorized error"
+//	@Failure		500		{object}	errorResponse	"Internal server error"
 //	@Router			/users/login [post]
 func (ah *AuthHandler) Login(ctx *gin.Context) {
 	var req loginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -65,5 +51,5 @@ func (ah *AuthHandler) Login(ctx *gin.Context) {
 
 	rsp := newAuthResponse(token)
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }

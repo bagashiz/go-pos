@@ -1,9 +1,6 @@
 package handler
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-gonic/gin"
@@ -18,34 +15,6 @@ type ProductHandler struct {
 func NewProductHandler(svc port.ProductService) *ProductHandler {
 	return &ProductHandler{
 		svc,
-	}
-}
-
-// productResponse represents a product response body
-type productResponse struct {
-	ID        uint64           `json:"id" example:"1"`
-	SKU       string           `json:"sku" example:"9a4c25d3-9786-492c-b084-85cb75c1ee3e"`
-	Name      string           `json:"name" example:"Chiki Ball"`
-	Stock     int64            `json:"stock" example:"100"`
-	Price     float64          `json:"price" example:"5000"`
-	Image     string           `json:"image" example:"https://example.com/chiki-ball.png"`
-	Category  categoryResponse `json:"category"`
-	CreatedAt time.Time        `json:"created_at" example:"1970-01-01T00:00:00Z"`
-	UpdatedAt time.Time        `json:"updated_at" example:"1970-01-01T00:00:00Z"`
-}
-
-// newProductResponse is a helper function to create a response body for handling product data
-func newProductResponse(product *domain.Product) productResponse {
-	return productResponse{
-		ID:        product.ID,
-		SKU:       product.SKU.String(),
-		Name:      product.Name,
-		Stock:     product.Stock,
-		Price:     product.Price,
-		Image:     product.Image,
-		Category:  newCategoryResponse(product.Category),
-		CreatedAt: product.CreatedAt,
-		UpdatedAt: product.UpdatedAt,
 	}
 }
 
@@ -66,18 +35,18 @@ type createProductRequest struct {
 //	@Accept			json
 //	@Produce		json
 //	@Param			createProductRequest	body		createProductRequest	true	"Create product request"
-//	@Success		201						{object}	productResponse			"Product created"
-//	@Failure		400						{object}	response				"Validation error"
-//	@Failure		401						{object}	response				"Unauthorized error"
-//	@Failure		404						{object}	response				"Data not found error"
-//	@Failure		409						{object}	response				"Data conflict error"
-//	@Failure		500						{object}	response				"Internal server error"
+//	@Success		200						{object}	productResponse			"Product created"
+//	@Failure		400						{object}	errorResponse			"Validation error"
+//	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		404						{object}	errorResponse			"Data not found error"
+//	@Failure		409						{object}	errorResponse			"Data conflict error"
+//	@Failure		500						{object}	errorResponse			"Internal server error"
 //	@Router			/products [post]
 //	@Security		BearerAuth
 func (ph *ProductHandler) CreateProduct(ctx *gin.Context) {
 	var req createProductRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -97,7 +66,7 @@ func (ph *ProductHandler) CreateProduct(ctx *gin.Context) {
 
 	rsp := newProductResponse(&product)
 
-	successResponse(ctx, http.StatusCreated, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // getProductRequest represents a request body for retrieving a product
@@ -114,14 +83,14 @@ type getProductRequest struct {
 //	@Produce		json
 //	@Param			id	path		uint64			true	"Product ID"
 //	@Success		200	{object}	productResponse	"Product retrieved"
-//	@Failure		400	{object}	response		"Validation error"
-//	@Failure		404	{object}	response		"Data not found error"
-//	@Failure		500	{object}	response		"Internal server error"
+//	@Failure		400	{object}	errorResponse	"Validation error"
+//	@Failure		404	{object}	errorResponse	"Data not found error"
+//	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/products/{id} [get]
 func (ph *ProductHandler) GetProduct(ctx *gin.Context) {
 	var req getProductRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -133,7 +102,7 @@ func (ph *ProductHandler) GetProduct(ctx *gin.Context) {
 
 	rsp := newProductResponse(product)
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // listProductsRequest represents a request body for listing products
@@ -151,20 +120,20 @@ type listProductsRequest struct {
 //	@Tags			Products
 //	@Accept			json
 //	@Produce		json
-//	@Param			category_id	query		uint64		false	"Category ID"
-//	@Param			q			query		string		false	"Query"
-//	@Param			skip		query		uint64		true	"Skip"
-//	@Param			limit		query		uint64		true	"Limit"
-//	@Success		200			{object}	response	"Products retrieved"
-//	@Failure		400			{object}	response	"Validation error"
-//	@Failure		500			{object}	response	"Internal server error"
+//	@Param			category_id	query		uint64			false	"Category ID"
+//	@Param			q			query		string			false	"Query"
+//	@Param			skip		query		uint64			true	"Skip"
+//	@Param			limit		query		uint64			true	"Limit"
+//	@Success		200			{object}	meta			"Products retrieved"
+//	@Failure		400			{object}	errorResponse	"Validation error"
+//	@Failure		500			{object}	errorResponse	"Internal server error"
 //	@Router			/products [get]
 func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 	var req listProductsRequest
 	var productsList []productResponse
 
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -182,7 +151,7 @@ func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 	meta := newMeta(total, req.Limit, req.Skip)
 	rsp := toMap(meta, productsList, "products")
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // updateProductRequest represents a request body for updating a product
@@ -204,24 +173,24 @@ type updateProductRequest struct {
 //	@Param			id						path		uint64					true	"Product ID"
 //	@Param			updateProductRequest	body		updateProductRequest	true	"Update product request"
 //	@Success		200						{object}	productResponse			"Product updated"
-//	@Failure		400						{object}	response				"Validation error"
-//	@Failure		401						{object}	response				"Unauthorized error"
-//	@Failure		404						{object}	response				"Data not found error"
-//	@Failure		409						{object}	response				"Data conflict error"
-//	@Failure		500						{object}	response				"Internal server error"
+//	@Failure		400						{object}	errorResponse			"Validation error"
+//	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		404						{object}	errorResponse			"Data not found error"
+//	@Failure		409						{object}	errorResponse			"Data conflict error"
+//	@Failure		500						{object}	errorResponse			"Internal server error"
 //	@Router			/products/{id} [put]
 //	@Security		BearerAuth
 func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	var req updateProductRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
 	idStr := ctx.Param("id")
 	id, err := stringToUint64(idStr)
 	if err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -242,7 +211,7 @@ func (ph *ProductHandler) UpdateProduct(ctx *gin.Context) {
 
 	rsp := newProductResponse(&product)
 
-	successResponse(ctx, http.StatusOK, rsp)
+	handleSuccess(ctx, rsp)
 }
 
 // deleteProductRequest represents a request body for deleting a product
@@ -257,18 +226,18 @@ type deleteProductRequest struct {
 //	@Tags			Products
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		uint64		true	"Product ID"
-//	@Success		200	{object}	response	"Product deleted"
-//	@Failure		400	{object}	response	"Validation error"
-//	@Failure		401	{object}	response	"Unauthorized error"
-//	@Failure		404	{object}	response	"Data not found error"
-//	@Failure		500	{object}	response	"Internal server error"
+//	@Param			id	path		uint64			true	"Product ID"
+//	@Success		200	{object}	response		"Product deleted"
+//	@Failure		400	{object}	errorResponse	"Validation error"
+//	@Failure		401	{object}	errorResponse	"Unauthorized error"
+//	@Failure		404	{object}	errorResponse	"Data not found error"
+//	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/products/{id} [delete]
 //	@Security		BearerAuth
 func (ph *ProductHandler) DeleteProduct(ctx *gin.Context) {
 	var req deleteProductRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		errorResponse(ctx, http.StatusBadRequest, err)
+		validationError(ctx, err)
 		return
 	}
 
@@ -278,5 +247,5 @@ func (ph *ProductHandler) DeleteProduct(ctx *gin.Context) {
 		return
 	}
 
-	successResponse(ctx, http.StatusOK, nil)
+	handleSuccess(ctx, nil)
 }
