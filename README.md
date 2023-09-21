@@ -6,6 +6,8 @@ A simple RESTful Point of Sale (POS) web service written in Go programming langu
 
 It uses [Gin](https://gin-gonic.com/) as the HTTP framework and [PostgreSQL](https://www.postgresql.org/) as the database with [pgx](https://github.com/jackc/pgx/) as the driver and [Squirrel](https://github.com/Masterminds/squirrel/) as the query builder. It also utilizes [Redis](https://redis.io/) as the caching layer with [go-redis](https://github.com/redis/go-redis/) as the client.
 
+This project idea was inspired by the [Ide Project untuk Upgrade Portfolio Backend Engineer](https://www.youtube.com/watch?v=uAR1kjyeDtg) video on YouTube by [Asdita Prasetya](https://www.youtube.com/@asditaprasetya), which provided valuable guidance and inspiration for its development.
+
 ## Getting Started
 
 1. Ensure you have [Go](https://go.dev/dl/) 1.21 or higher and [Task](https://taskfile.dev/installation/) installed on your machine:
@@ -48,7 +50,7 @@ It uses [Gin](https://gin-gonic.com/) as the HTTP framework and [PostgreSQL](htt
 
 For database schema documentation, see [here](https://dbdocs.io/bagashiz/Go-POS/), powered by [dbdocs.io](https://dbdocs.io/).
 
-API documentation can be found in `docs/` directory. To view the documentation, open the browser and go to `http://localhost:8080/swagger/index.html`. The documentation is generated using [swaggo](https://github.com/swaggo/swag/) using [swaggo/gin-swagger](https://github.com/swaggo/gin-swagger/) middleware.
+API documentation can be found in `docs/` directory. To view the documentation, open the browser and go to `http://localhost:8080/docs/index.html`. The documentation is generated using [swaggo](https://github.com/swaggo/swag/) with [gin-swagger](https://github.com/swaggo/gin-swagger/) middleware.
 
 ## Contributing
 

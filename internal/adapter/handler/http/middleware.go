@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
@@ -26,7 +25,7 @@ func authMiddleware(token port.TokenService) gin.HandlerFunc {
 		isEmpty := len(authorizationHeader) == 0
 		if isEmpty {
 			err := port.ErrEmptyAuthorizationHeader
-			abortResponse(ctx, http.StatusUnauthorized, err)
+			handleAbort(ctx, err)
 			return
 		}
 
@@ -34,21 +33,21 @@ func authMiddleware(token port.TokenService) gin.HandlerFunc {
 		isValid := len(fields) == 2
 		if !isValid {
 			err := port.ErrInvalidAuthorizationHeader
-			abortResponse(ctx, http.StatusUnauthorized, err)
+			handleAbort(ctx, err)
 			return
 		}
 
 		currentAuthorizationType := strings.ToLower(fields[0])
 		if currentAuthorizationType != authorizationType {
 			err := port.ErrInvalidAuthorizationType
-			abortResponse(ctx, http.StatusUnauthorized, err)
+			handleAbort(ctx, err)
 			return
 		}
 
 		accessToken := fields[1]
 		payload, err := token.VerifyToken(accessToken)
 		if err != nil {
-			abortResponse(ctx, http.StatusUnauthorized, err)
+			handleAbort(ctx, err)
 			return
 		}
 
@@ -64,8 +63,8 @@ func adminMiddleware() gin.HandlerFunc {
 
 		isAdmin := payload.Role == domain.Admin
 		if !isAdmin {
-			err := port.ErrUnauthorized
-			abortResponse(ctx, http.StatusUnauthorized, err)
+			err := port.ErrForbidden
+			handleAbort(ctx, err)
 			return
 		}
 

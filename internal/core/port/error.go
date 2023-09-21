@@ -30,6 +30,8 @@ var (
 	ErrInvalidAuthorizationType = errors.New("authorization type is not supported")
 	// ErrUnauthorized is an error for when the user is unauthorized
 	ErrUnauthorized = errors.New("user is unauthorized to access the resource")
+	// ErrForbidden is an error for when the user is forbidden to access the resource
+	ErrForbidden = errors.New("user is forbidden to access the resource")
 )
 
 // IsUniqueConstraintViolationError checks if the error is a unique constraint violation error
