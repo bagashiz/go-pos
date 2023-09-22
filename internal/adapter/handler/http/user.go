@@ -83,6 +83,7 @@ type listUsersRequest struct {
 //	@Failure		400		{object}	errorResponse	"Validation error"
 //	@Failure		500		{object}	errorResponse	"Internal server error"
 //	@Router			/users [get]
+//	@Security		BearerAuth
 func (uh *UserHandler) ListUsers(ctx *gin.Context) {
 	var req listUsersRequest
 	var usersList []userResponse
@@ -127,6 +128,7 @@ type getUserRequest struct {
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/users/{id} [get]
+//	@Security		BearerAuth
 func (uh *UserHandler) GetUser(ctx *gin.Context) {
 	var req getUserRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {

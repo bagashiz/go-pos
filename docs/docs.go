@@ -25,6 +25,11 @@ const docTemplate = `{
     "paths": {
         "/categories": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "List categories with pagination",
                 "consumes": [
                     "application/json"
@@ -143,6 +148,11 @@ const docTemplate = `{
         },
         "/categories/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get a category by id",
                 "consumes": [
                     "application/json"
@@ -386,6 +396,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new order and return the order data with purchase details",
                 "consumes": [
                     "application/json"
@@ -444,6 +459,11 @@ const docTemplate = `{
         },
         "/orders/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get an order by id and return the order data with purchase details",
                 "consumes": [
                     "application/json"
@@ -494,6 +514,11 @@ const docTemplate = `{
         },
         "/payments": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "List payments with pagination",
                 "consumes": [
                     "application/json"
@@ -612,6 +637,11 @@ const docTemplate = `{
         },
         "/payments/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get a payment by id",
                 "consumes": [
                     "application/json"
@@ -795,6 +825,11 @@ const docTemplate = `{
         },
         "/products": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "List products with pagination",
                 "consumes": [
                     "application/json"
@@ -925,6 +960,11 @@ const docTemplate = `{
         },
         "/products/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get a product by id with its category",
                 "consumes": [
                     "application/json"
@@ -1108,6 +1148,11 @@ const docTemplate = `{
         },
         "/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "List users with pagination",
                 "consumes": [
                     "application/json"
@@ -1273,6 +1318,11 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a user by id",
                 "consumes": [
                     "application/json"
@@ -1972,7 +2022,7 @@ const docTemplate = `{
         "handler.userResponse": {
             "type": "object",
             "properties": {
-                "c0eated_at": {
+                "created_at": {
                     "type": "string",
                     "example": "1970-01-01T00:00:00Z"
                 },

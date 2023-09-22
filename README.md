@@ -34,7 +34,6 @@ This project idea was inspired by the [Ide Project untuk Upgrade Portfolio Backe
 
     ```bash
     task service:up
-    task db:create
     task migrate:up
     ```
 

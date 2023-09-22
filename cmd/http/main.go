@@ -27,7 +27,7 @@ func init() {
 		})
 
 		// Load .env file
-		err := godotenv.Load()
+		err := godotenv.Load("../../.env")
 		if err != nil {
 			slog.Error("Error loading .env file", "error", err)
 			os.Exit(1)
@@ -86,6 +86,8 @@ func main() {
 		os.Exit(1)
 	}
 	defer cache.Close()
+
+	slog.Info("Successfully connected to the cache server")
 
 	// Init token service
 	token, err := token.NewToken(tokenSymmetricKey)

@@ -79,6 +79,7 @@ type getCategoryRequest struct {
 //	@Failure		404	{object}	errorResponse		"Data not found error"
 //	@Failure		500	{object}	errorResponse		"Internal server error"
 //	@Router			/categories/{id} [get]
+//	@Security		BearerAuth
 func (ch *CategoryHandler) GetCategory(ctx *gin.Context) {
 	var req getCategoryRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -116,6 +117,7 @@ type listCategoriesRequest struct {
 //	@Failure		400		{object}	errorResponse	"Validation error"
 //	@Failure		500		{object}	errorResponse	"Internal server error"
 //	@Router			/categories [get]
+//	@Security		BearerAuth
 func (ch *CategoryHandler) ListCategories(ctx *gin.Context) {
 	var req listCategoriesRequest
 	var categoriesList []categoryResponse

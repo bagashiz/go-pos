@@ -39,7 +39,7 @@ func (as *AuthService) Login(ctx context.Context, email, password string) (strin
 		return "", port.ErrInvalidCredentials
 	}
 
-	accessTokenDurationStr := os.Getenv("ACCESS_TOKEN_DURATION")
+	accessTokenDurationStr := os.Getenv("TOKEN_DURATION")
 	accessTokenDuration, err := time.ParseDuration(accessTokenDurationStr)
 	if err != nil {
 		return "", err
