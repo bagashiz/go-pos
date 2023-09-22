@@ -27,7 +27,7 @@ func init() {
 		})
 
 		// Load .env file
-		err := godotenv.Load("../../.env")
+		err := godotenv.Load()
 		if err != nil {
 			slog.Error("Error loading .env file", "error", err)
 			os.Exit(1)
