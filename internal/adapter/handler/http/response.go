@@ -72,7 +72,7 @@ type userResponse struct {
 	ID        uint64    `json:"id" example:"1"`
 	Name      string    `json:"name" example:"John Doe"`
 	Email     string    `json:"email" example:"test@example.com"`
-	CreatedAt time.Time `json:"c0eated_at" example:"1970-01-01T00:00:00Z"`
+	CreatedAt time.Time `json:"created_at" example:"1970-01-01T00:00:00Z"`
 	UpdatedAt time.Time `json:"updated_at" example:"1970-01-01T00:00:00Z"`
 }
 

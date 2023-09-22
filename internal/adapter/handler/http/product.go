@@ -87,6 +87,7 @@ type getProductRequest struct {
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/products/{id} [get]
+//	@Security		BearerAuth
 func (ph *ProductHandler) GetProduct(ctx *gin.Context) {
 	var req getProductRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -128,6 +129,7 @@ type listProductsRequest struct {
 //	@Failure		400			{object}	errorResponse	"Validation error"
 //	@Failure		500			{object}	errorResponse	"Internal server error"
 //	@Router			/products [get]
+//	@Security		BearerAuth
 func (ph *ProductHandler) ListProducts(ctx *gin.Context) {
 	var req listProductsRequest
 	var productsList []productResponse

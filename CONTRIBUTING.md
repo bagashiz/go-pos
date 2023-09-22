@@ -21,7 +21,7 @@ To get started with the project, you can follow these steps:
 2. Clone your forked repository to your local machine.
 3. Install the project dependencies: `task install`
 4. Create a copy of the `.env.example` file and rename it to `.env`. Update configuration values as needed.
-5. Run the services container: `task service:up && task db:create && task migrate:up`
+5. Run the services container: `task service:up && task migrate:up`
 6. Start the development server: `task dev`
 
 ## Submitting bug reports

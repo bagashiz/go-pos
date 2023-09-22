@@ -46,6 +46,7 @@ type createOrderRequest struct {
 //	@Failure		409					{object}	errorResponse		"Data conflict error"
 //	@Failure		500					{object}	errorResponse		"Internal server error"
 //	@Router			/orders [post]
+//	@Security		BearerAuth
 func (oh *OrderHandler) CreateOrder(ctx *gin.Context) {
 	var req createOrderRequest
 	var products []domain.OrderProduct
@@ -101,6 +102,7 @@ type getOrderRequest struct {
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/orders/{id} [get]
+//	@Security		BearerAuth
 func (oh *OrderHandler) GetOrder(ctx *gin.Context) {
 	var req getOrderRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {

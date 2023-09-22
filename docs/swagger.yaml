@@ -372,7 +372,7 @@ definitions:
     type: object
   handler.userResponse:
     properties:
-      c0eated_at:
+      created_at:
         example: "1970-01-01T00:00:00Z"
         type: string
       email:
@@ -433,6 +433,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: List categories
       tags:
       - Categories
@@ -547,6 +549,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a category
       tags:
       - Categories
@@ -672,6 +676,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new order
       tags:
       - Orders
@@ -705,6 +711,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Get an order
       tags:
       - Orders
@@ -739,6 +747,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: List payments
       tags:
       - Payments
@@ -853,6 +863,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a payment
       tags:
       - Payments
@@ -943,6 +955,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: List products
       tags:
       - Products
@@ -1057,6 +1071,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a product
       tags:
       - Products
@@ -1139,6 +1155,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: List users
       tags:
       - Users
@@ -1251,6 +1269,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a user
       tags:
       - Users

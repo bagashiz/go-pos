@@ -83,6 +83,7 @@ type getPaymentRequest struct {
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/payments/{id} [get]
+//	@Security		BearerAuth
 func (ph *PaymentHandler) GetPayment(ctx *gin.Context) {
 	var req getPaymentRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -120,6 +121,7 @@ type listPaymentsRequest struct {
 //	@Failure		400		{object}	errorResponse	"Validation error"
 //	@Failure		500		{object}	errorResponse	"Internal server error"
 //	@Router			/payments [get]
+//	@Security		BearerAuth
 func (ph *PaymentHandler) ListPayments(ctx *gin.Context) {
 	var req listPaymentsRequest
 	var paymentsList []paymentResponse
