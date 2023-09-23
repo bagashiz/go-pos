@@ -1,0 +1,9 @@
+run:
+  timeout: "1m"
+  issue-exit-code: 1
+  tests: true
+  skip-dirs-use-default: true
+  skip-dirs:
+    - "opt"
+  allow-parallel-runners: false
+  go: "1.21"

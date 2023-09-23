@@ -10,10 +10,16 @@ Enum "users_role_enum" {
   "cashier"
 }
 
+Enum "payments_type_enum" {
+  "CASH"
+  "E-WALLET"
+  "EDC"
+}
+
 Table "payments" {
   "id" bigserial [pk, increment]
   "name" varchar [not null]
-  "type" varchar [not null]
+  "type" payments_type_enum [not null]
   "logo" varchar
   "created_at" timestamptz [not null, default: `now()`]
   "updated_at" timestamptz [not null, default: `now()`]
@@ -59,9 +65,9 @@ Indexes {
 
 Table "categories" {
   "id" bigserial [pk, increment]
-  "updated_at" timestamptz [not null, default: `now()`]
-  "created_at" timestamptz [not null, default: `now()`]
   "name" varchar [not null]
+  "created_at" timestamptz [not null, default: `now()`]
+  "updated_at" timestamptz [not null, default: `now()`]
 
 Indexes {
   name [unique, name: "category_name"]
@@ -71,7 +77,7 @@ Indexes {
 Table "products" {
   "id" bigserial [pk, increment]
   "category_id" bigint [not null]
-  "sku" varchar [not null]
+  "sku" uuid [not null, default: `gen_random_uuid()`]
   "name" varchar [not null]
   "stock" bigint [not null]
   "price" decimal(18,2) [not null]
