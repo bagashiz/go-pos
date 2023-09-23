@@ -49,7 +49,7 @@ func init() {
 //	@license.name				MIT
 //	@license.url				https://github.com/bagashiz/go-pos/blob/main/LICENSE
 //
-//	@host						localhost:8080
+//	@host						gopos.bagashiz.me
 //	@BasePath					/v1
 //	@schemes					http https
 //
