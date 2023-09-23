@@ -388,7 +388,7 @@ definitions:
         example: "1970-01-01T00:00:00Z"
         type: string
     type: object
-host: localhost:8080
+host: 0.0.0.0
 info:
   contact:
     email: bagash.office@simplelogin.com

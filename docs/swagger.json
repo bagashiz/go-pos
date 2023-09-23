@@ -18,7 +18,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "0.0.0.0",
     "basePath": "/v1",
     "paths": {
         "/categories": {
