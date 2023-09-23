@@ -1,6 +1,6 @@
 module github.com/bagashiz/go-pos
 
-go 1.21.0
+go 1.21
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
