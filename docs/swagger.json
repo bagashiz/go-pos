@@ -18,7 +18,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "gopos.bagashiz.me",
     "basePath": "/v1",
     "paths": {
         "/categories": {
