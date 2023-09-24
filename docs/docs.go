@@ -125,6 +125,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -254,6 +260,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -315,6 +327,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -614,6 +632,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -743,6 +767,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -804,6 +834,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -937,6 +973,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -1066,6 +1108,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -1127,6 +1175,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -1424,6 +1478,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -1479,6 +1539,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }

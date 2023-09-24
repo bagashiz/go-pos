@@ -36,6 +36,7 @@ type createPaymentRequest struct {
 //	@Success		200						{object}	paymentResponse			"Payment created"
 //	@Failure		400						{object}	errorResponse			"Validation error"
 //	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		403						{object}	errorResponse			"Forbidden error"
 //	@Failure		404						{object}	errorResponse			"Data not found error"
 //	@Failure		409						{object}	errorResponse			"Data conflict error"
 //	@Failure		500						{object}	errorResponse			"Internal server error"
@@ -167,6 +168,7 @@ type updatePaymentRequest struct {
 //	@Success		200						{object}	paymentResponse			"Payment updated"
 //	@Failure		400						{object}	errorResponse			"Validation error"
 //	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		403						{object}	errorResponse			"Forbidden error"
 //	@Failure		404						{object}	errorResponse			"Data not found error"
 //	@Failure		409						{object}	errorResponse			"Data conflict error"
 //	@Failure		500						{object}	errorResponse			"Internal server error"
@@ -220,6 +222,7 @@ type deletePaymentRequest struct {
 //	@Success		200	{object}	response		"Payment deleted"
 //	@Failure		400	{object}	errorResponse	"Validation error"
 //	@Failure		401	{object}	errorResponse	"Unauthorized error"
+//	@Failure		403	{object}	errorResponse	"Forbidden error"
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/payments/{id} [delete]
