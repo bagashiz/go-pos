@@ -123,6 +123,12 @@
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -252,6 +258,12 @@
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -313,6 +325,12 @@
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -612,6 +630,12 @@
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -741,6 +765,12 @@
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -802,6 +832,12 @@
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -935,6 +971,12 @@
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -1064,6 +1106,12 @@
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -1125,6 +1173,12 @@
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }
@@ -1422,6 +1476,12 @@
                             "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Data not found error",
                         "schema": {
@@ -1477,6 +1537,12 @@
                     },
                     "401": {
                         "description": "Unauthorized error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden error",
                         "schema": {
                             "$ref": "#/definitions/handler.errorResponse"
                         }

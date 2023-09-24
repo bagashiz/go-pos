@@ -34,6 +34,7 @@ type createCategoryRequest struct {
 //	@Success		200						{object}	categoryResponse		"Category created"
 //	@Failure		400						{object}	errorResponse			"Validation error"
 //	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		403						{object}	errorResponse			"Forbidden error"
 //	@Failure		404						{object}	errorResponse			"Data not found error"
 //	@Failure		409						{object}	errorResponse			"Data conflict error"
 //	@Failure		500						{object}	errorResponse			"Internal server error"
@@ -161,6 +162,7 @@ type updateCategoryRequest struct {
 //	@Success		200						{object}	categoryResponse		"Category updated"
 //	@Failure		400						{object}	errorResponse			"Validation error"
 //	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		403						{object}	errorResponse			"Forbidden error"
 //	@Failure		404						{object}	errorResponse			"Data not found error"
 //	@Failure		409						{object}	errorResponse			"Data conflict error"
 //	@Failure		500						{object}	errorResponse			"Internal server error"
@@ -212,6 +214,7 @@ type deleteCategoryRequest struct {
 //	@Success		200	{object}	response		"Category deleted"
 //	@Failure		400	{object}	errorResponse	"Validation error"
 //	@Failure		401	{object}	errorResponse	"Unauthorized error"
+//	@Failure		403	{object}	errorResponse	"Forbidden error"
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/categories/{id} [delete]

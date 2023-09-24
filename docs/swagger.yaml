@@ -464,6 +464,10 @@ paths:
           description: Unauthorized error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
         "404":
           description: Data not found error
           schema:
@@ -505,6 +509,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
         "401":
           description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
           schema:
             $ref: '#/definitions/handler.errorResponse'
         "404":
@@ -583,6 +591,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
         "401":
           description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
           schema:
             $ref: '#/definitions/handler.errorResponse'
         "404":
@@ -778,6 +790,10 @@ paths:
           description: Unauthorized error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
         "404":
           description: Data not found error
           schema:
@@ -819,6 +835,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
         "401":
           description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
           schema:
             $ref: '#/definitions/handler.errorResponse'
         "404":
@@ -897,6 +917,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
         "401":
           description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
           schema:
             $ref: '#/definitions/handler.errorResponse'
         "404":
@@ -986,6 +1010,10 @@ paths:
           description: Unauthorized error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
         "404":
           description: Data not found error
           schema:
@@ -1027,6 +1055,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
         "401":
           description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
           schema:
             $ref: '#/definitions/handler.errorResponse'
         "404":
@@ -1105,6 +1137,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
         "401":
           description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
           schema:
             $ref: '#/definitions/handler.errorResponse'
         "404":
@@ -1227,6 +1263,10 @@ paths:
           description: Unauthorized error
           schema:
             $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
         "404":
           description: Data not found error
           schema:
@@ -1303,6 +1343,10 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
         "401":
           description: Unauthorized error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "403":
+          description: Forbidden error
           schema:
             $ref: '#/definitions/handler.errorResponse'
         "404":

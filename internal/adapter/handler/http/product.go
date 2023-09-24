@@ -38,6 +38,7 @@ type createProductRequest struct {
 //	@Success		200						{object}	productResponse			"Product created"
 //	@Failure		400						{object}	errorResponse			"Validation error"
 //	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		403						{object}	errorResponse			"Forbidden error"
 //	@Failure		404						{object}	errorResponse			"Data not found error"
 //	@Failure		409						{object}	errorResponse			"Data conflict error"
 //	@Failure		500						{object}	errorResponse			"Internal server error"
@@ -177,6 +178,7 @@ type updateProductRequest struct {
 //	@Success		200						{object}	productResponse			"Product updated"
 //	@Failure		400						{object}	errorResponse			"Validation error"
 //	@Failure		401						{object}	errorResponse			"Unauthorized error"
+//	@Failure		403						{object}	errorResponse			"Forbidden error"
 //	@Failure		404						{object}	errorResponse			"Data not found error"
 //	@Failure		409						{object}	errorResponse			"Data conflict error"
 //	@Failure		500						{object}	errorResponse			"Internal server error"
@@ -232,6 +234,7 @@ type deleteProductRequest struct {
 //	@Success		200	{object}	response		"Product deleted"
 //	@Failure		400	{object}	errorResponse	"Validation error"
 //	@Failure		401	{object}	errorResponse	"Unauthorized error"
+//	@Failure		403	{object}	errorResponse	"Forbidden error"
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/products/{id} [delete]

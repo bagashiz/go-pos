@@ -167,6 +167,7 @@ type updateUserRequest struct {
 //	@Success		200					{object}	userResponse		"User updated"
 //	@Failure		400					{object}	errorResponse		"Validation error"
 //	@Failure		401					{object}	errorResponse		"Unauthorized error"
+//	@Failure		403					{object}	errorResponse		"Forbidden error"
 //	@Failure		404					{object}	errorResponse		"Data not found error"
 //	@Failure		500					{object}	errorResponse		"Internal server error"
 //	@Router			/users/{id} [put]
@@ -220,6 +221,7 @@ type deleteUserRequest struct {
 //	@Success		200	{object}	response		"User deleted"
 //	@Failure		400	{object}	errorResponse	"Validation error"
 //	@Failure		401	{object}	errorResponse	"Unauthorized error"
+//	@Failure		403	{object}	errorResponse	"Forbidden error"
 //	@Failure		404	{object}	errorResponse	"Data not found error"
 //	@Failure		500	{object}	errorResponse	"Internal server error"
 //	@Router			/users/{id} [delete]
