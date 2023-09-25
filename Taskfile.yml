@@ -18,6 +18,7 @@ tasks:
       - task: db:create
       - task: migrate:up
       - task: dev
+      - task: mockery
 
   install:
     desc: "Install dependencies"
@@ -111,3 +112,8 @@ tasks:
   # test:
   #   desc: "Run tests"
   #   cmd: ginkgo -v -r --cover --race --keep-going --timeout=30s
+
+  mockery:
+    desc: "Run mockery using docker"
+    cmds: 
+      - sudo docker run -v "$PWD":/src -w /src vektra/mockery:v2.33 {{.CLI_ARGS}}
