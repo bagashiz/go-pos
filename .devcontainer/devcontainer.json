@@ -20,13 +20,10 @@
             "onAutoForward": "notify"
         }
     },
-    "postCreateCommand": "go mod download && go install github.com/go-task/task/v3/cmd/task@latest",
+    "postCreateCommand": "chmod +x /workspace/.devcontainer/post-create.sh && /workspace/.devcontainer/post-create.sh",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
-            "installZsh": true,
-            "installOhMyZsh": true,
-            "configureZshAsDefaultShell": true,
-            "upgradePackages": true
+            "configureZshAsDefaultShell": true
         },
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
         "ghcr.io/devcontainers-contrib/features/act:1": {}
@@ -57,7 +54,7 @@
                 ],
                 "[go]": {
                     "editor.codeActionsOnSave": {
-                        "source.organizeImports": true
+                        "source.organizeImports": "explicit"
                     }
                 }
             }
