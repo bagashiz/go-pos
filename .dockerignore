@@ -1,4 +1,5 @@
 # exclude any development-specific files
+.devcontainer/
 .vscode/
 .idea/
 
@@ -24,6 +25,8 @@ Dockerfile*
 docker-compose*.yml
 
 # exclude any development-specific files
+**/*_test.go
+Makefile
 .*ignore
 *.env
 *.log
@@ -31,6 +34,4 @@ docker-compose*.yml
 *.out
 *.toml
 *.test
-**/*_test.go
 *.yml
-Makefile

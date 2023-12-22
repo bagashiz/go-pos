@@ -8,8 +8,8 @@ Before you start contributing to the project, you will need to set up your devel
 
 - [Go](https://golang.org/) 1.21 or higher
 - [Task](https://taskfile.dev/)
-- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
-- [Docker Compose](https://docs.docker.com/compose/) or [Podman Compose](https://github.com/containers/podman-compose)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 - [PostgreSQL](https://hub.docker.com/_/postgres) container
 - [Redis](https://hub.docker.com/_/redis) container
 
@@ -21,8 +21,9 @@ To get started with the project, you can follow these steps:
 2. Clone your forked repository to your local machine.
 3. Install the project dependencies: `task install`
 4. Create a copy of the `.env.example` file and rename it to `.env`. Update configuration values as needed.
-5. Run the services container: `task service:up && task migrate:up`
-6. Start the development server: `task dev`
+5. If not using devcontainer, run the database services (PostgreSQL and Redis): `docker compose up -d postgres redis`
+6. Run the migration: `task migrate:up`
+7. Start the development server: `task dev`
 
 ## Submitting bug reports
 
@@ -59,6 +60,8 @@ When submitting code changes, please adhere to the following standards:
 2. **Packages and imports**: Use goimports to organize imports and remove unused imports.
 3. **Naming conventions**: Follow the Go naming conventions for variables, functions, and types. Use descriptive and meaningful names for variables, functions, and types. Avoid using abbreviations or acronyms unless they are well-known and widely used. Refer to the [Go Naming Slides](https://go.dev/talks/2014/names.slide) for more information.
 4. **Comments**: Include comments to explain complex logic or provide clarity where needed. Use complete sentences and follow the Go commenting style (e.g., `//` for single-line comments and `/** ... */` for multi-line comments).
+5. **Testing**: Write unit tests for your code changes. Make sure your code changes pass all unit tests before submitting your changes.
+6. **Documentation**: Update the documentation as needed. If you are adding a new feature, make sure to include the documentation for the new feature. If you are changing an existing feature, make sure to update the documentation for the feature.
 
 ## Conclusion
 
