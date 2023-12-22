@@ -30,14 +30,17 @@ This project idea was inspired by the [Ide Project untuk Upgrade Portfolio Backe
 
     Update configuration values as needed.
 
-4. Run the service containers:
+4. Run the database migration:
+
+   **⚠NOTE:** if you do not use devcontainer, you need to manually run the services (PostgreSQL and Redis) first before running the migration:
+
+   ```bash
+   docker compose up -d postgres redis
+   ```
 
     ```bash
-    task service:up
     task migrate:up
     ```
-
-    **NOTE**: the command use `podman` and `podman-compose` by default. If you want to use `docker` or `docker compose`, manually run `docker` commands instead or replace `podman` and `podman-compose` with `docker` or `docker compose` in the tasks inside `Taskfile.yml` file.
 
 5. Run the project in development mode:
 
