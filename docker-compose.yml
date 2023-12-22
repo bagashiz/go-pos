@@ -1,10 +1,8 @@
 version: "3.8"
 
 services:
-  dev:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/go:1.21-bookworm
     container_name: dev_gopos
     volumes:
       - .:/workspace:cached
@@ -12,6 +10,9 @@ services:
       - ~/.ssh:/home/vscode/.ssh
       - ~/.zsh_history:/home/vscode/.zsh_history
     command: "sleep infinity"
+    depends_on:
+      - postgres
+      - redis
 
   postgres:
     image: postgres:16.1-alpine3.19
@@ -19,7 +20,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - gopos-postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: "${DB_USERNAME}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
@@ -36,14 +37,14 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - gopos-redis:/data
+      - redis:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       timeout: 5s
       retries: 5
 
 volumes:
-  gopos-postgres:
+  postgres:
     driver: local
-  gopos-redis:
+  redis:
     driver: local

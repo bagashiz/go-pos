@@ -3,9 +3,9 @@
     "dockerComposeFile": [
         "../docker-compose.yml"
     ],
-    "service": "dev",
+    "service": "devcontainer",
     "runServices": [
-        "dev",
+        "devcontainer",
         "postgres",
         "redis"
     ],
@@ -20,6 +20,7 @@
             "onAutoForward": "notify"
         }
     },
+    "postCreateCommand": "go mod download && go install github.com/go-task/task/v3/cmd/task@latest",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "installZsh": true,
