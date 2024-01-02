@@ -1,19 +1,23 @@
-package repository
+package postgres
 
 import (
 	"context"
 	"fmt"
 	"os"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 /**
  * DB is a wrapper for PostgreSQL database connection
- * that uses pgxpool as database driver
+ * that uses pgxpool as database driver.
+ * It also holds a reference to squirrel.StatementBuilderType
+ * which is used to build SQL queries that compatible with PostgreSQL syntax
  */
 type DB struct {
 	*pgxpool.Pool
+	QueryBuilder *squirrel.StatementBuilderType
 }
 
 // NewDB creates a new PostgreSQL database instance
@@ -36,8 +40,11 @@ func NewDB(ctx context.Context) (*DB, error) {
 		return nil, err
 	}
 
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
 	return &DB{
 		db,
+		&psql,
 	}, nil
 }
 

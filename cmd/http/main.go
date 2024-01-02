@@ -8,7 +8,8 @@ import (
 	_ "github.com/bagashiz/go-pos/docs"
 	cache "github.com/bagashiz/go-pos/internal/adapter/cache/redis"
 	handler "github.com/bagashiz/go-pos/internal/adapter/handler/http"
-	repo "github.com/bagashiz/go-pos/internal/adapter/repository/postgres"
+	"github.com/bagashiz/go-pos/internal/adapter/postgres"
+	"github.com/bagashiz/go-pos/internal/adapter/postgres/repository"
 	token "github.com/bagashiz/go-pos/internal/adapter/token/paseto"
 	"github.com/bagashiz/go-pos/internal/core/service"
 	"github.com/joho/godotenv"
@@ -38,25 +39,25 @@ func init() {
 	slog.SetDefault(logger)
 }
 
-//	@title						Go POS (Point of Sale) API
-//	@version					1.0
-//	@description				This is a simple RESTful Point of Sale (POS) Service API written in Go using Gin web framework, PostgreSQL database, and Redis cache.
+// @title						Go POS (Point of Sale) API
+// @version					1.0
+// @description				This is a simple RESTful Point of Sale (POS) Service API written in Go using Gin web framework, PostgreSQL database, and Redis cache.
 //
-//	@contact.name				Bagas Hizbullah
-//	@contact.url				https://github.com/bagashiz/go-pos
-//	@contact.email				bagash.office@simplelogin.com
+// @contact.name				Bagas Hizbullah
+// @contact.url				https://github.com/bagashiz/go-pos
+// @contact.email				bagash.office@simplelogin.com
 //
-//	@license.name				MIT
-//	@license.url				https://github.com/bagashiz/go-pos/blob/main/LICENSE
+// @license.name				MIT
+// @license.url				https://github.com/bagashiz/go-pos/blob/main/LICENSE
 //
-//	@host						gopos.bagashiz.me
-//	@BasePath					/v1
-//	@schemes					http https
+// @host						gopos.bagashiz.me
+// @BasePath					/v1
+// @schemes					http https
 //
-//	@securityDefinitions.apikey	BearerAuth
-//	@in							header
-//	@name						Authorization
-//	@description				Type "Bearer" followed by a space and the access token.
+// @securityDefinitions.apikey	BearerAuth
+// @in							header
+// @name						Authorization
+// @description				Type "Bearer" followed by a space and the access token.
 func main() {
 	appName := os.Getenv("APP_NAME")
 	env := os.Getenv("APP_ENV")
@@ -70,7 +71,7 @@ func main() {
 
 	// Init database
 	ctx := context.Background()
-	db, err := repo.NewDB(ctx)
+	db, err := postgres.NewDB(ctx)
 	if err != nil {
 		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
@@ -98,7 +99,7 @@ func main() {
 
 	// Dependency injection
 	// User
-	userRepo := repo.NewUserRepository(db)
+	userRepo := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepo, cache)
 	userHandler := handler.NewUserHandler(userService)
 
@@ -107,22 +108,22 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 
 	// Payment
-	paymentRepo := repo.NewPaymentRepository(db)
+	paymentRepo := repository.NewPaymentRepository(db)
 	paymentService := service.NewPaymentService(paymentRepo, cache)
 	paymentHandler := handler.NewPaymentHandler(paymentService)
 
 	// Category
-	categoryRepo := repo.NewCategoryRepository(db)
+	categoryRepo := repository.NewCategoryRepository(db)
 	categoryService := service.NewCategoryService(categoryRepo, cache)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	// Product
-	productRepo := repo.NewProductRepository(db)
+	productRepo := repository.NewProductRepository(db)
 	productService := service.NewProductService(productRepo, categoryRepo, cache)
 	productHandler := handler.NewProductHandler(productService)
 
 	// Order
-	orderRepo := repo.NewOrderRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
 	orderService := service.NewOrderService(orderRepo, productRepo, categoryRepo, userRepo, paymentRepo, cache)
 	orderHandler := handler.NewOrderHandler(orderService)
 
