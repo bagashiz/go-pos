@@ -15,11 +15,11 @@ import (
  */
 type CategoryService struct {
 	repo  port.CategoryRepository
-	cache port.CacheService
+	cache port.CacheRepository
 }
 
 // NewCategoryService creates a new category service instance
-func NewCategoryService(repo port.CategoryRepository, cache port.CacheService) *CategoryService {
+func NewCategoryService(repo port.CategoryRepository, cache port.CacheRepository) *CategoryService {
 	return &CategoryService{
 		repo,
 		cache,

@@ -20,11 +20,11 @@ type OrderService struct {
 	categoryRepo port.CategoryRepository
 	userRepo     port.UserRepository
 	paymentRepo  port.PaymentRepository
-	cache        port.CacheService
+	cache        port.CacheRepository
 }
 
 // NewOrderService creates a new order service instance
-func NewOrderService(orderRepo port.OrderRepository, productRepo port.ProductRepository, categoryRepo port.CategoryRepository, userRepo port.UserRepository, paymentRepo port.PaymentRepository, cache port.CacheService) *OrderService {
+func NewOrderService(orderRepo port.OrderRepository, productRepo port.ProductRepository, categoryRepo port.CategoryRepository, userRepo port.UserRepository, paymentRepo port.PaymentRepository, cache port.CacheRepository) *OrderService {
 	return &OrderService{
 		orderRepo,
 		productRepo,

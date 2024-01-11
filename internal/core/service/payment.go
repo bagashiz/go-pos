@@ -15,11 +15,11 @@ import (
  */
 type PaymentService struct {
 	repo  port.PaymentRepository
-	cache port.CacheService
+	cache port.CacheRepository
 }
 
 // NewPaymentService creates a new payment service instance
-func NewPaymentService(repo port.PaymentRepository, cache port.CacheService) *PaymentService {
+func NewPaymentService(repo port.PaymentRepository, cache port.CacheRepository) *PaymentService {
 	return &PaymentService{
 		repo,
 		cache,

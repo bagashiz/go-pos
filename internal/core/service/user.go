@@ -15,11 +15,11 @@ import (
  */
 type UserService struct {
 	repo  port.UserRepository
-	cache port.CacheService
+	cache port.CacheRepository
 }
 
 // NewUserService creates a new user service instance
-func NewUserService(repo port.UserRepository, cache port.CacheService) *UserService {
+func NewUserService(repo port.UserRepository, cache port.CacheRepository) *UserService {
 	return &UserService{
 		repo,
 		cache,
