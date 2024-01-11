@@ -15,11 +15,11 @@ const (
 
 // User is an entity that represents a user
 type User struct {
-	ID        uint64    `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	Role      UserRole  `json:"role"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uint64
+	Name      string
+	Email     string
+	Password  string
+	Role      UserRole
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
