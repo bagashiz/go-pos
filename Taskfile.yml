@@ -34,16 +34,16 @@ tasks:
         - DBML_FILE
 
   db:create:
-    desc: "Create database schema"
-    cmd: docker exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'CREATE DATABASE {{.DB_DATABASE}};'"
+    desc: "Create database if not exists"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USERNAME}} -c 'SELECT 1' -d {{.DB_DATABASE}} &>/dev/null || psql -U {{.DB_USERNAME}} -c 'CREATE DATABASE {{.DB_DATABASE}};'"
     requires:
       vars:
         - DB_USERNAME
         - DB_DATABASE
 
   db:drop:
-    desc: "Drop database schema"
-    cmd: docker exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'DROP DATABASE {{.DB_DATABASE}};'"
+    desc: "Drop database"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USERNAME}} -c 'DROP DATABASE {{.DB_DATABASE}};'"
     requires:
       vars:
         - DB_USERNAME
@@ -51,7 +51,7 @@ tasks:
 
   db:cli:
     desc: "Connect to database using command line interface"
-    cmd: docker exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -d {{.DB_DATABASE}}"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USERNAME}} -d {{.DB_DATABASE}}"
     requires:
       vars:
         - DB_USERNAME
@@ -59,21 +59,21 @@ tasks:
 
   migrate:up:
     desc: "Run database migrations"
-    cmd: migrate -path ./internal/adapter/repository/postgres/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
+    cmd: migrate -path ./internal/adapter/storage/postgres/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
     requires:
       vars:
         - DSN
 
   migrate:down:
     desc: "Rollback database migrations"
-    cmd: migrate -path ./internal/adapter/repository/postgres/migrations -database {{.DSN}} -verbose down {{.CLI_ARGS}}
+    cmd: migrate -path ./internal/adapter/storage/postgres/migrations -database {{.DSN}} -verbose down {{.CLI_ARGS}}
     requires:
       vars:
         - DSN
 
   redis:cli:
     desc: "Connect to redis using command line interface"
-    cmd: docker exec -it redis_gopos redis-cli
+    cmd: docker exec -it go-pos_redis redis-cli
 
   dev:
     desc: "Start development server"

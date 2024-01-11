@@ -16,11 +16,11 @@ import (
 type ProductService struct {
 	productRepo  port.ProductRepository
 	categoryRepo port.CategoryRepository
-	cache        port.CacheService
+	cache        port.CacheRepository
 }
 
 // NewProductService creates a new product service instance
-func NewProductService(productRepo port.ProductRepository, categoryRepo port.CategoryRepository, cache port.CacheService) *ProductService {
+func NewProductService(productRepo port.ProductRepository, categoryRepo port.CategoryRepository, cache port.CacheRepository) *ProductService {
 	return &ProductService{
 		productRepo,
 		categoryRepo,

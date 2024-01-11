@@ -1,4 +1,4 @@
-package cache
+package redis
 
 import (
 	"context"
@@ -10,15 +10,15 @@ import (
 )
 
 /**
- * Redis implements port.CacheService interface
+ * Redis implements port.CacheRepository interface
  * and provides an access to the redis library
  */
 type Redis struct {
 	client *redis.Client
 }
 
-// NewCache creates a new instance of Redis
-func NewCache(ctx context.Context) (port.CacheService, error) {
+// New creates a new instance of Redis
+func New(ctx context.Context) (port.CacheRepository, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_SERVER"),
 		Password: os.Getenv("REDIS_PASSWORD"),

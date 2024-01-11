@@ -1,4 +1,4 @@
-package token
+package paseto
 
 import (
 	"errors"
@@ -20,8 +20,8 @@ type PasetoToken struct {
 	symmetricKey []byte
 }
 
-// NewToken creates a new paseto instance
-func NewToken(symmetricKey string) (port.TokenService, error) {
+// New creates a new paseto instance
+func New(symmetricKey string) (port.TokenService, error) {
 	validSymmetricKey := len(symmetricKey) == chacha20poly1305.KeySize
 	if !validSymmetricKey {
 		return nil, errors.New("invalid token key size")

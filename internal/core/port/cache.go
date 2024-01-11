@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// CacheService is an interface for interacting with cache-related business logic
-type CacheService interface {
+// CacheRepository is an interface for interacting with cache-related business logic
+type CacheRepository interface {
 	// Set stores the value in the cache
 	Set(ctx context.Context, key string, value []byte, ttl time.Duration) error
 	// Get retrieves the value from the cache
