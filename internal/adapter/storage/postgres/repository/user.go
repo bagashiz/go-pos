@@ -5,6 +5,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
@@ -15,11 +16,11 @@ import (
  * and provides an access to the postgres database
  */
 type UserRepository struct {
-	db *DB
+	db *postgres.DB
 }
 
 // NewUserRepository creates a new user repository instance
-func NewUserRepository(db *DB) *UserRepository {
+func NewUserRepository(db *postgres.DB) *UserRepository {
 	return &UserRepository{
 		db,
 	}
@@ -27,7 +28,7 @@ func NewUserRepository(db *DB) *UserRepository {
 
 // CreateUser creates a new user in the database
 func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
-	query := psql.Insert("users").
+	query := ur.db.QueryBuilder.Insert("users").
 		Columns("name", "email", "password").
 		Values(user.Name, user.Email, user.Password).
 		Suffix("RETURNING *")
@@ -57,7 +58,7 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.User, error) {
 	var user domain.User
 
-	query := psql.Select("*").
+	query := ur.db.QueryBuilder.Select("*").
 		From("users").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
@@ -90,7 +91,7 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id uint64) (*domain.U
 func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
 	var user domain.User
 
-	query := psql.Select("*").
+	query := ur.db.QueryBuilder.Select("*").
 		From("users").
 		Where(sq.Eq{"email": email}).
 		Limit(1)
@@ -121,7 +122,7 @@ func (ur *UserRepository) ListUsers(ctx context.Context, skip, limit uint64) ([]
 	var user domain.User
 	var users []domain.User
 
-	query := psql.Select("*").
+	query := ur.db.QueryBuilder.Select("*").
 		From("users").
 		OrderBy("id").
 		Limit(limit).
@@ -165,7 +166,7 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 	password := nullString(user.Password)
 	role := nullString(string(user.Role))
 
-	query := psql.Update("users").
+	query := ur.db.QueryBuilder.Update("users").
 		Set("name", sq.Expr("COALESCE(?, name)", name)).
 		Set("email", sq.Expr("COALESCE(?, email)", email)).
 		Set("password", sq.Expr("COALESCE(?, password)", password)).
@@ -197,7 +198,7 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 
 // DeleteUser deletes a user by ID from the database
 func (ur *UserRepository) DeleteUser(ctx context.Context, id uint64) error {
-	query := psql.Delete("users").
+	query := ur.db.QueryBuilder.Delete("users").
 		Where(sq.Eq{"id": id})
 
 	sql, args, err := query.ToSql()
