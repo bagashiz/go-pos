@@ -39,25 +39,25 @@ func init() {
 	slog.SetDefault(logger)
 }
 
-// @title						Go POS (Point of Sale) API
-// @version					1.0
-// @description				This is a simple RESTful Point of Sale (POS) Service API written in Go using Gin web framework, PostgreSQL database, and Redis cache.
+//	@title						Go POS (Point of Sale) API
+//	@version					1.0
+//	@description				This is a simple RESTful Point of Sale (POS) Service API written in Go using Gin web framework, PostgreSQL database, and Redis cache.
 //
-// @contact.name				Bagas Hizbullah
-// @contact.url				https://github.com/bagashiz/go-pos
-// @contact.email				bagash.office@simplelogin.com
+//	@contact.name				Bagas Hizbullah
+//	@contact.url				https://github.com/bagashiz/go-pos
+//	@contact.email				bagash.office@simplelogin.com
 //
-// @license.name				MIT
-// @license.url				https://github.com/bagashiz/go-pos/blob/main/LICENSE
+//	@license.name				MIT
+//	@license.url				https://github.com/bagashiz/go-pos/blob/main/LICENSE
 //
-// @host						gopos.bagashiz.me
-// @BasePath					/v1
-// @schemes					http https
+//	@host						gopos.bagashiz.me
+//	@BasePath					/v1
+//	@schemes					http https
 //
-// @securityDefinitions.apikey	BearerAuth
-// @in							header
-// @name						Authorization
-// @description				Type "Bearer" followed by a space and the access token.
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Type "Bearer" followed by a space and the access token.
 func main() {
 	appName := os.Getenv("APP_NAME")
 	env := os.Getenv("APP_ENV")
