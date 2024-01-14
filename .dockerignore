@@ -35,3 +35,4 @@ Makefile
 *.toml
 *.test
 *.yml
+*.dbml
