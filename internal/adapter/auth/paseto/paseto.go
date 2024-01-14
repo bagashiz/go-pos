@@ -1,9 +1,9 @@
 package paseto
 
 import (
-	"errors"
 	"time"
 
+	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/google/uuid"
@@ -18,23 +18,33 @@ import (
 type PasetoToken struct {
 	paseto       *paseto.V2
 	symmetricKey []byte
+	duration     time.Duration
 }
 
 // New creates a new paseto instance
-func New(symmetricKey string) (port.TokenService, error) {
+func New(config *config.Token) (port.TokenService, error) {
+	symmetricKey := config.SymmetricKey
+	durationStr := config.Duration
+
 	validSymmetricKey := len(symmetricKey) == chacha20poly1305.KeySize
 	if !validSymmetricKey {
-		return nil, errors.New("invalid token key size")
+		return nil, port.ErrInvalidTokenSymmetricKey
+	}
+
+	duration, err := time.ParseDuration(durationStr)
+	if err != nil {
+		return nil, err
 	}
 
 	return &PasetoToken{
 		paseto.NewV2(),
 		[]byte(symmetricKey),
+		duration,
 	}, nil
 }
 
 // CreateToken creates a new paseto token
-func (pt *PasetoToken) CreateToken(user *domain.User, duration time.Duration) (string, error) {
+func (pt *PasetoToken) CreateToken(user *domain.User) (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
@@ -45,7 +55,7 @@ func (pt *PasetoToken) CreateToken(user *domain.User, duration time.Duration) (s
 		UserID:    user.ID,
 		Role:      user.Role,
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(duration),
+		ExpiredAt: time.Now().Add(pt.duration),
 	}
 
 	token, err := pt.paseto.Encrypt(pt.symmetricKey, payload, nil)

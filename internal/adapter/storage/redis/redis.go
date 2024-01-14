@@ -2,9 +2,9 @@ package redis
 
 import (
 	"context"
-	"os"
 	"time"
 
+	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/redis/go-redis/v9"
 )
@@ -18,10 +18,10 @@ type Redis struct {
 }
 
 // New creates a new instance of Redis
-func New(ctx context.Context) (port.CacheRepository, error) {
+func New(ctx context.Context, config *config.Redis) (port.CacheRepository, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_SERVER"),
-		Password: os.Getenv("REDIS_PASSWORD"),
+		Addr:     config.Addr,
+		Password: config.Password,
 		DB:       0,
 	})
 

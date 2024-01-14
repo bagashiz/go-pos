@@ -4,9 +4,9 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"os"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
@@ -31,14 +31,14 @@ type DB struct {
 }
 
 // New creates a new PostgreSQL database instance
-func New(ctx context.Context) (*DB, error) {
+func New(ctx context.Context, config *config.DB) (*DB, error) {
 	url := fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=disable",
-		os.Getenv("DB_CONNECTION"),
-		os.Getenv("DB_USERNAME"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_DATABASE"),
+		config.Connection,
+		config.User,
+		config.Password,
+		config.Host,
+		config.Port,
+		config.Name,
 	)
 
 	db, err := pgxpool.New(ctx, url)

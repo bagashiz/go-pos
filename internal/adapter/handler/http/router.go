@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,7 @@ type Router struct {
 
 // NewRouter creates a new HTTP router
 func NewRouter(
+	config *config.HTTP,
 	token port.TokenService,
 	userHandler UserHandler,
 	authHandler AuthHandler,
@@ -32,7 +34,7 @@ func NewRouter(
 	orderHandler OrderHandler,
 ) (*Router, error) {
 	// Disable debug mode and write logs to file in production
-	env := os.Getenv("APP_ENV")
+	env := config.Env
 	if env == "production" {
 		gin.SetMode(gin.ReleaseMode)
 
@@ -41,13 +43,13 @@ func NewRouter(
 	}
 
 	// CORS
-	config := cors.DefaultConfig()
-	allowedOrigins := os.Getenv("HTTP_ALLOWED_ORIGINS")
+	ginConfig := cors.DefaultConfig()
+	allowedOrigins := config.AllowedOrigins
 	originsList := strings.Split(allowedOrigins, ",")
-	config.AllowOrigins = originsList
+	ginConfig.AllowOrigins = originsList
 
 	router := gin.New()
-	router.Use(gin.LoggerWithFormatter(customLogger), gin.Recovery(), cors.New(config))
+	router.Use(gin.LoggerWithFormatter(customLogger), gin.Recovery(), cors.New(ginConfig))
 
 	// Custom validators
 	v, ok := binding.Validator.Engine().(*validator.Validate)
