@@ -80,6 +80,15 @@ func main() {
 
 	slog.Info("Successfully connected to the database", "db", dbConn)
 
+	// Migrate database
+	err = db.Migrate()
+	if err != nil {
+		slog.Error("Error migrating database", "error", err)
+		os.Exit(1)
+	}
+
+	slog.Info("Successfully migrated the database")
+
 	// Init cache service
 	cache, err := redis.New(ctx)
 	if err != nil {

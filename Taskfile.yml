@@ -15,7 +15,6 @@ tasks:
     cmds:
       - task: install
       - task: db:create
-      - task: migrate:up
       - task: dev
 
   install:
@@ -78,6 +77,10 @@ tasks:
   dev:
     desc: "Start development server"
     cmd: air
+
+  lint:
+    desc: "Run linter"
+    cmd: golangci-lint run ./...
 
   build:
     desc: "Build binary"
