@@ -4,7 +4,7 @@ version: "3"
 
 vars:
   DBML_FILE: "./schema.dbml"
-  DSN: "{{.DB_CONNECTION}}://{{.DB_USERNAME}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_DATABASE}}?sslmode=disable"
+  DSN: "{{.DB_CONNECTION}}://{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_NAME}}?sslmode=disable"
 
 dotenv:
   - ".env"
@@ -34,27 +34,27 @@ tasks:
 
   db:create:
     desc: "Create database if not exists"
-    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USERNAME}} -c 'SELECT 1' -d {{.DB_DATABASE}} &>/dev/null || psql -U {{.DB_USERNAME}} -c 'CREATE DATABASE {{.DB_DATABASE}};'"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USER}} -c 'SELECT 1' -d {{.DB_NAME}} &>/dev/null || psql -U {{.DB_USER}} -c 'CREATE DATABASE {{.DB_NAME}};'"
     requires:
       vars:
-        - DB_USERNAME
-        - DB_DATABASE
+        - DB_USER
+        - DB_NAME
 
   db:drop:
     desc: "Drop database"
-    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USERNAME}} -c 'DROP DATABASE {{.DB_DATABASE}};'"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USER}} -c 'DROP DATABASE {{.DB_NAME}};'"
     requires:
       vars:
-        - DB_USERNAME
-        - DB_DATABASE
+        - DB_USER
+        - DB_NAME
 
   db:cli:
     desc: "Connect to database using command line interface"
-    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USERNAME}} -d {{.DB_DATABASE}}"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USER}} -d {{.DB_NAME}}"
     requires:
       vars:
-        - DB_USERNAME
-        - DB_DATABASE
+        - DB_USER
+        - DB_NAME
 
   migrate:up:
     desc: "Run database migrations"

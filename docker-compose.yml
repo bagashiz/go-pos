@@ -21,14 +21,14 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
-      POSTGRES_DB: "${DB_DATABASE}"
+      POSTGRES_DB: "${DB_NAME}"
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -d ${DB_DATABASE} -U ${DB_USERNAME}"
+          "pg_isready -d ${DB_NAME} -U ${DB_USER}"
         ]
       interval: 10s
       timeout: 5s

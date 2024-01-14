@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
 	_ "github.com/bagashiz/go-pos/docs"
 	"github.com/bagashiz/go-pos/internal/adapter/auth/paseto"
+	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/adapter/handler/http"
 	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres/repository"
@@ -39,46 +41,45 @@ func init() {
 	slog.SetDefault(logger)
 }
 
-//	@title						Go POS (Point of Sale) API
-//	@version					1.0
-//	@description				This is a simple RESTful Point of Sale (POS) Service API written in Go using Gin web framework, PostgreSQL database, and Redis cache.
+// @title						Go POS (Point of Sale) API
+// @version					1.0
+// @description				This is a simple RESTful Point of Sale (POS) Service API written in Go using Gin web framework, PostgreSQL database, and Redis cache.
 //
-//	@contact.name				Bagas Hizbullah
-//	@contact.url				https://github.com/bagashiz/go-pos
-//	@contact.email				bagash.office@simplelogin.com
+// @contact.name				Bagas Hizbullah
+// @contact.url				https://github.com/bagashiz/go-pos
+// @contact.email				bagash.office@simplelogin.com
 //
-//	@license.name				MIT
-//	@license.url				https://github.com/bagashiz/go-pos/blob/main/LICENSE
+// @license.name				MIT
+// @license.url				https://github.com/bagashiz/go-pos/blob/main/LICENSE
 //
-//	@host						gopos.bagashiz.me
-//	@BasePath					/v1
-//	@schemes					http https
+// @host						gopos.bagashiz.me
+// @BasePath					/v1
+// @schemes					http https
 //
-//	@securityDefinitions.apikey	BearerAuth
-//	@in							header
-//	@name						Authorization
-//	@description				Type "Bearer" followed by a space and the access token.
+// @securityDefinitions.apikey	BearerAuth
+// @in							header
+// @name						Authorization
+// @description				Type "Bearer" followed by a space and the access token.
 func main() {
-	appName := os.Getenv("APP_NAME")
-	env := os.Getenv("APP_ENV")
-	dbConn := os.Getenv("DB_CONNECTION")
-	tokenSymmetricKey := os.Getenv("TOKEN_SYMMETRIC_KEY")
-	httpUrl := os.Getenv("HTTP_URL")
-	httpPort := os.Getenv("HTTP_PORT")
-	listenAddr := httpUrl + ":" + httpPort
+	// Load environment variables
+	config, err := config.New()
+	if err != nil {
+		slog.Error("Error loading environment variables", "error", err)
+		os.Exit(1)
+	}
 
-	slog.Info("Starting the application", "app", appName, "env", env)
+	slog.Info("Starting the application", "app", config.App.Name, "env", config.App.Env)
 
 	// Init database
 	ctx := context.Background()
-	db, err := postgres.New(ctx)
+	db, err := postgres.New(ctx, config.DB)
 	if err != nil {
 		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	slog.Info("Successfully connected to the database", "db", dbConn)
+	slog.Info("Successfully connected to the database", "db", config.DB.Connection)
 
 	// Migrate database
 	err = db.Migrate()
@@ -90,7 +91,7 @@ func main() {
 	slog.Info("Successfully migrated the database")
 
 	// Init cache service
-	cache, err := redis.New(ctx)
+	cache, err := redis.New(ctx, config.Redis)
 	if err != nil {
 		slog.Error("Error initializing cache connection", "error", err)
 		os.Exit(1)
@@ -100,7 +101,7 @@ func main() {
 	slog.Info("Successfully connected to the cache server")
 
 	// Init token service
-	token, err := paseto.New(tokenSymmetricKey)
+	token, err := paseto.New(config.Token)
 	if err != nil {
 		slog.Error("Error initializing token service", "error", err)
 		os.Exit(1)
@@ -138,6 +139,7 @@ func main() {
 
 	// Init router
 	router, err := http.NewRouter(
+		config.HTTP,
 		token,
 		*userHandler,
 		*authHandler,
@@ -152,6 +154,7 @@ func main() {
 	}
 
 	// Start server
+	listenAddr := fmt.Sprintf("%s:%s", config.HTTP.URL, config.HTTP.Port)
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
 	err = router.Serve(listenAddr)
 	if err != nil {
