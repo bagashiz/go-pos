@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"os"
-	"time"
 
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/bagashiz/go-pos/internal/core/util"
@@ -39,13 +37,7 @@ func (as *AuthService) Login(ctx context.Context, email, password string) (strin
 		return "", port.ErrInvalidCredentials
 	}
 
-	accessTokenDurationStr := os.Getenv("TOKEN_DURATION")
-	accessTokenDuration, err := time.ParseDuration(accessTokenDurationStr)
-	if err != nil {
-		return "", err
-	}
-
-	accessToken, err := as.ts.CreateToken(user, accessTokenDuration)
+	accessToken, err := as.ts.CreateToken(user)
 	if err != nil {
 		return "", err
 	}
