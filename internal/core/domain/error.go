@@ -1,4 +1,4 @@
-package port
+package domain
 
 import (
 	"errors"
@@ -16,6 +16,8 @@ var (
 	ErrInsufficientStock = errors.New("product stock is not enough")
 	// ErrInsufficientPayment is an error for when total paid is less than total price
 	ErrInsufficientPayment = errors.New("total paid is less than total price")
+	// ErrInvalidTokenSize is an error for when the token symmetric key size is invalid
+	ErrInvalidTokenSymmetricKey = errors.New("invalid token key size")
 	// ErrExpiredToken is an error for when the access token is expired
 	ErrExpiredToken = errors.New("access token has expired")
 	// ErrInvalidToken is an error for when the access token is invalid

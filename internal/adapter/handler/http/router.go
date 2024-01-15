@@ -1,17 +1,16 @@
-package handler
+package http
 
 import (
-	"fmt"
-	"io"
-	"os"
+	"log/slog"
 	"strings"
-	"time"
 
+	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	sloggin "github.com/samber/slog-gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -23,6 +22,7 @@ type Router struct {
 
 // NewRouter creates a new HTTP router
 func NewRouter(
+	config *config.HTTP,
 	token port.TokenService,
 	userHandler UserHandler,
 	authHandler AuthHandler,
@@ -31,23 +31,19 @@ func NewRouter(
 	productHandler ProductHandler,
 	orderHandler OrderHandler,
 ) (*Router, error) {
-	// Disable debug mode and write logs to file in production
-	env := os.Getenv("APP_ENV")
-	if env == "production" {
+	// Disable debug mode in production
+	if config.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
-
-		logFile, _ := os.Create("gin.log")
-		gin.DefaultWriter = io.Writer(logFile)
 	}
 
 	// CORS
-	config := cors.DefaultConfig()
-	allowedOrigins := os.Getenv("HTTP_ALLOWED_ORIGINS")
+	ginConfig := cors.DefaultConfig()
+	allowedOrigins := config.AllowedOrigins
 	originsList := strings.Split(allowedOrigins, ",")
-	config.AllowOrigins = originsList
+	ginConfig.AllowOrigins = originsList
 
 	router := gin.New()
-	router.Use(gin.LoggerWithFormatter(customLogger), gin.Recovery(), cors.New(config))
+	router.Use(sloggin.New(slog.Default()), gin.Recovery(), cors.New(ginConfig))
 
 	// Custom validators
 	v, ok := binding.Validator.Engine().(*validator.Validate)
@@ -136,18 +132,4 @@ func NewRouter(
 // Serve starts the HTTP server
 func (r *Router) Serve(listenAddr string) error {
 	return r.Run(listenAddr)
-}
-
-// customLogger is a custom Gin logger
-func customLogger(param gin.LogFormatterParams) string {
-	return fmt.Sprintf("[%s] - %s \"%s %s %s %d %s [%s]\"\n",
-		param.TimeStamp.Format(time.RFC1123),
-		param.ClientIP,
-		param.Method,
-		param.Path,
-		param.Request.Proto,
-		param.StatusCode,
-		param.Latency.Round(time.Millisecond),
-		param.Request.UserAgent(),
-	)
 }

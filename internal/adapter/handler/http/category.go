@@ -1,4 +1,4 @@
-package handler
+package http
 
 import (
 	"github.com/bagashiz/go-pos/internal/core/domain"

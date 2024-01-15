@@ -18,13 +18,13 @@ definitions:
     x-enum-varnames:
     - Admin
     - Cashier
-  handler.authResponse:
+  http.authResponse:
     properties:
       token:
         example: v2.local.Gdh5kiOTyyaQ3_bNykYDeYHO21Jg2...
         type: string
     type: object
-  handler.categoryResponse:
+  http.categoryResponse:
     properties:
       id:
         example: 1
@@ -33,7 +33,7 @@ definitions:
         example: Foods
         type: string
     type: object
-  handler.createCategoryRequest:
+  http.createCategoryRequest:
     properties:
       name:
         example: Foods
@@ -41,7 +41,7 @@ definitions:
     required:
     - name
     type: object
-  handler.createOrderRequest:
+  http.createOrderRequest:
     properties:
       customer_name:
         example: John Doe
@@ -51,7 +51,7 @@ definitions:
         type: integer
       products:
         items:
-          $ref: '#/definitions/handler.orderProductRequest'
+          $ref: '#/definitions/http.orderProductRequest'
         type: array
       total_paid:
         example: 100000
@@ -62,7 +62,7 @@ definitions:
     - products
     - total_paid
     type: object
-  handler.createPaymentRequest:
+  http.createPaymentRequest:
     properties:
       logo:
         example: https://example.com/cash.png
@@ -79,7 +79,7 @@ definitions:
     - name
     - type
     type: object
-  handler.createProductRequest:
+  http.createProductRequest:
     properties:
       category_id:
         example: 1
@@ -106,16 +106,20 @@ definitions:
     - price
     - stock
     type: object
-  handler.errorResponse:
+  http.errorResponse:
     properties:
-      message:
-        example: Error message
-        type: string
+      messages:
+        example:
+        - Error message 1
+        - ' Error message 2'
+        items:
+          type: string
+        type: array
       success:
         example: false
         type: boolean
     type: object
-  handler.loginRequest:
+  http.loginRequest:
     properties:
       email:
         example: test@example.com
@@ -128,7 +132,7 @@ definitions:
     - email
     - password
     type: object
-  handler.meta:
+  http.meta:
     properties:
       limit:
         example: 10
@@ -140,7 +144,7 @@ definitions:
         example: 100
         type: integer
     type: object
-  handler.orderProductRequest:
+  http.orderProductRequest:
     properties:
       product_id:
         example: 1
@@ -153,7 +157,7 @@ definitions:
     - product_id
     - qty
     type: object
-  handler.orderProductResponse:
+  http.orderProductResponse:
     properties:
       created_at:
         example: "1970-01-01T00:00:00Z"
@@ -168,7 +172,7 @@ definitions:
         example: 100000
         type: number
       product:
-        $ref: '#/definitions/handler.productResponse'
+        $ref: '#/definitions/http.productResponse'
       product_id:
         example: 1
         type: integer
@@ -185,7 +189,7 @@ definitions:
         example: "1970-01-01T00:00:00Z"
         type: string
     type: object
-  handler.orderResponse:
+  http.orderResponse:
     properties:
       created_at:
         example: "1970-01-01T00:00:00Z"
@@ -197,13 +201,13 @@ definitions:
         example: 1
         type: integer
       payment_type:
-        $ref: '#/definitions/handler.paymentResponse'
+        $ref: '#/definitions/http.paymentResponse'
       payment_type_id:
         example: 1
         type: integer
       products:
         items:
-          $ref: '#/definitions/handler.orderProductResponse'
+          $ref: '#/definitions/http.orderProductResponse'
         type: array
       receipt_id:
         example: 4979cf6e-d215-4ff8-9d0d-b3e99bcc7750
@@ -224,7 +228,7 @@ definitions:
         example: 1
         type: integer
     type: object
-  handler.paymentResponse:
+  http.paymentResponse:
     properties:
       id:
         example: 1
@@ -240,10 +244,10 @@ definitions:
         - $ref: '#/definitions/domain.PaymentType'
         example: CASH
     type: object
-  handler.productResponse:
+  http.productResponse:
     properties:
       category:
-        $ref: '#/definitions/handler.categoryResponse'
+        $ref: '#/definitions/http.categoryResponse'
       created_at:
         example: "1970-01-01T00:00:00Z"
         type: string
@@ -269,7 +273,7 @@ definitions:
         example: "1970-01-01T00:00:00Z"
         type: string
     type: object
-  handler.registerRequest:
+  http.registerRequest:
     properties:
       email:
         example: test@example.com
@@ -286,7 +290,7 @@ definitions:
     - name
     - password
     type: object
-  handler.response:
+  http.response:
     properties:
       data: {}
       message:
@@ -296,7 +300,7 @@ definitions:
         example: true
         type: boolean
     type: object
-  handler.updateCategoryRequest:
+  http.updateCategoryRequest:
     properties:
       name:
         example: Beverages
@@ -304,7 +308,7 @@ definitions:
     required:
     - name
     type: object
-  handler.updatePaymentRequest:
+  http.updatePaymentRequest:
     properties:
       logo:
         example: https://example.com/gopay.png
@@ -321,7 +325,7 @@ definitions:
     - name
     - type
     type: object
-  handler.updateProductRequest:
+  http.updateProductRequest:
     properties:
       category_id:
         example: 1
@@ -348,7 +352,7 @@ definitions:
     - price
     - stock
     type: object
-  handler.updateUserRequest:
+  http.updateUserRequest:
     properties:
       email:
         example: test@example.com
@@ -370,7 +374,7 @@ definitions:
     - password
     - role
     type: object
-  handler.userResponse:
+  http.userResponse:
     properties:
       created_at:
         example: "1970-01-01T00:00:00Z"
@@ -424,15 +428,15 @@ paths:
         "200":
           description: Categories displayed
           schema:
-            $ref: '#/definitions/handler.meta'
+            $ref: '#/definitions/http.meta'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: List categories
@@ -448,38 +452,38 @@ paths:
         name: createCategoryRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.createCategoryRequest'
+          $ref: '#/definitions/http.createCategoryRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Category created
           schema:
-            $ref: '#/definitions/handler.categoryResponse'
+            $ref: '#/definitions/http.categoryResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Create a new category
@@ -502,27 +506,27 @@ paths:
         "200":
           description: Category deleted
           schema:
-            $ref: '#/definitions/handler.response'
+            $ref: '#/definitions/http.response'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Delete a category
@@ -544,19 +548,19 @@ paths:
         "200":
           description: Category retrieved
           schema:
-            $ref: '#/definitions/handler.categoryResponse'
+            $ref: '#/definitions/http.categoryResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Get a category
@@ -577,38 +581,38 @@ paths:
         name: updateCategoryRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.updateCategoryRequest'
+          $ref: '#/definitions/http.updateCategoryRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Category updated
           schema:
-            $ref: '#/definitions/handler.categoryResponse'
+            $ref: '#/definitions/http.categoryResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Update a category
@@ -636,19 +640,19 @@ paths:
         "200":
           description: Orders displayed
           schema:
-            $ref: '#/definitions/handler.meta'
+            $ref: '#/definitions/http.meta'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: List orders
@@ -664,30 +668,30 @@ paths:
         name: createOrderRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.createOrderRequest'
+          $ref: '#/definitions/http.createOrderRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Order created
           schema:
-            $ref: '#/definitions/handler.orderResponse'
+            $ref: '#/definitions/http.orderResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Create a new order
@@ -710,19 +714,19 @@ paths:
         "200":
           description: Order displayed
           schema:
-            $ref: '#/definitions/handler.orderResponse'
+            $ref: '#/definitions/http.orderResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Get an order
@@ -750,15 +754,15 @@ paths:
         "200":
           description: Payments displayed
           schema:
-            $ref: '#/definitions/handler.meta'
+            $ref: '#/definitions/http.meta'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: List payments
@@ -774,38 +778,38 @@ paths:
         name: createPaymentRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.createPaymentRequest'
+          $ref: '#/definitions/http.createPaymentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Payment created
           schema:
-            $ref: '#/definitions/handler.paymentResponse'
+            $ref: '#/definitions/http.paymentResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Create a new payment
@@ -828,27 +832,27 @@ paths:
         "200":
           description: Payment deleted
           schema:
-            $ref: '#/definitions/handler.response'
+            $ref: '#/definitions/http.response'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Delete a payment
@@ -870,19 +874,19 @@ paths:
         "200":
           description: Payment retrieved
           schema:
-            $ref: '#/definitions/handler.paymentResponse'
+            $ref: '#/definitions/http.paymentResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Get a payment
@@ -903,38 +907,38 @@ paths:
         name: updatePaymentRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.updatePaymentRequest'
+          $ref: '#/definitions/http.updatePaymentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Payment updated
           schema:
-            $ref: '#/definitions/handler.paymentResponse'
+            $ref: '#/definitions/http.paymentResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Update a payment
@@ -970,15 +974,15 @@ paths:
         "200":
           description: Products retrieved
           schema:
-            $ref: '#/definitions/handler.meta'
+            $ref: '#/definitions/http.meta'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: List products
@@ -994,38 +998,38 @@ paths:
         name: createProductRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.createProductRequest'
+          $ref: '#/definitions/http.createProductRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Product created
           schema:
-            $ref: '#/definitions/handler.productResponse'
+            $ref: '#/definitions/http.productResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Create a new product
@@ -1048,27 +1052,27 @@ paths:
         "200":
           description: Product deleted
           schema:
-            $ref: '#/definitions/handler.response'
+            $ref: '#/definitions/http.response'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Delete a product
@@ -1090,19 +1094,19 @@ paths:
         "200":
           description: Product retrieved
           schema:
-            $ref: '#/definitions/handler.productResponse'
+            $ref: '#/definitions/http.productResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Get a product
@@ -1123,38 +1127,38 @@ paths:
         name: updateProductRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.updateProductRequest'
+          $ref: '#/definitions/http.updateProductRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Product updated
           schema:
-            $ref: '#/definitions/handler.productResponse'
+            $ref: '#/definitions/http.productResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Update a product
@@ -1182,15 +1186,15 @@ paths:
         "200":
           description: Users displayed
           schema:
-            $ref: '#/definitions/handler.meta'
+            $ref: '#/definitions/http.meta'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: List users
@@ -1206,34 +1210,34 @@ paths:
         name: registerRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.registerRequest'
+          $ref: '#/definitions/http.registerRequest'
       produces:
       - application/json
       responses:
         "200":
           description: User created
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/http.userResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "409":
           description: Data conflict error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       summary: Register a new user
       tags:
       - Users
@@ -1254,27 +1258,27 @@ paths:
         "200":
           description: User deleted
           schema:
-            $ref: '#/definitions/handler.response'
+            $ref: '#/definitions/http.response'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Delete a user
@@ -1296,19 +1300,19 @@ paths:
         "200":
           description: User displayed
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/http.userResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Get a user
@@ -1329,34 +1333,34 @@ paths:
         name: updateUserRequest
         required: true
         schema:
-          $ref: '#/definitions/handler.updateUserRequest'
+          $ref: '#/definitions/http.updateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: User updated
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/http.userResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "403":
           description: Forbidden error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "404":
           description: Data not found error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       security:
       - BearerAuth: []
       summary: Update a user
@@ -1374,26 +1378,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/handler.loginRequest'
+          $ref: '#/definitions/http.loginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Succesfully logged in
           schema:
-            $ref: '#/definitions/handler.authResponse'
+            $ref: '#/definitions/http.authResponse'
         "400":
           description: Validation error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "401":
           description: Unauthorized error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/http.errorResponse'
       summary: Login and get an access token
       tags:
       - Users

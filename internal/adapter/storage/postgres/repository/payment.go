@@ -5,8 +5,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/core/domain"
-	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -15,11 +15,11 @@ import (
  * and provides an access to the postgres database
  */
 type PaymentRepository struct {
-	db *DB
+	db *postgres.DB
 }
 
 // NewPaymentRepository creates a new payment repository instance
-func NewPaymentRepository(db *DB) *PaymentRepository {
+func NewPaymentRepository(db *postgres.DB) *PaymentRepository {
 	return &PaymentRepository{
 		db,
 	}
@@ -27,7 +27,7 @@ func NewPaymentRepository(db *DB) *PaymentRepository {
 
 // CreatePayment creates a new payment record in the database
 func (pr *PaymentRepository) CreatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
-	query := psql.Insert("payments").
+	query := pr.db.QueryBuilder.Insert("payments").
 		Columns("name", "type", "logo").
 		Values(payment.Name, payment.Type, payment.Logo).
 		Suffix("RETURNING *")
@@ -56,7 +56,7 @@ func (pr *PaymentRepository) CreatePayment(ctx context.Context, payment *domain.
 func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*domain.Payment, error) {
 	var payment domain.Payment
 
-	query := psql.Select("*").
+	query := pr.db.QueryBuilder.Select("*").
 		From("payments").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
@@ -76,7 +76,7 @@ func (pr *PaymentRepository) GetPaymentByID(ctx context.Context, id uint64) (*do
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, port.ErrDataNotFound
+			return nil, domain.ErrDataNotFound
 		}
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (pr *PaymentRepository) ListPayments(ctx context.Context, skip, limit uint6
 	var payment domain.Payment
 	var payments []domain.Payment
 
-	query := psql.Select("*").
+	query := pr.db.QueryBuilder.Select("*").
 		From("payments").
 		OrderBy("id").
 		Limit(limit).
@@ -130,7 +130,7 @@ func (pr *PaymentRepository) UpdatePayment(ctx context.Context, payment *domain.
 	paymentType := nullString(string(payment.Type))
 	logo := nullString(payment.Logo)
 
-	query := psql.Update("payments").
+	query := pr.db.QueryBuilder.Update("payments").
 		Set("name", sq.Expr("COALESCE(?, name)", name)).
 		Set("type", sq.Expr("COALESCE(?, type)", paymentType)).
 		Set("logo", sq.Expr("COALESCE(?, logo)", logo)).
@@ -160,7 +160,7 @@ func (pr *PaymentRepository) UpdatePayment(ctx context.Context, payment *domain.
 
 // DeletePayment deletes a payment record from the database by id
 func (pr *PaymentRepository) DeletePayment(ctx context.Context, id uint64) error {
-	query := psql.Delete("payments").
+	query := pr.db.QueryBuilder.Delete("payments").
 		Where(sq.Eq{"id": id})
 
 	sql, args, err := query.ToSql()

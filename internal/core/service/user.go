@@ -15,11 +15,11 @@ import (
  */
 type UserService struct {
 	repo  port.UserRepository
-	cache port.CacheService
+	cache port.CacheRepository
 }
 
 // NewUserService creates a new user service instance
-func NewUserService(repo port.UserRepository, cache port.CacheService) *UserService {
+func NewUserService(repo port.UserRepository, cache port.CacheRepository) *UserService {
 	return &UserService{
 		repo,
 		cache,
@@ -37,8 +37,8 @@ func (us *UserService) Register(ctx context.Context, user *domain.User) (*domain
 
 	_, err = us.repo.CreateUser(ctx, user)
 	if err != nil {
-		if port.IsUniqueConstraintViolationError(err) {
-			return nil, port.ErrConflictingData
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
 		}
 
 		return nil, err
@@ -146,7 +146,7 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 		existingUser.Email == user.Email &&
 		existingUser.Role == user.Role
 	if emptyData || sameData {
-		return nil, port.ErrNoUpdatedData
+		return nil, domain.ErrNoUpdatedData
 	}
 
 	var hashedPassword string
@@ -162,8 +162,8 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 
 	_, err = us.repo.UpdateUser(ctx, user)
 	if err != nil {
-		if port.IsUniqueConstraintViolationError(err) {
-			return nil, port.ErrConflictingData
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
 		}
 
 		return nil, err

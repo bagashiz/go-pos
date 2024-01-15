@@ -2,9 +2,8 @@ package service
 
 import (
 	"context"
-	"os"
-	"time"
 
+	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/bagashiz/go-pos/internal/core/util"
 )
@@ -31,21 +30,15 @@ func NewAuthService(repo port.UserRepository, ts port.TokenService) *AuthService
 func (as *AuthService) Login(ctx context.Context, email, password string) (string, error) {
 	user, err := as.repo.GetUserByEmail(ctx, email)
 	if err != nil {
-		return "", port.ErrInvalidCredentials
+		return "", domain.ErrInvalidCredentials
 	}
 
 	err = util.ComparePassword(password, user.Password)
 	if err != nil {
-		return "", port.ErrInvalidCredentials
+		return "", domain.ErrInvalidCredentials
 	}
 
-	accessTokenDurationStr := os.Getenv("TOKEN_DURATION")
-	accessTokenDuration, err := time.ParseDuration(accessTokenDurationStr)
-	if err != nil {
-		return "", err
-	}
-
-	accessToken, err := as.ts.CreateToken(user, accessTokenDuration)
+	accessToken, err := as.ts.CreateToken(user)
 	if err != nil {
 		return "", err
 	}

@@ -1,30 +1,54 @@
 version: "3.8"
 
 services:
-  postgres_gopos:
-    image: postgres:15.4-alpine3.18
-    container_name: postgres_gopos
-    env_file:
-      - .env
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/go:1.21-bookworm
+    container_name: go-pos_devcontainer
+    volumes:
+      - .:/workspace:cached
+      - ~/.gitconfig:/home/vscode/.gitconfig
+      - ~/.ssh:/home/vscode/.ssh
+    command: "sleep infinity"
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16.1-alpine3.19
+    container_name: go-pos_postgres
     ports:
       - 5432:5432
     volumes:
-      - data:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: "${DB_NAME}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d gopos"]
-      interval: 5s
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d ${DB_NAME} -U ${DB_USER}"
+        ]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
 
-  redis_gopos:
-    image: redis:7.2-alpine
-    container_name: redis_gopos
+  redis:
+    image: redis:7.2.3-alpine
+    container_name: go-pos_redis
     ports:
       - 6379:6379
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
-  data:
+  postgres:
+    driver: local
+  redis:
+    driver: local

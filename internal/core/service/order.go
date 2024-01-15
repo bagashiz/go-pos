@@ -20,11 +20,11 @@ type OrderService struct {
 	categoryRepo port.CategoryRepository
 	userRepo     port.UserRepository
 	paymentRepo  port.PaymentRepository
-	cache        port.CacheService
+	cache        port.CacheRepository
 }
 
 // NewOrderService creates a new order service instance
-func NewOrderService(orderRepo port.OrderRepository, productRepo port.ProductRepository, categoryRepo port.CategoryRepository, userRepo port.UserRepository, paymentRepo port.PaymentRepository, cache port.CacheService) *OrderService {
+func NewOrderService(orderRepo port.OrderRepository, productRepo port.ProductRepository, categoryRepo port.CategoryRepository, userRepo port.UserRepository, paymentRepo port.PaymentRepository, cache port.CacheRepository) *OrderService {
 	return &OrderService{
 		orderRepo,
 		productRepo,
@@ -45,7 +45,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, order *domain.Order) (*
 		}
 
 		if product.Stock < orderProduct.Quantity {
-			return nil, port.ErrInsufficientStock
+			return nil, domain.ErrInsufficientStock
 		}
 
 		order.Products[i].TotalPrice = product.Price * float64(orderProduct.Quantity)
@@ -53,7 +53,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, order *domain.Order) (*
 	}
 
 	if order.TotalPaid < totalPrice {
-		return nil, port.ErrInsufficientPayment
+		return nil, domain.ErrInsufficientPayment
 	}
 
 	order.TotalPrice = totalPrice

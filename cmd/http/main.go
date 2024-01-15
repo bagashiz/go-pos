@@ -2,41 +2,20 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
 	_ "github.com/bagashiz/go-pos/docs"
-	cache "github.com/bagashiz/go-pos/internal/adapter/cache/redis"
-	handler "github.com/bagashiz/go-pos/internal/adapter/handler/http"
-	repo "github.com/bagashiz/go-pos/internal/adapter/repository/postgres"
-	token "github.com/bagashiz/go-pos/internal/adapter/token/paseto"
+	"github.com/bagashiz/go-pos/internal/adapter/auth/paseto"
+	"github.com/bagashiz/go-pos/internal/adapter/config"
+	"github.com/bagashiz/go-pos/internal/adapter/handler/http"
+	"github.com/bagashiz/go-pos/internal/adapter/logger"
+	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
+	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres/repository"
+	"github.com/bagashiz/go-pos/internal/adapter/storage/redis"
 	"github.com/bagashiz/go-pos/internal/core/service"
-	"github.com/joho/godotenv"
 )
-
-func init() {
-	// Init logger
-	var logHandler *slog.JSONHandler
-
-	env := os.Getenv("APP_ENV")
-	if env == "production" {
-		logHandler = slog.NewJSONHandler(os.Stdout, nil)
-	} else {
-		logHandler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		})
-
-		// Load .env file
-		err := godotenv.Load()
-		if err != nil {
-			slog.Error("Error loading .env file", "error", err)
-			os.Exit(1)
-		}
-	}
-
-	logger := slog.New(logHandler)
-	slog.SetDefault(logger)
-}
 
 //	@title						Go POS (Point of Sale) API
 //	@version					1.0
@@ -58,29 +37,40 @@ func init() {
 //	@name						Authorization
 //	@description				Type "Bearer" followed by a space and the access token.
 func main() {
-	appName := os.Getenv("APP_NAME")
-	env := os.Getenv("APP_ENV")
-	dbConn := os.Getenv("DB_CONNECTION")
-	tokenSymmetricKey := os.Getenv("TOKEN_SYMMETRIC_KEY")
-	httpUrl := os.Getenv("HTTP_URL")
-	httpPort := os.Getenv("HTTP_PORT")
-	listenAddr := httpUrl + ":" + httpPort
+	// Load environment variables
+	config, err := config.New()
+	if err != nil {
+		slog.Error("Error loading environment variables", "error", err)
+		os.Exit(1)
+	}
 
-	slog.Info("Starting the application", "app", appName, "env", env)
+	// Set logger
+	logger.Set(config.App)
+
+	slog.Info("Starting the application", "app", config.App.Name, "env", config.App.Env)
 
 	// Init database
 	ctx := context.Background()
-	db, err := repo.NewDB(ctx)
+	db, err := postgres.New(ctx, config.DB)
 	if err != nil {
 		slog.Error("Error initializing database connection", "error", err)
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	slog.Info("Successfully connected to the database", "db", dbConn)
+	slog.Info("Successfully connected to the database", "db", config.DB.Connection)
+
+	// Migrate database
+	err = db.Migrate()
+	if err != nil {
+		slog.Error("Error migrating database", "error", err)
+		os.Exit(1)
+	}
+
+	slog.Info("Successfully migrated the database")
 
 	// Init cache service
-	cache, err := cache.NewCache(ctx)
+	cache, err := redis.New(ctx, config.Redis)
 	if err != nil {
 		slog.Error("Error initializing cache connection", "error", err)
 		os.Exit(1)
@@ -90,7 +80,7 @@ func main() {
 	slog.Info("Successfully connected to the cache server")
 
 	// Init token service
-	token, err := token.NewToken(tokenSymmetricKey)
+	token, err := paseto.New(config.Token)
 	if err != nil {
 		slog.Error("Error initializing token service", "error", err)
 		os.Exit(1)
@@ -98,36 +88,37 @@ func main() {
 
 	// Dependency injection
 	// User
-	userRepo := repo.NewUserRepository(db)
+	userRepo := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepo, cache)
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := http.NewUserHandler(userService)
 
 	// Auth
 	authService := service.NewAuthService(userRepo, token)
-	authHandler := handler.NewAuthHandler(authService)
+	authHandler := http.NewAuthHandler(authService)
 
 	// Payment
-	paymentRepo := repo.NewPaymentRepository(db)
+	paymentRepo := repository.NewPaymentRepository(db)
 	paymentService := service.NewPaymentService(paymentRepo, cache)
-	paymentHandler := handler.NewPaymentHandler(paymentService)
+	paymentHandler := http.NewPaymentHandler(paymentService)
 
 	// Category
-	categoryRepo := repo.NewCategoryRepository(db)
+	categoryRepo := repository.NewCategoryRepository(db)
 	categoryService := service.NewCategoryService(categoryRepo, cache)
-	categoryHandler := handler.NewCategoryHandler(categoryService)
+	categoryHandler := http.NewCategoryHandler(categoryService)
 
 	// Product
-	productRepo := repo.NewProductRepository(db)
+	productRepo := repository.NewProductRepository(db)
 	productService := service.NewProductService(productRepo, categoryRepo, cache)
-	productHandler := handler.NewProductHandler(productService)
+	productHandler := http.NewProductHandler(productService)
 
 	// Order
-	orderRepo := repo.NewOrderRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
 	orderService := service.NewOrderService(orderRepo, productRepo, categoryRepo, userRepo, paymentRepo, cache)
-	orderHandler := handler.NewOrderHandler(orderService)
+	orderHandler := http.NewOrderHandler(orderService)
 
 	// Init router
-	router, err := handler.NewRouter(
+	router, err := http.NewRouter(
+		config.HTTP,
 		token,
 		*userHandler,
 		*authHandler,
@@ -142,6 +133,7 @@ func main() {
 	}
 
 	// Start server
+	listenAddr := fmt.Sprintf("%s:%s", config.HTTP.URL, config.HTTP.Port)
 	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
 	err = router.Serve(listenAddr)
 	if err != nil {

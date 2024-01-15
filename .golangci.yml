@@ -1,6 +1,5 @@
 run:
-  timeout: "1m"
-  issue-exit-code: 1
+  timeout: "3m"
   tests: true
   skip-dirs-use-default: true
   skip-dirs:

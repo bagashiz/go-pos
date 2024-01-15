@@ -5,8 +5,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/core/domain"
-	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -15,11 +15,11 @@ import (
  * and provides an access to the postgres database
  */
 type OrderRepository struct {
-	db *DB
+	db *postgres.DB
 }
 
 // NewOrderRepository creates a new order repository instance
-func NewOrderRepository(db *DB) *OrderRepository {
+func NewOrderRepository(db *postgres.DB) *OrderRepository {
 	return &OrderRepository{
 		db,
 	}
@@ -30,7 +30,7 @@ func (or *OrderRepository) CreateOrder(ctx context.Context, order *domain.Order)
 	var product domain.Product
 	var products []domain.OrderProduct
 
-	orderQuery := psql.Insert("orders").
+	orderQuery := or.db.QueryBuilder.Insert("orders").
 		Columns("user_id", "payment_id", "customer_name", "total_price", "total_paid", "total_return").
 		Values(order.UserID, order.PaymentID, order.CustomerName, order.TotalPrice, order.TotalPaid, order.TotalReturn).
 		Suffix("RETURNING *")
@@ -58,7 +58,7 @@ func (or *OrderRepository) CreateOrder(ctx context.Context, order *domain.Order)
 		}
 
 		for _, orderProduct := range order.Products {
-			orderProductQuery := psql.Insert("order_products").
+			orderProductQuery := or.db.QueryBuilder.Insert("order_products").
 				Columns("order_id", "product_id", "quantity", "total_price").
 				Values(order.ID, orderProduct.ProductID, orderProduct.Quantity, orderProduct.TotalPrice).
 				Suffix("RETURNING *")
@@ -83,7 +83,7 @@ func (or *OrderRepository) CreateOrder(ctx context.Context, order *domain.Order)
 
 			products = append(products, orderProduct)
 
-			productQuery := psql.Update("products").
+			productQuery := or.db.QueryBuilder.Update("products").
 				Set("stock", sq.Expr("stock - ?", orderProduct.Quantity)).
 				Set("updated_at", time.Now()).
 				Where(sq.Eq{"id": orderProduct.ProductID}).
@@ -122,12 +122,12 @@ func (or *OrderRepository) GetOrderByID(ctx context.Context, id uint64) (*domain
 	var order domain.Order
 	var orderProduct domain.OrderProduct
 
-	orderQuery := psql.Select("*").
+	orderQuery := or.db.QueryBuilder.Select("*").
 		From("orders").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
 
-	orderProductQuery := psql.Select("*").
+	orderProductQuery := or.db.QueryBuilder.Select("*").
 		From("order_products").
 		Where(sq.Eq{"order_id": id})
 
@@ -152,7 +152,7 @@ func (or *OrderRepository) GetOrderByID(ctx context.Context, id uint64) (*domain
 		)
 		if err != nil {
 			if err == pgx.ErrNoRows {
-				return port.ErrDataNotFound
+				return domain.ErrDataNotFound
 			}
 			return err
 		}
@@ -199,7 +199,7 @@ func (or *OrderRepository) ListOrders(ctx context.Context, skip, limit uint64) (
 	var orderProduct domain.OrderProduct
 	var orders []domain.Order
 
-	ordersQuery := psql.Select("*").
+	ordersQuery := or.db.QueryBuilder.Select("*").
 		From("orders").
 		OrderBy("id").
 		Limit(limit).
@@ -237,7 +237,7 @@ func (or *OrderRepository) ListOrders(ctx context.Context, skip, limit uint64) (
 		}
 
 		for i, order := range orders {
-			orderProductQuery := psql.Select("*").
+			orderProductQuery := or.db.QueryBuilder.Select("*").
 				From("order_products").
 				Where(sq.Eq{"order_id": order.ID})
 

@@ -1,27 +1,27 @@
-package cache
+package redis
 
 import (
 	"context"
-	"os"
 	"time"
 
+	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/redis/go-redis/v9"
 )
 
 /**
- * Redis implements port.CacheService interface
+ * Redis implements port.CacheRepository interface
  * and provides an access to the redis library
  */
 type Redis struct {
 	client *redis.Client
 }
 
-// NewCache creates a new instance of Redis
-func NewCache(ctx context.Context) (port.CacheService, error) {
+// New creates a new instance of Redis
+func New(ctx context.Context, config *config.Redis) (port.CacheRepository, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_SERVER"),
-		Password: os.Getenv("REDIS_PASSWORD"),
+		Addr:     config.Addr,
+		Password: config.Password,
 		DB:       0,
 	})
 

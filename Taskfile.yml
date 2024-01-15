@@ -4,7 +4,7 @@ version: "3"
 
 vars:
   DBML_FILE: "./schema.dbml"
-  DSN: "{{.DB_CONNECTION}}://{{.DB_USERNAME}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_DATABASE}}?sslmode=disable"
+  DSN: "{{.DB_CONNECTION}}://{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_NAME}}?sslmode=disable"
 
 dotenv:
   - ".env"
@@ -14,9 +14,7 @@ tasks:
     desc: "Gettings started"
     cmds:
       - task: install
-      - task: service:up
       - task: db:create
-      - task: migrate:up
       - task: dev
 
   install:
@@ -27,14 +25,6 @@ tasks:
       - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
       - go install github.com/swaggo/swag/cmd/swag@latest
 
-  service:up:
-    desc: "Start services containers"
-    cmd: podman-compose up -d
-
-  service:down:
-    desc: "Stop services and remove containers"
-    cmd: podman-compose down
-
   db:docs:
     desc: "Generate database documentation from DBML file"
     cmd: dbdocs build {{.DBML_FILE}}
@@ -43,50 +33,54 @@ tasks:
         - DBML_FILE
 
   db:create:
-    desc: "Create database schema"
-    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'CREATE DATABASE {{.DB_DATABASE}};'"
+    desc: "Create database if not exists"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USER}} -c 'SELECT 1' -d {{.DB_NAME}} &>/dev/null || psql -U {{.DB_USER}} -c 'CREATE DATABASE {{.DB_NAME}};'"
     requires:
       vars:
-        - DB_USERNAME
-        - DB_DATABASE
+        - DB_USER
+        - DB_NAME
 
   db:drop:
-    desc: "Drop database schema"
-    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -c 'DROP DATABASE {{.DB_DATABASE}};'"
+    desc: "Drop database"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USER}} -c 'DROP DATABASE {{.DB_NAME}};'"
     requires:
       vars:
-        - DB_USERNAME
-        - DB_DATABASE
+        - DB_USER
+        - DB_NAME
 
   db:cli:
     desc: "Connect to database using command line interface"
-    cmd: podman exec -it postgres_gopos sh -c "psql -U {{.DB_USERNAME}} -d {{.DB_DATABASE}}"
+    cmd: docker exec -it go-pos_postgres sh -c "psql -U {{.DB_USER}} -d {{.DB_NAME}}"
     requires:
       vars:
-        - DB_USERNAME
-        - DB_DATABASE
+        - DB_USER
+        - DB_NAME
 
   migrate:up:
     desc: "Run database migrations"
-    cmd: migrate -path ./internal/adapter/repository/postgres/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
+    cmd: migrate -path ./internal/adapter/storage/postgres/migrations -database {{.DSN}} -verbose up {{.CLI_ARGS}}
     requires:
       vars:
         - DSN
 
   migrate:down:
     desc: "Rollback database migrations"
-    cmd: migrate -path ./internal/adapter/repository/postgres/migrations -database {{.DSN}} -verbose down {{.CLI_ARGS}}
+    cmd: migrate -path ./internal/adapter/storage/postgres/migrations -database {{.DSN}} -verbose down {{.CLI_ARGS}}
     requires:
       vars:
         - DSN
 
   redis:cli:
     desc: "Connect to redis using command line interface"
-    cmd: podman exec -it redis_gopos redis-cli
+    cmd: docker exec -it go-pos_redis redis-cli
 
   dev:
     desc: "Start development server"
     cmd: air
+
+  lint:
+    desc: "Run linter"
+    cmd: golangci-lint run ./...
 
   build:
     desc: "Build binary"
@@ -108,6 +102,6 @@ tasks:
       - swag fmt
       - swag init -g ./cmd/http/main.go -o ./docs --parseInternal true
 
-  # test:
-  #   desc: "Run tests"
-  #   cmd: ginkgo -v -r --cover --race --keep-going --timeout=30s
+  test:
+    desc: "Run tests"
+    cmd: go test -v ./... -race -cover -timeout 10s

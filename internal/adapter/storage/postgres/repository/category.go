@@ -5,8 +5,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/core/domain"
-	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -15,11 +15,11 @@ import (
  * and provides an access to the postgres database
  */
 type CategoryRepository struct {
-	db *DB
+	db *postgres.DB
 }
 
 // NewCategoryRepository creates a new category repository instance
-func NewCategoryRepository(db *DB) *CategoryRepository {
+func NewCategoryRepository(db *postgres.DB) *CategoryRepository {
 	return &CategoryRepository{
 		db,
 	}
@@ -27,7 +27,7 @@ func NewCategoryRepository(db *DB) *CategoryRepository {
 
 // CreateCategory creates a new category record in the database
 func (cr *CategoryRepository) CreateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error) {
-	query := psql.Insert("categories").
+	query := cr.db.QueryBuilder.Insert("categories").
 		Columns("name").
 		Values(category.Name).
 		Suffix("RETURNING *")
@@ -54,7 +54,7 @@ func (cr *CategoryRepository) CreateCategory(ctx context.Context, category *doma
 func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*domain.Category, error) {
 	var category domain.Category
 
-	query := psql.Select("*").
+	query := cr.db.QueryBuilder.Select("*").
 		From("categories").
 		Where(sq.Eq{"id": id}).
 		Limit(1)
@@ -72,7 +72,7 @@ func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, port.ErrDataNotFound
+			return nil, domain.ErrDataNotFound
 		}
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit ui
 	var category domain.Category
 	var categories []domain.Category
 
-	query := psql.Select("*").
+	query := cr.db.QueryBuilder.Select("*").
 		From("categories").
 		OrderBy("id").
 		Limit(limit).
@@ -120,7 +120,7 @@ func (cr *CategoryRepository) ListCategories(ctx context.Context, skip, limit ui
 
 // UpdateCategory updates a category record in the database
 func (cr *CategoryRepository) UpdateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error) {
-	query := psql.Update("categories").
+	query := cr.db.QueryBuilder.Update("categories").
 		Set("name", category.Name).
 		Set("updated_at", time.Now()).
 		Where(sq.Eq{"id": category.ID}).
@@ -146,7 +146,7 @@ func (cr *CategoryRepository) UpdateCategory(ctx context.Context, category *doma
 
 // DeleteCategory deletes a category record from the database by id
 func (cr *CategoryRepository) DeleteCategory(ctx context.Context, id uint64) error {
-	query := psql.Delete("categories").
+	query := cr.db.QueryBuilder.Delete("categories").
 		Where(sq.Eq{"id": id})
 
 	sql, args, err := query.ToSql()

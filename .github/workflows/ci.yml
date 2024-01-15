@@ -24,7 +24,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: "v1.53"
+          version: "v1.55"
           config: .golangci.yml
 
   test:
@@ -44,5 +44,5 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      # - name: Test
-      #   run: go run github.com/onsi/ginkgo/v2/ginkgo -v -r --randomize-all --randomize-suites --fail-on-pending --keep-going --cover --race --trace
+      - name: Test
+        run: go test -v ./... -race -cover -timeout 10s

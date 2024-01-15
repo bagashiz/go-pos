@@ -15,11 +15,11 @@ import (
  */
 type PaymentService struct {
 	repo  port.PaymentRepository
-	cache port.CacheService
+	cache port.CacheRepository
 }
 
 // NewPaymentService creates a new payment service instance
-func NewPaymentService(repo port.PaymentRepository, cache port.CacheService) *PaymentService {
+func NewPaymentService(repo port.PaymentRepository, cache port.CacheRepository) *PaymentService {
 	return &PaymentService{
 		repo,
 		cache,
@@ -30,8 +30,8 @@ func NewPaymentService(repo port.PaymentRepository, cache port.CacheService) *Pa
 func (ps *PaymentService) CreatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
 	_, err := ps.repo.CreatePayment(ctx, payment)
 	if err != nil {
-		if port.IsUniqueConstraintViolationError(err) {
-			return nil, port.ErrConflictingData
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
 		}
 
 		return nil, err
@@ -135,13 +135,13 @@ func (ps *PaymentService) UpdatePayment(ctx context.Context, payment *domain.Pay
 	emptyData := payment.Name == "" && payment.Type == "" && payment.Logo == ""
 	sameData := existingPayment.Name == payment.Name && existingPayment.Type == payment.Type && existingPayment.Logo == payment.Logo
 	if emptyData || sameData {
-		return nil, port.ErrNoUpdatedData
+		return nil, domain.ErrNoUpdatedData
 	}
 
 	_, err = ps.repo.UpdatePayment(ctx, payment)
 	if err != nil {
-		if port.IsUniqueConstraintViolationError(err) {
-			return nil, port.ErrConflictingData
+		if domain.IsUniqueConstraintViolationError(err) {
+			return nil, domain.ErrConflictingData
 		}
 
 		return nil, err
