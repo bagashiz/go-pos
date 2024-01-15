@@ -28,7 +28,7 @@ func New(config *config.Token) (port.TokenService, error) {
 
 	validSymmetricKey := len(symmetricKey) == chacha20poly1305.KeySize
 	if !validSymmetricKey {
-		return nil, port.ErrInvalidTokenSymmetricKey
+		return nil, domain.ErrInvalidTokenSymmetricKey
 	}
 
 	duration, err := time.ParseDuration(durationStr)
@@ -70,12 +70,12 @@ func (pt *PasetoToken) VerifyToken(token string) (*domain.TokenPayload, error) {
 
 	err := pt.paseto.Decrypt(token, pt.symmetricKey, &payload, nil)
 	if err != nil {
-		return nil, port.ErrInvalidToken
+		return nil, domain.ErrInvalidToken
 	}
 
 	isExpired := time.Now().After(payload.ExpiredAt)
 	if isExpired {
-		return nil, port.ErrExpiredToken
+		return nil, domain.ErrExpiredToken
 	}
 
 	return &payload, nil

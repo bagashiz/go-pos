@@ -24,7 +24,7 @@ func authMiddleware(token port.TokenService) gin.HandlerFunc {
 
 		isEmpty := len(authorizationHeader) == 0
 		if isEmpty {
-			err := port.ErrEmptyAuthorizationHeader
+			err := domain.ErrEmptyAuthorizationHeader
 			handleAbort(ctx, err)
 			return
 		}
@@ -32,14 +32,14 @@ func authMiddleware(token port.TokenService) gin.HandlerFunc {
 		fields := strings.Fields(authorizationHeader)
 		isValid := len(fields) == 2
 		if !isValid {
-			err := port.ErrInvalidAuthorizationHeader
+			err := domain.ErrInvalidAuthorizationHeader
 			handleAbort(ctx, err)
 			return
 		}
 
 		currentAuthorizationType := strings.ToLower(fields[0])
 		if currentAuthorizationType != authorizationType {
-			err := port.ErrInvalidAuthorizationType
+			err := domain.ErrInvalidAuthorizationType
 			handleAbort(ctx, err)
 			return
 		}
@@ -63,7 +63,7 @@ func adminMiddleware() gin.HandlerFunc {
 
 		isAdmin := payload.Role == domain.Admin
 		if !isAdmin {
-			err := port.ErrForbidden
+			err := domain.ErrForbidden
 			handleAbort(ctx, err)
 			return
 		}

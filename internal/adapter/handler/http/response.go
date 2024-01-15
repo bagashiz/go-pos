@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/bagashiz/go-pos/internal/core/domain"
-	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -207,19 +206,19 @@ func newOrderProductResponse(orderProduct []domain.OrderProduct) []orderProductR
 
 // errorStatusMap is a map of defined error messages and their corresponding http status codes
 var errorStatusMap = map[error]int{
-	port.ErrDataNotFound:               http.StatusNotFound,
-	port.ErrConflictingData:            http.StatusConflict,
-	port.ErrInvalidCredentials:         http.StatusUnauthorized,
-	port.ErrUnauthorized:               http.StatusUnauthorized,
-	port.ErrEmptyAuthorizationHeader:   http.StatusUnauthorized,
-	port.ErrInvalidAuthorizationHeader: http.StatusUnauthorized,
-	port.ErrInvalidAuthorizationType:   http.StatusUnauthorized,
-	port.ErrInvalidToken:               http.StatusUnauthorized,
-	port.ErrExpiredToken:               http.StatusUnauthorized,
-	port.ErrForbidden:                  http.StatusForbidden,
-	port.ErrNoUpdatedData:              http.StatusBadRequest,
-	port.ErrInsufficientStock:          http.StatusBadRequest,
-	port.ErrInsufficientPayment:        http.StatusBadRequest,
+	domain.ErrDataNotFound:               http.StatusNotFound,
+	domain.ErrConflictingData:            http.StatusConflict,
+	domain.ErrInvalidCredentials:         http.StatusUnauthorized,
+	domain.ErrUnauthorized:               http.StatusUnauthorized,
+	domain.ErrEmptyAuthorizationHeader:   http.StatusUnauthorized,
+	domain.ErrInvalidAuthorizationHeader: http.StatusUnauthorized,
+	domain.ErrInvalidAuthorizationType:   http.StatusUnauthorized,
+	domain.ErrInvalidToken:               http.StatusUnauthorized,
+	domain.ErrExpiredToken:               http.StatusUnauthorized,
+	domain.ErrForbidden:                  http.StatusForbidden,
+	domain.ErrNoUpdatedData:              http.StatusBadRequest,
+	domain.ErrInsufficientStock:          http.StatusBadRequest,
+	domain.ErrInsufficientPayment:        http.StatusBadRequest,
 }
 
 // validationError sends an error response for some specific request validation error

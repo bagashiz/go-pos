@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/core/domain"
-	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -153,7 +152,7 @@ func (or *OrderRepository) GetOrderByID(ctx context.Context, id uint64) (*domain
 		)
 		if err != nil {
 			if err == pgx.ErrNoRows {
-				return port.ErrDataNotFound
+				return domain.ErrDataNotFound
 			}
 			return err
 		}
