@@ -44,5 +44,5 @@ jobs:
       - name: Build
         run: go build -v ./...
 
-      # - name: Test
-      #   run: go test -v ./... -race -cover -timeout 10s
+      - name: Test
+        run: go test -v ./... -race -cover -timeout 10s
