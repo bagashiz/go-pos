@@ -10,36 +10,12 @@ import (
 	"github.com/bagashiz/go-pos/internal/adapter/auth/paseto"
 	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/adapter/handler/http"
+	"github.com/bagashiz/go-pos/internal/adapter/logger"
 	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres/repository"
 	"github.com/bagashiz/go-pos/internal/adapter/storage/redis"
 	"github.com/bagashiz/go-pos/internal/core/service"
-	"github.com/joho/godotenv"
 )
-
-func init() {
-	// Init logger
-	var logHandler *slog.JSONHandler
-
-	env := os.Getenv("APP_ENV")
-	if env == "production" {
-		logHandler = slog.NewJSONHandler(os.Stdout, nil)
-	} else {
-		logHandler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		})
-
-		// Load .env file
-		err := godotenv.Load()
-		if err != nil {
-			slog.Error("Error loading .env file", "error", err)
-			os.Exit(1)
-		}
-	}
-
-	logger := slog.New(logHandler)
-	slog.SetDefault(logger)
-}
 
 // @title						Go POS (Point of Sale) API
 // @version					1.0
@@ -67,6 +43,9 @@ func main() {
 		slog.Error("Error loading environment variables", "error", err)
 		os.Exit(1)
 	}
+
+	// Set logger
+	logger.Set(config.App)
 
 	slog.Info("Starting the application", "app", config.App.Name, "env", config.App.Env)
 
