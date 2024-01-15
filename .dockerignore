@@ -12,6 +12,7 @@ build/
 dist/
 bin/
 tmp/
+log/
 
 # exclude any version control files
 .git/
