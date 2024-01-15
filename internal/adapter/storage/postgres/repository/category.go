@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/bagashiz/go-pos/internal/adapter/storage/postgres"
 	"github.com/bagashiz/go-pos/internal/core/domain"
-	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -73,7 +72,7 @@ func (cr *CategoryRepository) GetCategoryByID(ctx context.Context, id uint64) (*
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, port.ErrDataNotFound
+			return nil, domain.ErrDataNotFound
 		}
 		return nil, err
 	}
