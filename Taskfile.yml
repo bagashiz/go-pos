@@ -13,6 +13,7 @@ tasks:
   default:
     desc: "Gettings started"
     cmds:
+      - task: service:up
       - task: install
       - task: db:create
       - task: migrate:up
@@ -25,6 +26,14 @@ tasks:
       - go install github.com/cosmtrek/air@latest
       - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
       - go install github.com/swaggo/swag/cmd/swag@latest
+
+  service:up:
+    desc: "Start services"
+    cmd: docker-compose up -d
+
+  service:down:
+    desc: "Stop services"
+    cmd: docker-compose down
 
   db:docs:
     desc: "Generate database documentation from DBML file"

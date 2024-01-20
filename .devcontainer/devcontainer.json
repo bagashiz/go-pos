@@ -1,14 +1,11 @@
 {
     "name": "go-pos",
-    "dockerComposeFile": [
-        "../docker-compose.yml"
+    "image": "mcr.microsoft.com/devcontainers/go:1.21-bookworm",
+    "runArgs": [
+        "--name",
+        "go-pos",
+        "--network=host"
     ],
-    "service": "devcontainer",
-    "runServices": [
-        "postgres",
-        "redis"
-    ],
-    "workspaceFolder": "/workspace",
     "portsAttributes": {
         "8080": {
             "label": "Application",
@@ -41,9 +38,10 @@
                 "go.testFlags": [
                     "-v",
                     "-race",
-                    "-cover"
+                    "-cover",
+                    "-count=1"
                 ],
-                "go.testTimeout": "10s",
+                "go.testTimeout": "30s",
                 "go.lintTool": "golangci-lint",
                 "go.lintFlags": [
                     "--fast"
