@@ -10,6 +10,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -78,6 +79,12 @@ func (db *DB) Migrate() error {
 	}
 
 	return nil
+}
+
+// ErrorCode returns the error code of the given error
+func (db *DB) ErrorCode(err error) string {
+	pgErr := err.(*pgconn.PgError)
+	return pgErr.Code
 }
 
 // Close closes the database connection
