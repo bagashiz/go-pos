@@ -28,29 +28,28 @@ func NewCategoryService(repo port.CategoryRepository, cache port.CacheRepository
 
 // CreateCategory creates a new category
 func (cs *CategoryService) CreateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error) {
-	_, err := cs.repo.CreateCategory(ctx, category)
+	category, err := cs.repo.CreateCategory(ctx, category)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if err == domain.ErrConflictingData {
+			return nil, err
 		}
-
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("category", category.ID)
 	categorySerialized, err := util.Serialize(category)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = cs.cache.Set(ctx, cacheKey, categorySerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = cs.cache.DeleteByPrefix(ctx, "categories:*")
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return category, nil
@@ -65,25 +64,27 @@ func (cs *CategoryService) GetCategory(ctx context.Context, id uint64) (*domain.
 	if err == nil {
 		err := util.Deserialize(cachedCategory, &category)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrInternal
 		}
-
 		return category, nil
 	}
 
 	category, err = cs.repo.GetCategoryByID(ctx, id)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	categorySerialized, err := util.Serialize(category)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = cs.cache.Set(ctx, cacheKey, categorySerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return category, nil
@@ -100,7 +101,7 @@ func (cs *CategoryService) ListCategories(ctx context.Context, skip, limit uint6
 	if err == nil {
 		err := util.Deserialize(cachedCategories, &categories)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrInternal
 		}
 
 		return categories, nil
@@ -108,17 +109,17 @@ func (cs *CategoryService) ListCategories(ctx context.Context, skip, limit uint6
 
 	categories, err = cs.repo.ListCategories(ctx, skip, limit)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	categoriesSerialized, err := util.Serialize(categories)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = cs.cache.Set(ctx, cacheKey, categoriesSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return categories, nil
@@ -128,7 +129,10 @@ func (cs *CategoryService) ListCategories(ctx context.Context, skip, limit uint6
 func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.Category) (*domain.Category, error) {
 	existingCategory, err := cs.repo.GetCategoryByID(ctx, category.ID)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	emptyData := category.Name == ""
@@ -139,29 +143,31 @@ func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.
 
 	_, err = cs.repo.UpdateCategory(ctx, category)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if err == domain.ErrConflictingData {
+			return nil, err
 		}
-
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("category", category.ID)
-	_ = cs.cache.Delete(ctx, cacheKey)
+	err = cs.cache.Delete(ctx, cacheKey)
+	if err != nil {
+		return nil, domain.ErrInternal
+	}
 
 	categorySerialized, err := util.Serialize(category)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = cs.cache.Set(ctx, cacheKey, categorySerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = cs.cache.DeleteByPrefix(ctx, "categories:*")
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return category, nil
@@ -171,15 +177,21 @@ func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.
 func (cs *CategoryService) DeleteCategory(ctx context.Context, id uint64) error {
 	_, err := cs.repo.GetCategoryByID(ctx, id)
 	if err != nil {
-		return err
+		if err == domain.ErrDataNotFound {
+			return err
+		}
+		return domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("category", id)
-	_ = cs.cache.Delete(ctx, cacheKey)
+	err = cs.cache.Delete(ctx, cacheKey)
+	if err != nil {
+		return domain.ErrInternal
+	}
 
 	err = cs.cache.DeleteByPrefix(ctx, "categories:*")
 	if err != nil {
-		return err
+		return domain.ErrInternal
 	}
 
 	return cs.repo.DeleteCategory(ctx, id)

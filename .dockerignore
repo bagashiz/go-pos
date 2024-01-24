@@ -28,6 +28,7 @@ docker-compose*.yml
 # exclude any development-specific files
 **/*_test.go
 Makefile
+coverage*
 .*ignore
 *.env
 *.log
