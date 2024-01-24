@@ -15,6 +15,7 @@ tasks:
     cmds:
       - task: service:up
       - task: install
+      - sleep 5 # wait for postgres to start
       - task: db:create
       - task: migrate:up
 
@@ -26,6 +27,7 @@ tasks:
       - go install github.com/cosmtrek/air@latest
       - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
       - go install github.com/swaggo/swag/cmd/swag@latest
+      - go install go.uber.org/mock/mockgen@latest
 
   service:up:
     desc: "Start services"
@@ -114,4 +116,6 @@ tasks:
 
   test:
     desc: "Run tests"
-    cmd: go test -v ./... -race -cover -timeout 10s
+    cmds:
+      - go test -v ./... -race -cover -timeout 30s -count 1 -coverprofile=coverage.out
+      - go tool cover -html=coverage.out -o coverage.html
