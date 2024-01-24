@@ -16,5 +16,6 @@ log/
 # exclude any development-specific files
 *.env
 *.log
-*.out
 *.test
+*.out
+coverage.html

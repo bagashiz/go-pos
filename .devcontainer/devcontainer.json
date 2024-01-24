@@ -1,18 +1,10 @@
 {
     "name": "go-pos",
-    "dockerComposeFile": [
-        "../docker-compose.yml"
-    ],
-    "service": "devcontainer",
-    "runServices": [
-        "devcontainer",
-        "postgres",
-        "redis"
-    ],
-    "shutdownAction": "stopCompose",
-    "workspaceFolder": "/workspace",
-    "forwardPorts": [
-        8080
+    "image": "mcr.microsoft.com/devcontainers/go:1.21-bookworm",
+    "runArgs": [
+        "--name",
+        "go-pos",
+        "--network=host"
     ],
     "portsAttributes": {
         "8080": {
@@ -20,13 +12,14 @@
             "onAutoForward": "notify"
         }
     },
-    "postCreateCommand": "chmod +x /workspace/.devcontainer/post-create.sh && /workspace/.devcontainer/post-create.sh",
+    "postCreateCommand": "task",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "configureZshAsDefaultShell": true
         },
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-        "ghcr.io/devcontainers-contrib/features/act:1": {}
+        "ghcr.io/devcontainers-contrib/features/act:1": {},
+        "ghcr.io/devcontainers-contrib/features/go-task:1": {}
     },
     "customizations": {
         "vscode": {
@@ -45,9 +38,10 @@
                 "go.testFlags": [
                     "-v",
                     "-race",
-                    "-cover"
+                    "-cover",
+                    "-count=1"
                 ],
-                "go.testTimeout": "10s",
+                "go.testTimeout": "30s",
                 "go.lintTool": "golangci-lint",
                 "go.lintFlags": [
                     "--fast"

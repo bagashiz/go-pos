@@ -13,17 +13,29 @@ tasks:
   default:
     desc: "Gettings started"
     cmds:
+      - task: service:up
       - task: install
+      - sleep 5 # wait for postgres to start
       - task: db:create
-      - task: dev
+      - task: migrate:up
 
   install:
     desc: "Install dependencies"
     cmds:
+      - go mod download
       - go install github.com/go-task/task/v3/cmd/task@latest
       - go install github.com/cosmtrek/air@latest
       - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
       - go install github.com/swaggo/swag/cmd/swag@latest
+      - go install go.uber.org/mock/mockgen@latest
+
+  service:up:
+    desc: "Start services"
+    cmd: docker-compose up -d
+
+  service:down:
+    desc: "Stop services"
+    cmd: docker-compose down
 
   db:docs:
     desc: "Generate database documentation from DBML file"
@@ -104,4 +116,6 @@ tasks:
 
   test:
     desc: "Run tests"
-    cmd: go test -v ./... -race -cover -timeout 10s
+    cmds:
+      - go test -v ./... -race -cover -timeout 30s -count 1 -coverprofile=coverage.out
+      - go tool cover -html=coverage.out -o coverage.html

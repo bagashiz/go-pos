@@ -6,6 +6,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+//go:generate mockgen -source=product.go -destination=mock/product.go -package=mock
+
 // ProductRepository is an interface for interacting with product-related data
 type ProductRepository interface {
 	// CreateProduct inserts a new product into the database

@@ -110,6 +110,9 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*do
 		&user.UpdatedAt,
 	)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, domain.ErrDataNotFound
+		}
 		return nil, err
 	}
 
