@@ -47,7 +47,7 @@ func New(config *config.Token) (port.TokenService, error) {
 func (pt *PasetoToken) CreateToken(user *domain.User) (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
-		return "", err
+		return "", domain.ErrTokenCreation
 	}
 
 	payload := domain.TokenPayload{
@@ -59,9 +59,11 @@ func (pt *PasetoToken) CreateToken(user *domain.User) (string, error) {
 	}
 
 	token, err := pt.paseto.Encrypt(pt.symmetricKey, payload, nil)
+	if err != nil {
+		return "", domain.ErrTokenCreation
+	}
 
-	return token, err
-
+	return token, nil
 }
 
 // VerifyToken verifies the paseto token

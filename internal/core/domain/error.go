@@ -6,6 +6,8 @@ import (
 )
 
 var (
+	// ErrInternal is an error for when an internal service fails to process the request
+	ErrInternal = errors.New("internal error")
 	// ErrDataNotFound is an error for when requested data is not found
 	ErrDataNotFound = errors.New("data not found")
 	// ErrNoUpdatedData is an error for when no data is provided to update
@@ -18,6 +20,8 @@ var (
 	ErrInsufficientPayment = errors.New("total paid is less than total price")
 	// ErrInvalidTokenSize is an error for when the token symmetric key size is invalid
 	ErrInvalidTokenSymmetricKey = errors.New("invalid token key size")
+	// ErrTokenCreation is an error for when the token creation fails
+	ErrTokenCreation = errors.New("error creating token")
 	// ErrExpiredToken is an error for when the access token is expired
 	ErrExpiredToken = errors.New("access token has expired")
 	// ErrInvalidToken is an error for when the access token is invalid

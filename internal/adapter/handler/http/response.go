@@ -206,6 +206,7 @@ func newOrderProductResponse(orderProduct []domain.OrderProduct) []orderProductR
 
 // errorStatusMap is a map of defined error messages and their corresponding http status codes
 var errorStatusMap = map[error]int{
+	domain.ErrInternal:                   http.StatusInternalServerError,
 	domain.ErrDataNotFound:               http.StatusNotFound,
 	domain.ErrConflictingData:            http.StatusConflict,
 	domain.ErrInvalidCredentials:         http.StatusUnauthorized,
