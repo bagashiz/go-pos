@@ -6,6 +6,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+//go:generate mockgen -source=payment.go -destination=mock/payment.go -package=mock
+
 // PaymentRepository is an interface for interacting with payment-related data
 type PaymentRepository interface {
 	// CreatePayment inserts a new payment into the database

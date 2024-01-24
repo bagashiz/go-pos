@@ -6,6 +6,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+//go:generate mockgen -source=user.go -destination=mock/user.go -package=mock
+
 // UserRepository is an interface for interacting with user-related data
 type UserRepository interface {
 	// CreateUser inserts a new user into the database

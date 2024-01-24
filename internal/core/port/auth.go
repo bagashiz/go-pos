@@ -6,6 +6,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+//go:generate mockgen -source=auth.go -destination=mock/auth.go -package=mock
+
 // TokenService is an interface for interacting with token-related business logic
 type TokenService interface {
 	// CreateToken creates a new token for a given user

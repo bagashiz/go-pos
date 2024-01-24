@@ -6,6 +6,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+//go:generate mockgen -source=order.go -destination=mock/order.go -package=mock
+
 // OrderRepository is an interface for interacting with order-related data
 type OrderRepository interface {
 	// CreateOrder inserts a new order into the database
