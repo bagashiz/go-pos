@@ -47,6 +47,9 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 		&user.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := ur.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 
@@ -192,6 +195,9 @@ func (ur *UserRepository) UpdateUser(ctx context.Context, user *domain.User) (*d
 		&user.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := ur.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 
