@@ -150,6 +150,7 @@ func (cs *CategoryService) UpdateCategory(ctx context.Context, category *domain.
 	}
 
 	cacheKey := util.GenerateCacheKey("category", category.ID)
+
 	err = cs.cache.Delete(ctx, cacheKey)
 	if err != nil {
 		return nil, domain.ErrInternal
@@ -184,6 +185,7 @@ func (cs *CategoryService) DeleteCategory(ctx context.Context, id uint64) error 
 	}
 
 	cacheKey := util.GenerateCacheKey("category", id)
+
 	err = cs.cache.Delete(ctx, cacheKey)
 	if err != nil {
 		return domain.ErrInternal

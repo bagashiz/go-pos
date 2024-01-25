@@ -38,11 +38,7 @@ func TestCategoryService_CreateCategory(t *testing.T) {
 	}
 
 	cacheKey := util.GenerateCacheKey("category", categoryOutput.ID)
-	categorySerialized, err := util.Serialize(categoryOutput)
-	if err != nil {
-		t.Errorf("failed to serialize category: %v", err)
-		return
-	}
+	categorySerialized, _ := util.Serialize(categoryOutput)
 	ttl := time.Duration(0)
 
 	testCases := []struct {
@@ -211,11 +207,7 @@ func TestCategoryService_GetCategory(t *testing.T) {
 	}
 
 	cacheKey := util.GenerateCacheKey("category", category.ID)
-	categorySerialized, err := util.Serialize(category)
-	if err != nil {
-		t.Errorf("failed to serialize category: %v", err)
-		return
-	}
+	categorySerialized, _ := util.Serialize(category)
 
 	testCases := []struct {
 		desc  string
@@ -416,11 +408,7 @@ func TestCategoryService_ListCategories(t *testing.T) {
 
 	params := util.GenerateCacheKeyParams(skip, limit)
 	cacheKey := util.GenerateCacheKey("categories", params)
-	categoriesSerialized, err := util.Serialize(categories)
-	if err != nil {
-		t.Errorf("failed to serialize categories: %v", err)
-		return
-	}
+	categoriesSerialized, _ := util.Serialize(categories)
 
 	testCases := []struct {
 		desc  string
@@ -600,11 +588,7 @@ func TestCategoryService_UpdateCategory(t *testing.T) {
 	}
 
 	cacheKey := util.GenerateCacheKey("category", categoryOutput.ID)
-	categorySerialized, err := util.Serialize(categoryOutput)
-	if err != nil {
-		t.Errorf("failed to serialize category: %v", err)
-		return
-	}
+	categorySerialized, _ := util.Serialize(categoryOutput)
 	ttl := time.Duration(0)
 
 	testCases := []struct {
@@ -690,7 +674,7 @@ func TestCategoryService_UpdateCategory(t *testing.T) {
 			},
 		},
 		{
-			desc: "Fail_EmpyData",
+			desc: "Fail_EmptyData",
 			mocks: func(
 				categoryRepo *mock.MockCategoryRepository,
 				cache *mock.MockCacheRepository,
@@ -963,7 +947,7 @@ func TestCategoryService_DeleteCategory(t *testing.T) {
 			},
 		},
 		{
-			desc: "Fail_InternalError",
+			desc: "Fail_InternalErrorGetByID",
 			mocks: func(
 				categoryRepo *mock.MockCategoryRepository,
 				cache *mock.MockCacheRepository,
@@ -1018,6 +1002,36 @@ func TestCategoryService_DeleteCategory(t *testing.T) {
 					Return(nil)
 				cache.EXPECT().
 					DeleteByPrefix(gomock.Any(), gomock.Eq("categories:*")).
+					Times(1).
+					Return(domain.ErrInternal)
+			},
+			input: deleteCategoryTestedInput{
+				id: categoryID,
+			},
+			expected: deleteCategoryExpectedOutput{
+				err: domain.ErrInternal,
+			},
+		},
+		{
+			desc: "Fail_InternalErrorDelete",
+			mocks: func(
+				categoryRepo *mock.MockCategoryRepository,
+				cache *mock.MockCacheRepository,
+			) {
+				categoryRepo.EXPECT().
+					GetCategoryByID(gomock.Any(), gomock.Eq(categoryID)).
+					Times(1).
+					Return(&domain.Category{}, nil)
+				cache.EXPECT().
+					Delete(gomock.Any(), gomock.Eq(cacheKey)).
+					Times(1).
+					Return(nil)
+				cache.EXPECT().
+					DeleteByPrefix(gomock.Any(), gomock.Eq("categories:*")).
+					Times(1).
+					Return(nil)
+				categoryRepo.EXPECT().
+					DeleteCategory(gomock.Any(), gomock.Eq(categoryID)).
 					Times(1).
 					Return(domain.ErrInternal)
 			},
