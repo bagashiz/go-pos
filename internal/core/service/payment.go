@@ -28,29 +28,28 @@ func NewPaymentService(repo port.PaymentRepository, cache port.CacheRepository) 
 
 // CreatePayment creates a new payment
 func (ps *PaymentService) CreatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
-	_, err := ps.repo.CreatePayment(ctx, payment)
+	payment, err := ps.repo.CreatePayment(ctx, payment)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if err == domain.ErrConflictingData {
+			return nil, err
 		}
-
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("payment", payment.ID)
 	paymentSerialized, err := util.Serialize(payment)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, paymentSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.DeleteByPrefix(ctx, "payments:*")
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return payment, nil
@@ -63,9 +62,9 @@ func (ps *PaymentService) GetPayment(ctx context.Context, id uint64) (*domain.Pa
 	cacheKey := util.GenerateCacheKey("payment", id)
 	cachedPayment, err := ps.cache.Get(ctx, cacheKey)
 	if err == nil {
-		err = util.Deserialize(cachedPayment, &payment)
+		err := util.Deserialize(cachedPayment, &payment)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrInternal
 		}
 
 		return payment, nil
@@ -73,17 +72,20 @@ func (ps *PaymentService) GetPayment(ctx context.Context, id uint64) (*domain.Pa
 
 	payment, err = ps.repo.GetPaymentByID(ctx, id)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	paymentSerialized, err := util.Serialize(payment)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, paymentSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return payment, nil
@@ -98,9 +100,9 @@ func (ps *PaymentService) ListPayments(ctx context.Context, skip, limit uint64) 
 
 	cachedPayments, err := ps.cache.Get(ctx, cacheKey)
 	if err == nil {
-		err = util.Deserialize(cachedPayments, &payments)
+		err := util.Deserialize(cachedPayments, &payments)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrInternal
 		}
 
 		return payments, nil
@@ -108,17 +110,17 @@ func (ps *PaymentService) ListPayments(ctx context.Context, skip, limit uint64) 
 
 	payments, err = ps.repo.ListPayments(ctx, skip, limit)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	paymentsSerialized, err := util.Serialize(payments)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, paymentsSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return payments, nil
@@ -129,7 +131,10 @@ func (ps *PaymentService) ListPayments(ctx context.Context, skip, limit uint64) 
 func (ps *PaymentService) UpdatePayment(ctx context.Context, payment *domain.Payment) (*domain.Payment, error) {
 	existingPayment, err := ps.repo.GetPaymentByID(ctx, payment.ID)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	emptyData := payment.Name == "" && payment.Type == "" && payment.Logo == ""
@@ -140,27 +145,32 @@ func (ps *PaymentService) UpdatePayment(ctx context.Context, payment *domain.Pay
 
 	_, err = ps.repo.UpdatePayment(ctx, payment)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if err == domain.ErrConflictingData {
+			return nil, err
 		}
-
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("payment", payment.ID)
+
+	err = ps.cache.Delete(ctx, cacheKey)
+	if err != nil {
+		return nil, domain.ErrInternal
+	}
+
 	paymentSerialized, err := util.Serialize(payment)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, paymentSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.DeleteByPrefix(ctx, "payments:*")
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return payment, nil
@@ -170,15 +180,22 @@ func (ps *PaymentService) UpdatePayment(ctx context.Context, payment *domain.Pay
 func (ps *PaymentService) DeletePayment(ctx context.Context, id uint64) error {
 	_, err := ps.repo.GetPaymentByID(ctx, id)
 	if err != nil {
-		return err
+		if err == domain.ErrDataNotFound {
+			return err
+		}
+		return domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("payment", id)
-	_ = ps.cache.Delete(ctx, cacheKey)
+
+	err = ps.cache.Delete(ctx, cacheKey)
+	if err != nil {
+		return domain.ErrInternal
+	}
 
 	err = ps.cache.DeleteByPrefix(ctx, "payments:*")
 	if err != nil {
-		return err
+		return domain.ErrInternal
 	}
 
 	return ps.repo.DeletePayment(ctx, id)
