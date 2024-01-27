@@ -14,11 +14,11 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-type RegisterTestedInput struct {
+type registerTestedInput struct {
 	user *domain.User
 }
 
-type RegisterExpectedOutput struct {
+type registerExpectedOutput struct {
 	user *domain.User
 	err  error
 }
@@ -55,8 +55,8 @@ func TestUserService_Register(t *testing.T) {
 			userRepo *mock.MockUserRepository,
 			cache *mock.MockCacheRepository,
 		)
-		input    RegisterTestedInput
-		expected RegisterExpectedOutput
+		input    registerTestedInput
+		expected registerExpectedOutput
 	}{
 		{
 			desc: "Success",
@@ -74,10 +74,10 @@ func TestUserService_Register(t *testing.T) {
 					DeleteByPrefix(gomock.Any(), gomock.Eq("users:*")).
 					Return(nil)
 			},
-			input: RegisterTestedInput{
+			input: registerTestedInput{
 				user: userInput,
 			},
-			expected: RegisterExpectedOutput{
+			expected: registerExpectedOutput{
 				user: userOutput,
 				err:  nil,
 			},
@@ -92,10 +92,10 @@ func TestUserService_Register(t *testing.T) {
 					CreateUser(gomock.Any(), gomock.Eq(userInput)).
 					Return(nil, domain.ErrInternal)
 			},
-			input: RegisterTestedInput{
+			input: registerTestedInput{
 				user: userInput,
 			},
-			expected: RegisterExpectedOutput{
+			expected: registerExpectedOutput{
 				user: nil,
 				err:  domain.ErrInternal,
 			},
@@ -110,10 +110,10 @@ func TestUserService_Register(t *testing.T) {
 					CreateUser(gomock.Any(), gomock.Eq(userInput)).
 					Return(nil, domain.ErrConflictingData)
 			},
-			input: RegisterTestedInput{
+			input: registerTestedInput{
 				user: userInput,
 			},
-			expected: RegisterExpectedOutput{
+			expected: registerExpectedOutput{
 				user: nil,
 				err:  domain.ErrConflictingData,
 			},
@@ -131,10 +131,10 @@ func TestUserService_Register(t *testing.T) {
 					Set(gomock.Any(), gomock.Eq(cacheKey), gomock.Eq(userSerialized), gomock.Eq(ttl)).
 					Return(domain.ErrInternal)
 			},
-			input: RegisterTestedInput{
+			input: registerTestedInput{
 				user: userInput,
 			},
-			expected: RegisterExpectedOutput{
+			expected: registerExpectedOutput{
 				user: nil,
 				err:  domain.ErrInternal,
 			},
@@ -155,10 +155,10 @@ func TestUserService_Register(t *testing.T) {
 					DeleteByPrefix(gomock.Any(), gomock.Eq("users:*")).
 					Return(domain.ErrInternal)
 			},
-			input: RegisterTestedInput{
+			input: registerTestedInput{
 				user: userInput,
 			},
-			expected: RegisterExpectedOutput{
+			expected: registerExpectedOutput{
 				user: nil,
 				err:  domain.ErrInternal,
 			},
@@ -187,11 +187,11 @@ func TestUserService_Register(t *testing.T) {
 	}
 }
 
-type GetUserTestedInput struct {
+type getUserTestedInput struct {
 	id uint64
 }
 
-type GetUserExpectedOutput struct {
+type getUserExpectedOutput struct {
 	user *domain.User
 	err  error
 }
@@ -217,8 +217,8 @@ func TestUserService_GetUser(t *testing.T) {
 			userRepo *mock.MockUserRepository,
 			cache *mock.MockCacheRepository,
 		)
-		input    GetUserTestedInput
-		expected GetUserExpectedOutput
+		input    getUserTestedInput
+		expected getUserExpectedOutput
 	}{
 		{
 			desc: "Success_FromCache",
@@ -230,10 +230,10 @@ func TestUserService_GetUser(t *testing.T) {
 					Get(gomock.Any(), gomock.Eq(cacheKey)).
 					Return(userSerialized, nil)
 			},
-			input: GetUserTestedInput{
+			input: getUserTestedInput{
 				id: userID,
 			},
-			expected: GetUserExpectedOutput{
+			expected: getUserExpectedOutput{
 				user: userOutput,
 				err:  nil,
 			},
@@ -254,10 +254,10 @@ func TestUserService_GetUser(t *testing.T) {
 					Set(gomock.Any(), gomock.Eq(cacheKey), gomock.Eq(userSerialized), gomock.Eq(ttl)).
 					Return(nil)
 			},
-			input: GetUserTestedInput{
+			input: getUserTestedInput{
 				id: userID,
 			},
-			expected: GetUserExpectedOutput{
+			expected: getUserExpectedOutput{
 				user: userOutput,
 				err:  nil,
 			},
@@ -275,10 +275,10 @@ func TestUserService_GetUser(t *testing.T) {
 					GetUserByID(gomock.Any(), gomock.Eq(userID)).
 					Return(nil, domain.ErrDataNotFound)
 			},
-			input: GetUserTestedInput{
+			input: getUserTestedInput{
 				id: userID,
 			},
-			expected: GetUserExpectedOutput{
+			expected: getUserExpectedOutput{
 				user: nil,
 				err:  domain.ErrDataNotFound,
 			},
@@ -296,10 +296,10 @@ func TestUserService_GetUser(t *testing.T) {
 					GetUserByID(gomock.Any(), gomock.Eq(userID)).
 					Return(nil, domain.ErrInternal)
 			},
-			input: GetUserTestedInput{
+			input: getUserTestedInput{
 				id: userID,
 			},
-			expected: GetUserExpectedOutput{
+			expected: getUserExpectedOutput{
 				user: nil,
 				err:  domain.ErrInternal,
 			},
@@ -320,10 +320,10 @@ func TestUserService_GetUser(t *testing.T) {
 					Set(gomock.Any(), gomock.Eq(cacheKey), gomock.Eq(userSerialized), gomock.Eq(ttl)).
 					Return(domain.ErrInternal)
 			},
-			input: GetUserTestedInput{
+			input: getUserTestedInput{
 				id: userID,
 			},
-			expected: GetUserExpectedOutput{
+			expected: getUserExpectedOutput{
 				user: nil,
 				err:  domain.ErrInternal,
 			},
@@ -338,10 +338,10 @@ func TestUserService_GetUser(t *testing.T) {
 					Get(gomock.Any(), gomock.Eq(cacheKey)).
 					Return([]byte("invalid"), nil)
 			},
-			input: GetUserTestedInput{
+			input: getUserTestedInput{
 				id: userID,
 			},
-			expected: GetUserExpectedOutput{
+			expected: getUserExpectedOutput{
 				user: nil,
 				err:  domain.ErrInternal,
 			},
@@ -383,19 +383,15 @@ func TestUserService_ListUsers(t *testing.T) {
 	var users []domain.User
 
 	for i := 0; i < 10; i++ {
-		userID := gofakeit.Uint64()
-		userName := gofakeit.Name()
-		userEmail := gofakeit.Email()
 		userPassword := gofakeit.Password(true, true, true, true, false, 8)
 		hashedPassword, _ := util.HashPassword(userPassword)
-		userRole := domain.Cashier
 
 		users = append(users, domain.User{
-			ID:       userID,
-			Name:     userName,
-			Email:    userEmail,
+			ID:       gofakeit.Uint64(),
+			Name:     gofakeit.Name(),
+			Email:    gofakeit.Email(),
 			Password: hashedPassword,
-			Role:     userRole,
+			Role:     domain.Cashier,
 		})
 	}
 

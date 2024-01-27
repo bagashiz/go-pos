@@ -393,12 +393,9 @@ func TestCategoryService_ListCategories(t *testing.T) {
 	var categories []domain.Category
 
 	for i := 0; i < 10; i++ {
-		categoryID := gofakeit.Uint64()
-		categoryName := gofakeit.ProductCategory()
-
 		categories = append(categories, domain.Category{
-			ID:   categoryID,
-			Name: categoryName,
+			ID:   gofakeit.Uint64(),
+			Name: gofakeit.ProductCategory(),
 		})
 	}
 
