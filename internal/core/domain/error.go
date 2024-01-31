@@ -2,7 +2,6 @@ package domain
 
 import (
 	"errors"
-	"strings"
 )
 
 var (
@@ -39,8 +38,3 @@ var (
 	// ErrForbidden is an error for when the user is forbidden to access the resource
 	ErrForbidden = errors.New("user is forbidden to access the resource")
 )
-
-// IsUniqueConstraintViolationError checks if the error is a unique constraint violation error
-func IsUniqueConstraintViolationError(err error) bool {
-	return strings.Contains(err.Error(), "23505")
-}
