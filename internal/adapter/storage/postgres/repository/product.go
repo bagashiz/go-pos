@@ -49,6 +49,9 @@ func (pr *ProductRepository) CreateProduct(ctx context.Context, product *domain.
 		&product.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := pr.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 
@@ -176,6 +179,9 @@ func (pr *ProductRepository) UpdateProduct(ctx context.Context, product *domain.
 		&product.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := pr.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 

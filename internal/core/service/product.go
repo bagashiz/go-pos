@@ -32,34 +32,36 @@ func NewProductService(productRepo port.ProductRepository, categoryRepo port.Cat
 func (ps *ProductService) CreateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error) {
 	category, err := ps.categoryRepo.GetCategoryByID(ctx, product.CategoryID)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	product.Category = category
 
-	_, err = ps.productRepo.CreateProduct(ctx, product)
+	product, err = ps.productRepo.CreateProduct(ctx, product)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if err == domain.ErrConflictingData {
+			return nil, err
 		}
-
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("product", product.ID)
 	productSerialized, err := util.Serialize(product)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, productSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.DeleteByPrefix(ctx, "products:*")
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return product, nil
@@ -74,63 +76,70 @@ func (ps *ProductService) GetProduct(ctx context.Context, id uint64) (*domain.Pr
 	if err == nil {
 		err := util.Deserialize(cachedProduct, &product)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrInternal
 		}
-
 		return product, nil
 	}
 
 	product, err = ps.productRepo.GetProductByID(ctx, id)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	category, err := ps.categoryRepo.GetCategoryByID(ctx, product.CategoryID)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	product.Category = category
 
 	productSerialized, err := util.Serialize(product)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, productSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return product, nil
 }
 
 // ListProducts retrieves a list of products
-func (ps *ProductService) ListProducts(ctx context.Context, search string, categoryId, skip, limit uint64) ([]domain.Product, error) {
+func (ps *ProductService) ListProducts(ctx context.Context, search string, categoryID, skip, limit uint64) ([]domain.Product, error) {
 	var products []domain.Product
 
-	params := util.GenerateCacheKeyParams(skip, limit, categoryId, search)
+	params := util.GenerateCacheKeyParams(skip, limit, categoryID, search)
 	cacheKey := util.GenerateCacheKey("products", params)
 
 	cachedProducts, err := ps.cache.Get(ctx, cacheKey)
 	if err == nil {
 		err := util.Deserialize(cachedProducts, &products)
 		if err != nil {
-			return nil, err
+			return nil, domain.ErrInternal
 		}
-
 		return products, nil
 	}
 
-	products, err = ps.productRepo.ListProducts(ctx, search, categoryId, skip, limit)
+	products, err = ps.productRepo.ListProducts(ctx, search, categoryID, skip, limit)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	for i, product := range products {
 		category, err := ps.categoryRepo.GetCategoryByID(ctx, product.CategoryID)
 		if err != nil {
-			return nil, err
+			if err == domain.ErrDataNotFound {
+				return nil, err
+			}
+			return nil, domain.ErrInternal
 		}
 
 		products[i].Category = category
@@ -138,12 +147,12 @@ func (ps *ProductService) ListProducts(ctx context.Context, search string, categ
 
 	productsSerialized, err := util.Serialize(products)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, productsSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return products, nil
@@ -153,7 +162,10 @@ func (ps *ProductService) ListProducts(ctx context.Context, search string, categ
 func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Product) (*domain.Product, error) {
 	existingProduct, err := ps.productRepo.GetProductByID(ctx, product.ID)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	emptyData := product.CategoryID == 0 &&
@@ -161,11 +173,13 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 		product.Image == "" &&
 		product.Price == 0 &&
 		product.Stock == 0
+
 	sameData := existingProduct.CategoryID == product.CategoryID &&
 		existingProduct.Name == product.Name &&
 		existingProduct.Image == product.Image &&
 		existingProduct.Price == product.Price &&
 		existingProduct.Stock == product.Stock
+
 	if emptyData || sameData {
 		return nil, domain.ErrNoUpdatedData
 	}
@@ -176,36 +190,42 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 
 	category, err := ps.categoryRepo.GetCategoryByID(ctx, product.CategoryID)
 	if err != nil {
-		return nil, err
+		if err == domain.ErrDataNotFound {
+			return nil, err
+		}
+		return nil, domain.ErrInternal
 	}
 
 	product.Category = category
 
 	_, err = ps.productRepo.UpdateProduct(ctx, product)
 	if err != nil {
-		if domain.IsUniqueConstraintViolationError(err) {
-			return nil, domain.ErrConflictingData
+		if err == domain.ErrConflictingData {
+			return nil, err
 		}
-
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("product", product.ID)
-	_ = ps.cache.Delete(ctx, cacheKey)
+
+	err = ps.cache.Delete(ctx, cacheKey)
+	if err != nil {
+		return nil, domain.ErrInternal
+	}
 
 	productSerialized, err := util.Serialize(product)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.Set(ctx, cacheKey, productSerialized, 0)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	err = ps.cache.DeleteByPrefix(ctx, "products:*")
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInternal
 	}
 
 	return product, nil
@@ -215,15 +235,22 @@ func (ps *ProductService) UpdateProduct(ctx context.Context, product *domain.Pro
 func (ps *ProductService) DeleteProduct(ctx context.Context, id uint64) error {
 	_, err := ps.productRepo.GetProductByID(ctx, id)
 	if err != nil {
-		return err
+		if err == domain.ErrDataNotFound {
+			return err
+		}
+		return domain.ErrInternal
 	}
 
 	cacheKey := util.GenerateCacheKey("product", id)
-	_ = ps.cache.Delete(ctx, cacheKey)
+
+	err = ps.cache.Delete(ctx, cacheKey)
+	if err != nil {
+		return domain.ErrInternal
+	}
 
 	err = ps.cache.DeleteByPrefix(ctx, "products:*")
 	if err != nil {
-		return err
+		return domain.ErrInternal
 	}
 
 	return ps.productRepo.DeleteProduct(ctx, id)
