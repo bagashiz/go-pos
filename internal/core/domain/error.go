@@ -17,8 +17,8 @@ var (
 	ErrInsufficientStock = errors.New("product stock is not enough")
 	// ErrInsufficientPayment is an error for when total paid is less than total price
 	ErrInsufficientPayment = errors.New("total paid is less than total price")
-	// ErrInvalidTokenSize is an error for when the token symmetric key size is invalid
-	ErrInvalidTokenSymmetricKey = errors.New("invalid token key size")
+	// ErrTokenDuration is an error for when the token duration format is invalid
+	ErrTokenDuration = errors.New("invalid token duration format")
 	// ErrTokenCreation is an error for when the token creation fails
 	ErrTokenCreation = errors.New("error creating token")
 	// ErrExpiredToken is an error for when the access token is expired
