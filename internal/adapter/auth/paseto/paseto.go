@@ -48,21 +48,19 @@ func (pt *PasetoToken) CreateToken(user *domain.User) (string, error) {
 		return "", domain.ErrTokenCreation
 	}
 
-	issuedAt := time.Now()
-	expiredAt := issuedAt.Add(pt.duration)
-
 	payload := &domain.TokenPayload{
-		ID:        id,
-		UserID:    user.ID,
-		Role:      user.Role,
-		IssuedAt:  issuedAt,
-		ExpiredAt: expiredAt,
+		ID:     id,
+		UserID: user.ID,
+		Role:   user.Role,
 	}
 
 	err = pt.token.Set("payload", payload)
 	if err != nil {
 		return "", domain.ErrTokenCreation
 	}
+
+	issuedAt := time.Now()
+	expiredAt := issuedAt.Add(pt.duration)
 
 	pt.token.SetIssuedAt(issuedAt)
 	pt.token.SetNotBefore(issuedAt)
@@ -75,7 +73,7 @@ func (pt *PasetoToken) CreateToken(user *domain.User) (string, error) {
 
 // VerifyToken verifies the paseto token
 func (pt *PasetoToken) VerifyToken(token string) (*domain.TokenPayload, error) {
-	var payload domain.TokenPayload
+	var payload *domain.TokenPayload
 
 	parsedToken, err := pt.parser.ParseV4Local(*pt.key, token, nil)
 	if err != nil {
@@ -90,5 +88,5 @@ func (pt *PasetoToken) VerifyToken(token string) (*domain.TokenPayload, error) {
 		return nil, domain.ErrInvalidToken
 	}
 
-	return &payload, nil
+	return payload, nil
 }
