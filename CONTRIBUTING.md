@@ -19,11 +19,9 @@ To get started with the project, you can follow these steps:
 
 1. Fork this repository.
 2. Clone your forked repository to your local machine.
-3. Install the project dependencies: `task install`
-4. Create a copy of the `.env.example` file and rename it to `.env`. Update configuration values as needed.
-5. If not using devcontainer, run the database services (PostgreSQL and Redis): `docker compose up -d postgres redis`
-6. Run the migration: `task migrate:up`
-7. Start the development server: `task dev`
+3. Create a copy of the `.env.example` file and rename it to `.env`. Update configuration values as needed.
+4. Install the project dependencies, run Docker Compose, create database schema, and run database migrations: `task`
+5. Start the development server: `task dev`
 
 ## Submitting bug reports
 

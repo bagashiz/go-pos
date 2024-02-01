@@ -46,6 +46,9 @@ func (pr *PaymentRepository) CreatePayment(ctx context.Context, payment *domain.
 		&payment.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := pr.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 
@@ -152,6 +155,9 @@ func (pr *PaymentRepository) UpdatePayment(ctx context.Context, payment *domain.
 		&payment.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := pr.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 

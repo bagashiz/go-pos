@@ -2,10 +2,11 @@ package domain
 
 import (
 	"errors"
-	"strings"
 )
 
 var (
+	// ErrInternal is an error for when an internal service fails to process the request
+	ErrInternal = errors.New("internal error")
 	// ErrDataNotFound is an error for when requested data is not found
 	ErrDataNotFound = errors.New("data not found")
 	// ErrNoUpdatedData is an error for when no data is provided to update
@@ -16,8 +17,10 @@ var (
 	ErrInsufficientStock = errors.New("product stock is not enough")
 	// ErrInsufficientPayment is an error for when total paid is less than total price
 	ErrInsufficientPayment = errors.New("total paid is less than total price")
-	// ErrInvalidTokenSize is an error for when the token symmetric key size is invalid
-	ErrInvalidTokenSymmetricKey = errors.New("invalid token key size")
+	// ErrTokenDuration is an error for when the token duration format is invalid
+	ErrTokenDuration = errors.New("invalid token duration format")
+	// ErrTokenCreation is an error for when the token creation fails
+	ErrTokenCreation = errors.New("error creating token")
 	// ErrExpiredToken is an error for when the access token is expired
 	ErrExpiredToken = errors.New("access token has expired")
 	// ErrInvalidToken is an error for when the access token is invalid
@@ -35,8 +38,3 @@ var (
 	// ErrForbidden is an error for when the user is forbidden to access the resource
 	ErrForbidden = errors.New("user is forbidden to access the resource")
 )
-
-// IsUniqueConstraintViolationError checks if the error is a unique constraint violation error
-func IsUniqueConstraintViolationError(err error) bool {
-	return strings.Contains(err.Error(), "23505")
-}

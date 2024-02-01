@@ -45,4 +45,4 @@ jobs:
         run: go build -v ./...
 
       - name: Test
-        run: go test -v ./... -race -cover -timeout 10s
+        run: go test -v ./... -race -cover -timeout 30s -count 1

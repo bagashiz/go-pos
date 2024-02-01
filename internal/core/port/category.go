@@ -6,6 +6,8 @@ import (
 	"github.com/bagashiz/go-pos/internal/core/domain"
 )
 
+//go:generate mockgen -source=category.go -destination=mock/category.go -package=mock
+
 // CategoryRepository is an interface for interacting with category-related data
 type CategoryRepository interface {
 	// CreateCategory inserts a new category into the database

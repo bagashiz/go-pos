@@ -3,12 +3,11 @@ package paseto
 import (
 	"time"
 
+	"aidanwoods.dev/go-paseto"
 	"github.com/bagashiz/go-pos/internal/adapter/config"
 	"github.com/bagashiz/go-pos/internal/core/domain"
 	"github.com/bagashiz/go-pos/internal/core/port"
 	"github.com/google/uuid"
-	"github.com/o1egl/paseto"
-	"golang.org/x/crypto/chacha20poly1305"
 )
 
 /**
@@ -16,29 +15,28 @@ import (
  * and provides an access to the paseto library
  */
 type PasetoToken struct {
-	paseto       *paseto.V2
-	symmetricKey []byte
-	duration     time.Duration
+	token    *paseto.Token
+	key      *paseto.V4SymmetricKey
+	parser   *paseto.Parser
+	duration time.Duration
 }
 
 // New creates a new paseto instance
 func New(config *config.Token) (port.TokenService, error) {
-	symmetricKey := config.SymmetricKey
 	durationStr := config.Duration
-
-	validSymmetricKey := len(symmetricKey) == chacha20poly1305.KeySize
-	if !validSymmetricKey {
-		return nil, domain.ErrInvalidTokenSymmetricKey
-	}
-
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrTokenDuration
 	}
 
+	token := paseto.NewToken()
+	key := paseto.NewV4SymmetricKey()
+	parser := paseto.NewParser()
+
 	return &PasetoToken{
-		paseto.NewV2(),
-		[]byte(symmetricKey),
+		&token,
+		&key,
+		&parser,
 		duration,
 	}, nil
 }
@@ -47,36 +45,48 @@ func New(config *config.Token) (port.TokenService, error) {
 func (pt *PasetoToken) CreateToken(user *domain.User) (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
-		return "", err
+		return "", domain.ErrTokenCreation
 	}
 
-	payload := domain.TokenPayload{
-		ID:        id,
-		UserID:    user.ID,
-		Role:      user.Role,
-		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(pt.duration),
+	payload := &domain.TokenPayload{
+		ID:     id,
+		UserID: user.ID,
+		Role:   user.Role,
 	}
 
-	token, err := pt.paseto.Encrypt(pt.symmetricKey, payload, nil)
+	err = pt.token.Set("payload", payload)
+	if err != nil {
+		return "", domain.ErrTokenCreation
+	}
 
-	return token, err
+	issuedAt := time.Now()
+	expiredAt := issuedAt.Add(pt.duration)
 
+	pt.token.SetIssuedAt(issuedAt)
+	pt.token.SetNotBefore(issuedAt)
+	pt.token.SetExpiration(expiredAt)
+
+	token := pt.token.V4Encrypt(*pt.key, nil)
+
+	return token, nil
 }
 
 // VerifyToken verifies the paseto token
 func (pt *PasetoToken) VerifyToken(token string) (*domain.TokenPayload, error) {
-	var payload domain.TokenPayload
+	var payload *domain.TokenPayload
 
-	err := pt.paseto.Decrypt(token, pt.symmetricKey, &payload, nil)
+	parsedToken, err := pt.parser.ParseV4Local(*pt.key, token, nil)
+	if err != nil {
+		if err.Error() == "this token has expired" {
+			return nil, domain.ErrExpiredToken
+		}
+		return nil, domain.ErrInvalidToken
+	}
+
+	err = parsedToken.Get("payload", &payload)
 	if err != nil {
 		return nil, domain.ErrInvalidToken
 	}
 
-	isExpired := time.Now().After(payload.ExpiredAt)
-	if isExpired {
-		return nil, domain.ErrExpiredToken
-	}
-
-	return &payload, nil
+	return payload, nil
 }

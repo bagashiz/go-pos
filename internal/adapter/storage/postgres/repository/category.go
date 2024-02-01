@@ -44,6 +44,9 @@ func (cr *CategoryRepository) CreateCategory(ctx context.Context, category *doma
 		&category.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := cr.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 
@@ -138,6 +141,9 @@ func (cr *CategoryRepository) UpdateCategory(ctx context.Context, category *doma
 		&category.UpdatedAt,
 	)
 	if err != nil {
+		if errCode := cr.db.ErrorCode(err); errCode == "23505" {
+			return nil, domain.ErrConflictingData
+		}
 		return nil, err
 	}
 
