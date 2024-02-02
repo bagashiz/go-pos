@@ -194,13 +194,13 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 		Role:     req.Role,
 	}
 
-	_, err = uh.svc.UpdateUser(ctx, &user)
+	updatedUser, err := uh.svc.UpdateUser(ctx, &user)
 	if err != nil {
 		handleError(ctx, err)
 		return
 	}
 
-	rsp := newUserResponse(&user)
+	rsp := newUserResponse(updatedUser)
 
 	handleSuccess(ctx, rsp)
 }

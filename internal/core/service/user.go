@@ -163,7 +163,7 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 
 	user.Password = hashedPassword
 
-	_, err = us.repo.UpdateUser(ctx, user)
+	updatedUser, err := us.repo.UpdateUser(ctx, user)
 	if err != nil {
 		if err == domain.ErrConflictingData {
 			return nil, err
@@ -193,7 +193,7 @@ func (us *UserService) UpdateUser(ctx context.Context, user *domain.User) (*doma
 		return nil, domain.ErrInternal
 	}
 
-	return user, nil
+	return updatedUser, nil
 }
 
 // DeleteUser deletes a user by ID
