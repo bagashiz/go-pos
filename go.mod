@@ -18,7 +18,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
-	github.com/swaggo/swag v1.16.2
+	github.com/swaggo/swag v1.16.3
 	go.uber.org/mock v0.4.0
 	golang.org/x/crypto v0.18.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
