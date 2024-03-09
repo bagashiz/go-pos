@@ -1,6 +1,6 @@
 {
     "name": "go-pos",
-    "image": "mcr.microsoft.com/devcontainers/go:1.21-bookworm",
+    "image": "mcr.microsoft.com/devcontainers/go:1.22-bookworm",
     "runArgs": [
         "--name",
         "go-pos",
