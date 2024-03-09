@@ -30,7 +30,7 @@ docker-compose*.yml
 Makefile
 coverage*
 .*ignore
-*.env
+.env*
 *.log
 *.md
 *.out

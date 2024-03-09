@@ -6,7 +6,7 @@ First and foremost, thank you for your interest in contributing to Go POS projec
 
 Before you start contributing to the project, you will need to set up your development environment. To get started, you should have the following software installed:
 
-- [Go](https://golang.org/) 1.21 or higher
+- [Go](https://golang.org/) 1.22 or higher
 - [Task](https://taskfile.dev/)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
