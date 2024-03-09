@@ -10,7 +10,7 @@ This project idea was inspired by the [Ide Project untuk Upgrade Portfolio Backe
 
 ## Getting Started
 
-1. If you do not use devcontainer, ensure you have [Go](https://go.dev/dl/) 1.21 or higher and [Task](https://taskfile.dev/installation/) installed on your machine:
+1. If you do not use devcontainer, ensure you have [Go](https://go.dev/dl/) 1.23 or higher and [Task](https://taskfile.dev/installation/) installed on your machine:
 
     ```bash
     go version && task --version
