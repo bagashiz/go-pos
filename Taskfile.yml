@@ -13,11 +13,7 @@ tasks:
   default:
     desc: "Gettings started"
     cmds:
-      - task: service:up
       - task: install
-      - sleep 5 # wait for postgres to start
-      - task: db:create
-      - task: migrate:up
 
   install:
     desc: "Install dependencies"
