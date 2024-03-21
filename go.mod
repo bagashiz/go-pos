@@ -13,7 +13,7 @@ require (
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.5.1
-	github.com/samber/slog-gin v1.10.2
+	github.com/samber/slog-gin v1.11.0
 	github.com/samber/slog-multi v1.0.2
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1
