@@ -155,8 +155,8 @@ github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDN
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
 github.com/samber/lo v1.38.1 h1:j2XEAqXKb09Am4ebOg31SpvzUTTs6EN3VfgeLUhPdXM=
 github.com/samber/lo v1.38.1/go.mod h1:+m/ZKRl6ClXCE2Lgf3MsQlWfh4bn1bz6CXEOxnEXnEA=
-github.com/samber/slog-gin v1.12.1 h1:cVNbmf/vEktrJkTJzyfnlDDE8MUVSzgrFpnzqqUcTLo=
-github.com/samber/slog-gin v1.12.1/go.mod h1:i6SkTHMmyiy2lBYBaVrJIktLl5lLOyW84ts1PKpC+SQ=
+github.com/samber/slog-gin v1.13.0 h1:xfELV0vyGJzx5yG0WNlL+NP/0XmNBQ7+E/7uIpw7NYA=
+github.com/samber/slog-gin v1.13.0/go.mod h1:i6SkTHMmyiy2lBYBaVrJIktLl5lLOyW84ts1PKpC+SQ=
 github.com/samber/slog-multi v1.0.2 h1:6BVH9uHGAsiGkbbtQgAOQJMpKgV8unMrHhhJaw+X1EQ=
 github.com/samber/slog-multi v1.0.2/go.mod h1:uLAvHpGqbYgX4FSL0p1ZwoLuveIAJvBECtE07XmYvFo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
