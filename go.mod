@@ -3,7 +3,7 @@ module github.com/bagashiz/go-pos
 go 1.22
 
 require (
-	aidanwoods.dev/go-paseto v1.5.1
+	aidanwoods.dev/go-paseto v1.5.2
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/gin-contrib/cors v1.7.2
