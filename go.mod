@@ -14,7 +14,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/samber/slog-gin v1.13.3
-	github.com/samber/slog-multi v1.1.0
+	github.com/samber/slog-multi v1.2.1
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
